@@ -23,13 +23,13 @@ public class TicketPaymentService {
 
 	@Transactional
 	public void paymentTicket(TicketContext ticketContext) {
-		pointService.decreasePoint(ticketContext.getMember().getId(), ticketContext.getTotalPoint(),
+		pointService.decreasePoint(ticketContext.getMemberId(), ticketContext.getTotalPoint(),
 			PointHistoryType.RESERVATION);
-		create(ticketContext.getTicket(), ticketContext.getMember(), ticketContext.getTotalPoint());
+		create(ticketContext.getTicket(), ticketContext.getMemberId(), ticketContext.getTotalPoint());
 	}
 
-	public void create(Ticket ticket, Member member, int point) {
-		TicketPayment ticketPayment = new TicketPayment(point, ticket, member);
+	public void create(Ticket ticket, Long memberId, int point) {
+		TicketPayment ticketPayment = new TicketPayment(point, ticket, memberId);
 		ticketPaymentRepository.save(ticketPayment);
 	}
 

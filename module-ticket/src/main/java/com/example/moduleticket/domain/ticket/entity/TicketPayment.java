@@ -1,6 +1,7 @@
 package com.example.moduleticket.domain.ticket.entity;
 
 import com.example.modulecommon.entity.Timestamped;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -30,15 +31,14 @@ public class TicketPayment extends Timestamped {
 	@JoinColumn(name = "ticket_id", nullable = false)
 	private Ticket ticket;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "member_id", nullable = false)
-	private Member member;
+	@Column(nullable = false)
+	private Long memberId;
 
 	@Builder
-	public TicketPayment(Integer totalPoint, Ticket ticket, Member member) {
+	public TicketPayment(Integer totalPoint, Ticket ticket, Long memberId) {
 		this.totalPoint = totalPoint;
 		this.ticket = ticket;
-		this.member = member;
+		this.memberId = memberId;
 	}
 	
 }

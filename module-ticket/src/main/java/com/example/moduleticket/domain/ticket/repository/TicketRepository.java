@@ -11,9 +11,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
 	@Query("SELECT t "
 		+ "   FROM Ticket t "
-		+ "   JOIN FETCH t.game "
 		+ "  WHERE t.id = :id "
-		+ "    AND t.member.id = :memberId "
+		+ "    AND t.memberId = :memberId "
 		+ "    AND t.deletedAt is null ")
 	Optional<Ticket> findByIdAndMemberIdWithGame(Long id, Long memberId);
 
@@ -24,8 +23,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 	Optional<Ticket> findByIdWithMember(Long id);
 
 	@Query("SELECT t "
-		+ "   FROM Ticket t JOIN FETCH t.game "
-		+ "  WHERE t.member.id = :memberId "
+		+ "   FROM Ticket t  "
+		+ "  WHERE t.memberId = :memberId "
 		+ "    AND t.deletedAt is null ")
 	List<Ticket> findAllByMemberIdWithGame(Long memberId);
 
