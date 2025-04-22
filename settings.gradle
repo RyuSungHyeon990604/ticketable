@@ -1,0 +1,5 @@
+rootProject.name = 'multi-test'
+include ':module-common'
+include ':module-ticket'
+include ':module-auth'
+include ':module-game'
