@@ -88,6 +88,7 @@ public class ReservationService {
 
 		//authUser가 선점한 좌석이맞는지 최종 확인 & TTL만료시 에약완료 불가
 		try {
+			ticketSeatService.checkDuplicateSeats(seatIds, gameId);
 			seatHoldRedisUtil.checkHeldSeatAtomic(seatIds, gameId, String.valueOf(authUser.getMemberId()));
 		} catch (ServerException e) {
 			// 선점한 좌석이 만료되었을경우 예약상태를 만료상태로 변경
@@ -98,10 +99,11 @@ public class ReservationService {
 			throw e;
 		}
 
-		ReservationDto reservationDto = ReservationDto.from(reservation);
+		GameDto gameDto = gameClient.getGame(gameId);
+		List<SeatDto> seatDtos = seatClient.getSeats(gameId, seatIds);
 
 		//티켓 정보를 생성
-		TicketResponse ticketResponse = ticketService.issueTicketFromReservation(authUser, reservationDto);
+		TicketResponse ticketResponse = ticketService.issueTicketFromReservation(authUser, gameDto, seatDtos, reservation.getTotalPrice());
 
 		reservation.completePayment();
 		eventPublisher.publishEvent(new SeatHoldReleaseEvent(seatIds, gameId));

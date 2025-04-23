@@ -5,17 +5,13 @@ import static com.example.modulecommon.exception.ErrorCode.USER_ACCESS_DENIED;
 
 import com.example.modulecommon.entity.AuthUser;
 import com.example.modulecommon.exception.ServerException;
-import com.example.moduleticket.domain.reservation.dto.ReservationDto;
+import com.example.moduleticket.domain.ticket.dto.TicketContext;
+import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
+import com.example.moduleticket.domain.ticket.entity.Ticket;
+import com.example.moduleticket.domain.ticket.repository.TicketRepository;
 import com.example.moduleticket.feign.GameClient;
 import com.example.moduleticket.feign.dto.GameDto;
 import com.example.moduleticket.feign.dto.SeatDto;
-import com.example.moduleticket.domain.ticket.dto.TicketContext;
-import com.example.moduleticket.domain.ticket.dto.request.TicketCreateRequest;
-import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
-import com.example.moduleticket.domain.ticket.entity.Ticket;
-import com.example.moduleticket.domain.ticket.event.SeatHoldReleaseEvent;
-import com.example.moduleticket.domain.ticket.repository.TicketRepository;
-import com.example.moduleticket.util.SeatHoldRedisUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +19,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,14 +31,12 @@ public class TicketService {
 	private final TicketSeatService ticketSeatService;
 	private final TicketPaymentService ticketPaymentService;
 	private final TicketCreateService ticketCreateService;
-	private final SeatHoldRedisUtil seatHoldRedisUtil;
-	private final ApplicationEventPublisher eventPublisher;
 	private final GameClient gameClient;
 
 	@Transactional(readOnly = true)
 	public TicketResponse getTicket(AuthUser auth, Long ticketId) {
 		Ticket ticket = ticketRepository.findByIdAndMemberIdAndDeletedAtIsNull(ticketId, auth.getMemberId())
-				.orElseThrow(() -> new ServerException(TICKET_NOT_FOUND));
+			.orElseThrow(() -> new ServerException(TICKET_NOT_FOUND));
 		Long gameId = ticket.getGameId();
 		GameDto gameDto = gameClient.getGame(gameId);
 
@@ -56,45 +49,19 @@ public class TicketService {
 
 		List<Long> gameIds = allTickets.stream().map(Ticket::getGameId).toList();
 		List<GameDto> gameDtos = gameClient.getGames(gameIds);
-		Map<Long, GameDto> gameDtoMap = gameDtos.stream().collect(Collectors.toMap(GameDto::getId, Function.identity()));
+		Map<Long, GameDto> gameDtoMap = gameDtos.stream()
+			.collect(Collectors.toMap(GameDto::getId, Function.identity()));
 
-		return allTickets.stream().map(ticket -> convertTicketResponse(ticket, gameDtoMap.get(ticket.getGameId()))).toList();
+		return allTickets.stream().map(ticket -> convertTicketResponse(ticket, gameDtoMap.get(ticket.getGameId())))
+			.toList();
 	}
 
 	@Transactional
-	public TicketResponse reservationTicketV4(AuthUser auth, TicketCreateRequest ticketCreateRequest) {
-		log.debug("사용자 : {}, 좌석 : {} 예매 신청", auth.getMemberId(), ticketCreateRequest.getSeats());
+	public TicketResponse issueTicketFromReservation(AuthUser auth, GameDto gameDto, List<SeatDto> seats,
+		int totalPrice) {
 
-
-		//todo : seatValidator에게 위임 아마 seatClient?
-		seatHoldRedisUtil.checkHeldSeatAtomic(ticketCreateRequest.getSeats(), ticketCreateRequest.getGameId(), String.valueOf(auth.getMemberId()));
-		ticketSeatService.checkDuplicateSeats(ticketCreateRequest.getSeats(), ticketCreateRequest.getGameId());
-
-		TicketContext ticketContext = ticketCreateService.createTicketV2(auth, ticketCreateRequest);
+		TicketContext ticketContext = ticketCreateService.createTicket(auth, gameDto, seats, totalPrice);
 		ticketPaymentService.paymentTicket(ticketContext);
-
-		eventPublisher.publishEvent(new SeatHoldReleaseEvent(ticketCreateRequest.getSeats(), ticketCreateRequest.getGameId()));
-
-		// 캐싱
-		//gameCacheService.handleAfterTicketChangeAll(ticketCreateRequest.getGameId(), ticketContext.getSeats().get(0));
-
-		return ticketContext.toResponse();
-	}
-
-	@Transactional
-	public TicketResponse issueTicketFromReservation(AuthUser auth, ReservationDto reservationDto) {
-		log.debug("사용자 : {}, 좌석 : {} 예매 신청", auth.getMemberId(), reservationDto.getSeatIds());
-
-
-		//todo : seatValidator에게 위임 아마 seatClient?
-		seatHoldRedisUtil.checkHeldSeatAtomic(reservationDto.getSeatIds(), reservationDto.getGameId(), String.valueOf(auth.getMemberId()));
-		ticketSeatService.checkDuplicateSeats(reservationDto.getSeatIds(), reservationDto.getGameId());
-
-		TicketContext ticketContext = ticketCreateService.createTicketV3(auth, reservationDto);
-		ticketPaymentService.paymentTicket(ticketContext);
-
-		// 캐싱
-		//gameCacheService.handleAfterTicketChangeAll(ticketCreateRequest.getGameId(), ticketContext.getSeats().get(0));
 
 		return ticketContext.toResponse();
 	}
@@ -104,7 +71,7 @@ public class TicketService {
 
 		// 1. 티켓 취소 처리
 		Ticket ticket = ticketRepository.findByIdAndDeletedAtIsNull(ticketId, auth.getMemberId())
-				.orElseThrow(() -> new ServerException(TICKET_NOT_FOUND));
+			.orElseThrow(() -> new ServerException(TICKET_NOT_FOUND));
 		if (auth.getRole().equals("AMDIN") && !auth.getMemberId().equals(ticket.getMemberId())) {
 			throw new ServerException(USER_ACCESS_DENIED);
 		}
@@ -113,6 +80,7 @@ public class TicketService {
 		// 2. 환불금 조회
 		int refund = ticketPaymentService.getTicketTotalPoint(ticketId);
 
+		//todo : 포인트 환불 처리
 		// 3. 사용자 포인트 환불
 		//pointService.increasePoint(ticket.getMemberId(), refund, PointHistoryType.REFUND);
 
@@ -126,6 +94,7 @@ public class TicketService {
 	 */
 	@Transactional
 	public void deleteAllTicketsByCanceledGame(Long gameId) {
+		//todo : 환불로직 추가
 		ticketRepository.softDeleteAllByGameId(gameId);
 	}
 
