@@ -1,8 +1,10 @@
 package com.example.modulegame.domain.stadium.repository;
 
 
-import com.example.ticketable.domain.stadium.entity.Seat;
+
 import java.util.List;
+
+import com.example.modulegame.domain.stadium.entity.Seat;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

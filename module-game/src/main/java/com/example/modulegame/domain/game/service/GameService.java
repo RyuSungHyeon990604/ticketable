@@ -1,27 +1,26 @@
 package com.example.modulegame.domain.game.service;
 
-import com.example.ticketable.common.exception.ErrorCode;
-import com.example.ticketable.common.exception.ServerException;
-import com.example.ticketable.common.service.ImageService;
-import com.example.ticketable.domain.auction.service.AuctionService;
-import com.example.ticketable.domain.game.dto.request.GameCreateRequest;
-import com.example.ticketable.domain.game.dto.request.GameUpdateRequest;
-import com.example.ticketable.domain.game.dto.response.GameCreateResponse;
-import com.example.ticketable.domain.game.dto.response.GameGetResponse;
-import com.example.ticketable.domain.game.dto.response.GameUpdateResponse;
-import com.example.ticketable.domain.game.entity.Game;
-import com.example.ticketable.domain.game.repository.GameRepository;
-import com.example.ticketable.domain.stadium.dto.response.SeatGetResponse;
-import com.example.ticketable.domain.stadium.dto.response.SectionSeatCountResponse;
-import com.example.ticketable.domain.stadium.dto.response.SectionTypeSeatCountResponse;
-import com.example.ticketable.domain.stadium.dto.response.StadiumGetResponse;
-import com.example.ticketable.domain.stadium.entity.Stadium;
-import com.example.ticketable.domain.stadium.service.StadiumService;
-import com.example.ticketable.domain.ticket.service.TicketService;
+import com.example.modulecommon.exception.ErrorCode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import com.example.modulecommon.exception.ServerException;
+import com.example.modulegame.common.image.ImageService;
+import com.example.modulegame.domain.game.dto.request.GameCreateRequest;
+import com.example.modulegame.domain.game.dto.request.GameUpdateRequest;
+import com.example.modulegame.domain.game.dto.response.GameCreateResponse;
+import com.example.modulegame.domain.game.dto.response.GameGetResponse;
+import com.example.modulegame.domain.game.dto.response.GameUpdateResponse;
+import com.example.modulegame.domain.game.entity.Game;
+import com.example.modulegame.domain.game.repository.GameRepository;
+import com.example.modulegame.domain.stadium.dto.response.SeatGetResponse;
+import com.example.modulegame.domain.stadium.dto.response.SectionSeatCountResponse;
+import com.example.modulegame.domain.stadium.dto.response.SectionTypeSeatCountResponse;
+import com.example.modulegame.domain.stadium.dto.response.StadiumGetResponse;
+import com.example.modulegame.domain.stadium.entity.Stadium;
+import com.example.modulegame.domain.stadium.service.StadiumService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,15 +32,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class GameService {
     private final GameRepository gameRepository;
-
     private final StadiumService stadiumService;
-    private final TicketService ticketService;
-    private final AuctionService auctionService;
-
     private final ImageService imageService;
-
     private final GameCacheService gameCacheService;
-
     private static final String GAME_FOLDER = "game/";
 
     @Transactional
@@ -114,8 +107,8 @@ public class GameService {
     public void deleteGames(Long gameId) {
         Game game = gameRepository.findById(gameId).orElseThrow(() -> new ServerException(ErrorCode.GAME_NOT_FOUND));
         game.cancel();
-        ticketService.deleteAllTicketsByCanceledGame(gameId);
-        auctionService.deleteAllAuctionsByCanceledGame(gameId);
+//        ticketService.deleteAllTicketsByCanceledGame(gameId);
+//        auctionService.deleteAllAuctionsByCanceledGame(gameId);
         gameCacheService.clearAllGameCaches();
     }
 

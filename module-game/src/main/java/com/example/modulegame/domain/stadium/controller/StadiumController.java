@@ -1,10 +1,11 @@
 package com.example.modulegame.domain.stadium.controller;
 
-import com.example.ticketable.domain.stadium.dto.request.StadiumCreateRequest;
-import com.example.ticketable.domain.stadium.dto.request.StadiumUpdateRequest;
-import com.example.ticketable.domain.stadium.dto.response.StadiumCreateResponse;
-import com.example.ticketable.domain.stadium.dto.response.StadiumUpdateResponse;
-import com.example.ticketable.domain.stadium.service.StadiumService;
+
+import com.example.modulegame.domain.stadium.dto.request.StadiumCreateRequest;
+import com.example.modulegame.domain.stadium.dto.request.StadiumUpdateRequest;
+import com.example.modulegame.domain.stadium.dto.response.StadiumCreateResponse;
+import com.example.modulegame.domain.stadium.dto.response.StadiumUpdateResponse;
+import com.example.modulegame.domain.stadium.service.StadiumService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

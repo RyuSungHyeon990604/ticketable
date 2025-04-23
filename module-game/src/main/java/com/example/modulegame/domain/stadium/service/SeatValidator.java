@@ -1,12 +1,14 @@
 package com.example.modulegame.domain.stadium.service;
 
-import static com.example.ticketable.common.exception.ErrorCode.SEAT_NOT_FOUND;
 
-import com.example.ticketable.common.exception.ServerException;
-import com.example.ticketable.domain.game.repository.GameRepository;
 import java.util.List;
+
+import com.example.modulecommon.exception.ServerException;
+import com.example.modulegame.domain.game.repository.GameRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import static com.example.modulecommon.exception.ErrorCode.SEAT_NOT_FOUND;
 
 @Component
 @RequiredArgsConstructor
