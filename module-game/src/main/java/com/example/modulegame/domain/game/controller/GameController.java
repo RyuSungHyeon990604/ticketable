@@ -98,7 +98,7 @@ public class GameController {
 
     @GetMapping("/internal/games")
     public ResponseEntity<List<GameDto>> getGame(
-        @RequestBody List<Long> gameIds
+        @RequestParam List<Long> gameIds
     ) {
         return ResponseEntity.ok(gameService.getGameDtoList(gameIds));
     }

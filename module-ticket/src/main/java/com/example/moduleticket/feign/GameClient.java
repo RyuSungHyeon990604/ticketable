@@ -6,6 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name = "game", url = "http://localhost:8081")
 public interface GameClient {
@@ -14,5 +15,5 @@ public interface GameClient {
 	public GameDto getGame(@PathVariable Long gameId);
 
 	@GetMapping("/api/internal/games")
-	public List<GameDto> getGames(@RequestBody List<Long> gameIds);
+	public List<GameDto> getGames(@RequestParam List<Long> gameIds);
 }
