@@ -1,6 +1,7 @@
 package com.example.modulegame.domain.stadium.dto.response;
 
-import com.example.ticketable.domain.stadium.entity.Stadium;
+
+import com.example.modulegame.domain.stadium.entity.Stadium;
 import lombok.Getter;
 
 @Getter

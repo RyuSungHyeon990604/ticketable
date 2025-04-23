@@ -1,7 +1,8 @@
 package com.example.modulegame.domain.game.repository;
 
-import com.example.ticketable.domain.game.entity.Game;
-import com.example.ticketable.domain.game.entity.QGame;
+
+import com.example.modulegame.domain.game.entity.Game;
+import com.example.modulegame.domain.game.entity.QGame;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;

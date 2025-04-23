@@ -1,14 +1,15 @@
 package com.example.modulegame.domain.game.controller;
 
-import com.example.ticketable.domain.game.dto.request.GameCreateRequest;
-import com.example.ticketable.domain.game.dto.request.GameUpdateRequest;
-import com.example.ticketable.domain.game.dto.response.GameCreateResponse;
-import com.example.ticketable.domain.game.dto.response.GameGetResponse;
-import com.example.ticketable.domain.game.dto.response.GameUpdateResponse;
-import com.example.ticketable.domain.game.service.GameService;
-import com.example.ticketable.domain.stadium.dto.response.SeatGetResponse;
-import com.example.ticketable.domain.stadium.dto.response.SectionSeatCountResponse;
-import com.example.ticketable.domain.stadium.dto.response.StadiumGetResponse;
+
+import com.example.modulegame.domain.game.dto.request.GameCreateRequest;
+import com.example.modulegame.domain.game.dto.request.GameUpdateRequest;
+import com.example.modulegame.domain.game.dto.response.GameCreateResponse;
+import com.example.modulegame.domain.game.dto.response.GameGetResponse;
+import com.example.modulegame.domain.game.dto.response.GameUpdateResponse;
+import com.example.modulegame.domain.game.service.GameService;
+import com.example.modulegame.domain.stadium.dto.response.SeatGetResponse;
+import com.example.modulegame.domain.stadium.dto.response.SectionSeatCountResponse;
+import com.example.modulegame.domain.stadium.dto.response.StadiumGetResponse;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;

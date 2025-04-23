@@ -1,14 +1,13 @@
 package com.example.modulegame.domain.game.service;
 
-import com.example.ticketable.domain.game.entity.Game;
-import com.example.ticketable.domain.game.repository.GameRepository;
-import com.example.ticketable.domain.game.util.GameCacheHelper;
-import com.example.ticketable.domain.stadium.dto.response.SeatGetResponse;
-import com.example.ticketable.domain.stadium.dto.response.SectionSeatCountResponse;
-import com.example.ticketable.domain.stadium.dto.response.SectionTypeSeatCountResponse;
-import com.example.ticketable.domain.stadium.entity.Seat;
-import java.time.LocalDateTime;
-import java.util.List;
+
+import com.example.modulegame.domain.game.entity.Game;
+import com.example.modulegame.domain.game.repository.GameRepository;
+import com.example.modulegame.domain.game.util.GameCacheHelper;
+import com.example.modulegame.domain.stadium.dto.response.SeatGetResponse;
+import com.example.modulegame.domain.stadium.dto.response.SectionSeatCountResponse;
+import com.example.modulegame.domain.stadium.dto.response.SectionTypeSeatCountResponse;
+import com.example.modulegame.domain.stadium.entity.Seat;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
@@ -16,6 +15,9 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor

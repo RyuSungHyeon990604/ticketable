@@ -1,8 +1,8 @@
-package com.example.moduleticket.domain.auction.repository;
-
-
-import com.example.moduleticket.domain.auction.entity.AuctionTicketInfo;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface AuctionTicketInfoRepository extends JpaRepository<AuctionTicketInfo, Long>, AuctionTicketInfoRepositoryQuery {
-}
+//package com.example.moduleticket.domain.auction.repository;
+//
+//
+//import com.example.moduleticket.domain.auction.entity.AuctionTicketInfo;
+//import org.springframework.data.jpa.repository.JpaRepository;
+//
+//public interface AuctionTicketInfoRepository extends JpaRepository<AuctionTicketInfo, Long>, AuctionTicketInfoRepositoryQuery {
+//}
