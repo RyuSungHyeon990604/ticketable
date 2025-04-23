@@ -28,7 +28,7 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
         "          on section.stadium = stadium " +
         "   left join Seat seat " +
         "          on seat.section = section " +
-        " where seat.id in :ids" +
+        " where seat.id in :seatIds" +
         "   and game.id = :gameId "
     )
     List<SeatDto> findSeatDtosByGameIdAndSeatIds(Long gameId, List<Long> seatIds);
