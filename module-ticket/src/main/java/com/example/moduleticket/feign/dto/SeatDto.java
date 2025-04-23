@@ -1,4 +1,4 @@
-package com.example.moduleticket.domain.ticket.dto;
+package com.example.moduleticket.feign.dto;
 
 import lombok.Getter;
 

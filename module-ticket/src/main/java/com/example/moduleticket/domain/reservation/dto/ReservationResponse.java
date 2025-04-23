@@ -1,8 +1,8 @@
 package com.example.moduleticket.domain.reservation.dto;
 
 import com.example.moduleticket.domain.reservation.entity.Reservation;
-import com.example.moduleticket.domain.ticket.dto.GameDto;
-import com.example.moduleticket.domain.ticket.dto.SeatDto;
+import com.example.moduleticket.feign.dto.GameDto;
+import com.example.moduleticket.feign.dto.SeatDto;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;

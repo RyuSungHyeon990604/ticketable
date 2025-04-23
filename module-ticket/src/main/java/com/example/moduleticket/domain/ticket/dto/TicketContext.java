@@ -1,5 +1,7 @@
 package com.example.moduleticket.domain.ticket.dto;
 
+import com.example.moduleticket.feign.dto.GameDto;
+import com.example.moduleticket.feign.dto.SeatDto;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
 import java.util.List;

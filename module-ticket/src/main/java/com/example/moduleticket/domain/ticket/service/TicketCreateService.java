@@ -1,9 +1,11 @@
 package com.example.moduleticket.domain.ticket.service;
 
 import com.example.modulecommon.entity.AuthUser;
+import com.example.moduleticket.feign.GameService;
 import com.example.moduleticket.domain.reservation.dto.ReservationDto;
-import com.example.moduleticket.domain.ticket.dto.GameDto;
-import com.example.moduleticket.domain.ticket.dto.SeatDto;
+import com.example.moduleticket.feign.SeatService;
+import com.example.moduleticket.feign.dto.GameDto;
+import com.example.moduleticket.feign.dto.SeatDto;
 import com.example.moduleticket.domain.ticket.dto.TicketContext;
 import com.example.moduleticket.domain.ticket.dto.request.TicketCreateRequest;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
@@ -24,16 +26,15 @@ public class TicketCreateService {
 	private final TicketRepository ticketRepository;
 	private final TicketSeatService ticketSeatService;
 	private final TicketPriceCalculator ticketPriceCalculator;
+	private final GameService gameService;
+	private final SeatService seatService;
 
 	@Transactional
 	public TicketContext createTicketV2(AuthUser auth, TicketCreateRequest ticketCreateRequest) {
 
-		//todo : api 호출해야함
-		List<SeatDto> seats = new ArrayList<>();
-		GameDto game = new GameDto();
-
-		//todo : 인증서버가 주는거 받기
-		Long memberId = 1L;
+		List<SeatDto> seats = seatService.getSeats(ticketCreateRequest.getSeats());
+		GameDto game = gameService.getGame(ticketCreateRequest.getGameId());
+		Long memberId = auth.getMemberId();
 
 		Ticket ticket = ticketRepository.save(new Ticket(memberId, game.getId()));
 		ticketSeatService.createAll(seats, game, ticket);
@@ -48,8 +49,8 @@ public class TicketCreateService {
 	public TicketContext createTicketV3(AuthUser auth, ReservationDto reservationDto) {
 
 		//todo : api 호출해야함
-		List<SeatDto> seats = new ArrayList<>();
-		GameDto game = new GameDto();
+		List<SeatDto> seats = seatService.getSeats(reservationDto.getSeatIds());
+		GameDto game = gameService.getGame(reservationDto.getGameId());
 
 		Ticket ticket = ticketRepository.save(new Ticket(auth.getMemberId(), game.getId()));
 		ticketSeatService.createAll(seats, game, ticket);

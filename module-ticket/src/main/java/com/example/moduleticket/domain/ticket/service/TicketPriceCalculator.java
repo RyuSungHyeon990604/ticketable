@@ -1,7 +1,7 @@
 package com.example.moduleticket.domain.ticket.service;
 
-import com.example.moduleticket.domain.ticket.dto.GameDto;
-import com.example.moduleticket.domain.ticket.dto.SeatDto;
+import com.example.moduleticket.feign.dto.GameDto;
+import com.example.moduleticket.feign.dto.SeatDto;
 import java.time.DayOfWeek;
 import java.util.List;
 import org.springframework.stereotype.Component;

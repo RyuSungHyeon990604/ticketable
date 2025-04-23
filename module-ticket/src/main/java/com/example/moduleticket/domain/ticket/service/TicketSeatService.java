@@ -3,8 +3,9 @@ package com.example.moduleticket.domain.ticket.service;
 import static com.example.modulecommon.exception.ErrorCode.TICKET_ALREADY_RESERVED;
 
 import com.example.modulecommon.exception.ServerException;
-import com.example.moduleticket.domain.ticket.dto.GameDto;
-import com.example.moduleticket.domain.ticket.dto.SeatDto;
+import com.example.moduleticket.feign.SeatService;
+import com.example.moduleticket.feign.dto.GameDto;
+import com.example.moduleticket.feign.dto.SeatDto;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
 import com.example.moduleticket.domain.ticket.entity.TicketSeat;
 import com.example.moduleticket.domain.ticket.repository.TicketSeatRepository;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TicketSeatService {
 	private final TicketSeatRepository ticketSeatRepository;
+	private final SeatService seatService;
 
 	public void createAll(List<SeatDto> seats, GameDto game, Ticket ticket) {
 		List<TicketSeat> ticketSeats = seats.stream().map(seat -> new TicketSeat(ticket, seat.getSeatId(), game.getId())).toList();
@@ -35,8 +37,8 @@ public class TicketSeatService {
 	public List<SeatDto> getSeatByTicketSeatId(Long ticketId) {
 		List<TicketSeat> ticketSeats = ticketSeatRepository.findByTicketId(ticketId);
 		List<Long> seatIds = ticketSeats.stream().map(TicketSeat::getSeatId).toList();
-		//todo : seatIds로 seatDtos요청
-		List<SeatDto> seatDtos = new ArrayList<>();
+		List<SeatDto> seatDtos = seatService.getSeats(seatIds);
+
 		return  seatDtos;
 	}
 
