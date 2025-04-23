@@ -1,16 +1,15 @@
 package com.example.moduleticket.domain.ticket.service;
 
 import com.example.modulecommon.entity.AuthUser;
-import com.example.moduleticket.feign.GameService;
+import com.example.moduleticket.feign.GameClient;
 import com.example.moduleticket.domain.reservation.dto.ReservationDto;
-import com.example.moduleticket.feign.SeatService;
+import com.example.moduleticket.feign.SeatClient;
 import com.example.moduleticket.feign.dto.GameDto;
 import com.example.moduleticket.feign.dto.SeatDto;
 import com.example.moduleticket.domain.ticket.dto.TicketContext;
 import com.example.moduleticket.domain.ticket.dto.request.TicketCreateRequest;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
 import com.example.moduleticket.domain.ticket.repository.TicketRepository;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,14 +25,14 @@ public class TicketCreateService {
 	private final TicketRepository ticketRepository;
 	private final TicketSeatService ticketSeatService;
 	private final TicketPriceCalculator ticketPriceCalculator;
-	private final GameService gameService;
-	private final SeatService seatService;
+	private final GameClient gameClient;
+	private final SeatClient seatClient;
 
 	@Transactional
 	public TicketContext createTicketV2(AuthUser auth, TicketCreateRequest ticketCreateRequest) {
 
-		List<SeatDto> seats = seatService.getSeats(ticketCreateRequest.getSeats());
-		GameDto game = gameService.getGame(ticketCreateRequest.getGameId());
+		List<SeatDto> seats = seatClient.getSeats(ticketCreateRequest.getSeats());
+		GameDto game = gameClient.getGame(ticketCreateRequest.getGameId());
 		Long memberId = auth.getMemberId();
 
 		Ticket ticket = ticketRepository.save(new Ticket(memberId, game.getId()));
@@ -49,8 +48,8 @@ public class TicketCreateService {
 	public TicketContext createTicketV3(AuthUser auth, ReservationDto reservationDto) {
 
 		//todo : api 호출해야함
-		List<SeatDto> seats = seatService.getSeats(reservationDto.getSeatIds());
-		GameDto game = gameService.getGame(reservationDto.getGameId());
+		List<SeatDto> seats = seatClient.getSeats(reservationDto.getSeatIds());
+		GameDto game = gameClient.getGame(reservationDto.getGameId());
 
 		Ticket ticket = ticketRepository.save(new Ticket(auth.getMemberId(), game.getId()));
 		ticketSeatService.createAll(seats, game, ticket);

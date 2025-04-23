@@ -6,8 +6,7 @@ import static com.example.modulecommon.exception.ErrorCode.USER_ACCESS_DENIED;
 import com.example.modulecommon.entity.AuthUser;
 import com.example.modulecommon.exception.ServerException;
 import com.example.moduleticket.domain.reservation.dto.ReservationDto;
-import com.example.moduleticket.feign.GameService;
-import com.example.moduleticket.feign.SeatService;
+import com.example.moduleticket.feign.GameClient;
 import com.example.moduleticket.feign.dto.GameDto;
 import com.example.moduleticket.feign.dto.SeatDto;
 import com.example.moduleticket.domain.ticket.dto.TicketContext;
@@ -18,7 +17,6 @@ import com.example.moduleticket.domain.ticket.event.SeatHoldReleaseEvent;
 import com.example.moduleticket.domain.ticket.repository.TicketRepository;
 import com.example.moduleticket.util.SeatHoldRedisUtil;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -40,15 +38,14 @@ public class TicketService {
 	private final TicketCreateService ticketCreateService;
 	private final SeatHoldRedisUtil seatHoldRedisUtil;
 	private final ApplicationEventPublisher eventPublisher;
-	private final SeatService seatService;
-	private final GameService gameService;
+	private final GameClient gameClient;
 
 	@Transactional(readOnly = true)
 	public TicketResponse getTicket(AuthUser auth, Long ticketId) {
 		Ticket ticket = ticketRepository.findByIdAndMemberIdAndDeletedAtIsNull(ticketId, auth.getMemberId())
 				.orElseThrow(() -> new ServerException(TICKET_NOT_FOUND));
 		Long gameId = ticket.getGameId();
-		GameDto gameDto = gameService.getGame(gameId);
+		GameDto gameDto = gameClient.getGame(gameId);
 
 		return convertTicketResponse(ticket, gameDto);
 	}
@@ -58,7 +55,7 @@ public class TicketService {
 		List<Ticket> allTickets = ticketRepository.findAllByMemberIdWithGame(auth.getMemberId());
 
 		List<Long> gameIds = allTickets.stream().map(Ticket::getGameId).toList();
-		List<GameDto> gameDtos = gameService.getGames(gameIds);
+		List<GameDto> gameDtos = gameClient.getGames(gameIds);
 		Map<Long, GameDto> gameDtoMap = gameDtos.stream().collect(Collectors.toMap(GameDto::getId, Function.identity()));
 
 		return allTickets.stream().map(ticket -> convertTicketResponse(ticket, gameDtoMap.get(ticket.getGameId()))).toList();

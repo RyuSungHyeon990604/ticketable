@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(name = "game", url = "http://localhost:8081")
-public interface GameService {
+public interface GameClient {
 
 	@GetMapping("/api/internal/games/{gameId}")
 	public GameDto getGame(@PathVariable Long gameId);

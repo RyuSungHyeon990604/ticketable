@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(name = "seat", url = "http://localhost:8081")
-public interface SeatService {
+public interface SeatClient {
 	@GetMapping("/api/internal/seats")
 	List<SeatDto> getSeats(@RequestBody List<Long> seatIds);
 }
