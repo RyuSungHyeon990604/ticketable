@@ -2,6 +2,7 @@ package com.example.modulegame.domain.stadium.repository;
 
 
 
+import com.example.modulegame.domain.game.dto.SeatDto;
 import java.util.List;
 
 import com.example.modulegame.domain.stadium.entity.Seat;
@@ -13,10 +14,22 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
 
     boolean existsBySectionId(Long sectionId);
 
-    @Query("select seat "
-        + "   from Seat seat "
-        + "   join fetch seat.section "
-        + "   join fetch seat.section.stadium "
-        + "  where seat.id in :ids ")
-    List<Seat> findAllByIds(List<Long> ids);
+    @Query(
+        " select new com.example.modulegame.domain.game.dto.SeatDto(" +
+        " seat.id, " +
+        " seat.position, " +
+        " section.extraCharge, " +
+        " section.extraCharge " +
+        " ) " +
+        "   from Game game " +
+        "  inner join Stadium stadium " +
+        "          on game.stadium = stadium " +
+        "   left join Section section " +
+        "          on section.stadium = stadium " +
+        "   left join Seat seat " +
+        "          on seat.section = section " +
+        " where seat.id in :ids" +
+        "   and game.id = :gameId "
+    )
+    List<SeatDto> findSeatDtosByGameIdAndSeatIds(Long gameId, List<Long> seatIds);
 }
