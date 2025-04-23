@@ -1,6 +1,5 @@
 package com.example.moduleticket.domain.ticket.dto;
 
-import com.example.moduleticket.domain.member.entity.Member;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
 import java.util.List;

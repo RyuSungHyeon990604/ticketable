@@ -5,8 +5,7 @@ import static com.example.modulecommon.exception.ErrorCode.USER_ACCESS_DENIED;
 
 import com.example.modulecommon.entity.AuthUser;
 import com.example.modulecommon.exception.ServerException;
-import com.example.moduleticket.domain.point.enums.PointHistoryType;
-import com.example.moduleticket.domain.point.service.PointService;
+import com.example.moduleticket.domain.reservation.dto.ReservationDto;
 import com.example.moduleticket.domain.ticket.dto.GameDto;
 import com.example.moduleticket.domain.ticket.dto.SeatDto;
 import com.example.moduleticket.domain.ticket.dto.TicketContext;
@@ -36,7 +35,7 @@ public class TicketService {
 	private final TicketRepository ticketRepository;
 	private final TicketSeatService ticketSeatService;
 	private final TicketPaymentService ticketPaymentService;
-	private final PointService pointService;
+	//private final PointService pointService;
 	private final TicketCreateService ticketCreateService;
 	private final SeatHoldRedisUtil seatHoldRedisUtil;
 	private final ApplicationEventPublisher eventPublisher;
@@ -85,6 +84,24 @@ public class TicketService {
 	}
 
 	@Transactional
+	public TicketResponse issueTicketFromReservation(AuthUser auth, ReservationDto reservationDto) {
+		log.debug("사용자 : {}, 좌석 : {} 예매 신청", auth.getMemberId(), reservationDto.getSeatIds());
+
+
+		//todo : seatValidator에게 위임 아마 seatClient?
+		seatHoldRedisUtil.checkHeldSeatAtomic(reservationDto.getSeatIds(), reservationDto.getGameId(), String.valueOf(auth.getMemberId()));
+		ticketSeatService.checkDuplicateSeats(reservationDto.getSeatIds(), reservationDto.getGameId());
+
+		TicketContext ticketContext = ticketCreateService.createTicketV3(auth, reservationDto);
+		ticketPaymentService.paymentTicket(ticketContext);
+
+		// 캐싱
+		//gameCacheService.handleAfterTicketChangeAll(ticketCreateRequest.getGameId(), ticketContext.getSeats().get(0));
+
+		return ticketContext.toResponse();
+	}
+
+	@Transactional
 	public void cancelTicket(AuthUser auth, Long ticketId) {
 
 		// 1. 티켓 취소 처리
@@ -99,7 +116,7 @@ public class TicketService {
 		int refund = ticketPaymentService.getTicketTotalPoint(ticketId);
 
 		// 3. 사용자 포인트 환불
-		pointService.increasePoint(ticket.getMemberId(), refund, PointHistoryType.REFUND);
+		//pointService.increasePoint(ticket.getMemberId(), refund, PointHistoryType.REFUND);
 
 		// 캐싱 삭제
 		//gameCacheService.handleAfterTicketChangeAll(ticket.getGameId(), ticketSeatService.getSeat(ticketId).get(0));

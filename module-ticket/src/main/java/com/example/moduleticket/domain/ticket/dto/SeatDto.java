@@ -7,4 +7,5 @@ public class SeatDto {
 	private Long seatId;
 	private String position;
 	private int SectionExtraCharge;
+	private int price;
 }

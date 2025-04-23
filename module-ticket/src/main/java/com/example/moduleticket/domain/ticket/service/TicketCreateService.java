@@ -1,10 +1,7 @@
 package com.example.moduleticket.domain.ticket.service;
 
-import static com.example.modulecommon.exception.ErrorCode.GAME_NOT_FOUND;
-
 import com.example.modulecommon.entity.AuthUser;
-import com.example.modulecommon.exception.ServerException;
-import com.example.moduleticket.domain.member.entity.Member;
+import com.example.moduleticket.domain.reservation.dto.ReservationDto;
 import com.example.moduleticket.domain.ticket.dto.GameDto;
 import com.example.moduleticket.domain.ticket.dto.SeatDto;
 import com.example.moduleticket.domain.ticket.dto.TicketContext;
@@ -44,5 +41,19 @@ public class TicketCreateService {
 		int totalPrice = ticketPriceCalculator.calculateTicketPrice(game, seats);
 
 		return new TicketContext(ticket, memberId, game, seats, totalPrice);
+	}
+
+
+	@Transactional
+	public TicketContext createTicketV3(AuthUser auth, ReservationDto reservationDto) {
+
+		//todo : api 호출해야함
+		List<SeatDto> seats = new ArrayList<>();
+		GameDto game = new GameDto();
+
+		Ticket ticket = ticketRepository.save(new Ticket(auth.getMemberId(), game.getId()));
+		ticketSeatService.createAll(seats, game, ticket);
+
+		return new TicketContext(ticket, auth.getMemberId(), game, seats, reservationDto.getTotalPrice());
 	}
 }
