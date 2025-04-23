@@ -56,4 +56,10 @@ public class TicketController {
 
 		return ResponseEntity.noContent().build();
 	}
+
+	@DeleteMapping("/tickets/game/{gameId}")
+	public ResponseEntity<Void> deleteTicketsByGameId(@PathVariable Long gameId) {
+		ticketService.deleteAllTicketsByCanceledGame(gameId);
+		return ResponseEntity.ok().build();
+	}
 }
