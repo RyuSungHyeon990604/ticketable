@@ -1,10 +1,11 @@
 package com.example.modulegame.domain.stadium.controller;
 
-import com.example.ticketable.domain.stadium.dto.request.SectionCreateRequest;
-import com.example.ticketable.domain.stadium.dto.request.SectionUpdateRequest;
-import com.example.ticketable.domain.stadium.dto.response.SectionCreateResponse;
-import com.example.ticketable.domain.stadium.dto.response.SectionUpdateResponse;
-import com.example.ticketable.domain.stadium.service.SectionService;
+
+import com.example.modulegame.domain.stadium.dto.request.SectionCreateRequest;
+import com.example.modulegame.domain.stadium.dto.request.SectionUpdateRequest;
+import com.example.modulegame.domain.stadium.dto.response.SectionCreateResponse;
+import com.example.modulegame.domain.stadium.dto.response.SectionUpdateResponse;
+import com.example.modulegame.domain.stadium.service.SectionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;

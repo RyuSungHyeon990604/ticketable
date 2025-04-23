@@ -1,7 +1,9 @@
 package com.example.modulegame.domain.game.dto.request;
 
-import com.example.ticketable.domain.game.enums.GameType;
+
 import java.time.LocalDateTime;
+
+import com.example.modulegame.domain.game.enums.GameType;
 import lombok.Getter;
 
 @Getter

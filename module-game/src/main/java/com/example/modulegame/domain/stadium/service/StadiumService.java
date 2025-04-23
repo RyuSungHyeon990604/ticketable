@@ -1,19 +1,21 @@
 package com.example.modulegame.domain.stadium.service;
 
-import com.example.ticketable.common.exception.ErrorCode;
-import com.example.ticketable.common.exception.ServerException;
-import com.example.ticketable.common.service.ImageService;
-import com.example.ticketable.domain.stadium.dto.request.StadiumCreateRequest;
-import com.example.ticketable.domain.stadium.dto.request.StadiumUpdateRequest;
-import com.example.ticketable.domain.stadium.dto.response.StadiumCreateResponse;
-import com.example.ticketable.domain.stadium.dto.response.StadiumUpdateResponse;
-import com.example.ticketable.domain.stadium.entity.Stadium;
-import com.example.ticketable.domain.stadium.repository.StadiumRepository;
+
 import java.util.UUID;
+
+import com.example.modulecommon.exception.ErrorCode;
+import com.example.modulegame.common.image.ImageService;
+import com.example.modulegame.domain.stadium.dto.request.StadiumCreateRequest;
+import com.example.modulegame.domain.stadium.dto.request.StadiumUpdateRequest;
+import com.example.modulegame.domain.stadium.dto.response.StadiumCreateResponse;
+import com.example.modulegame.domain.stadium.dto.response.StadiumUpdateResponse;
+import com.example.modulegame.domain.stadium.entity.Stadium;
+import com.example.modulegame.domain.stadium.repository.StadiumRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import com.example.modulecommon.exception.ServerException;
 
 @Service
 @RequiredArgsConstructor

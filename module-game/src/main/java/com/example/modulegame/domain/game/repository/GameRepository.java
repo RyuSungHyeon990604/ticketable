@@ -1,11 +1,13 @@
 package com.example.modulegame.domain.game.repository;
 
 
-import com.example.ticketable.domain.game.entity.Game;
-import com.example.ticketable.domain.stadium.dto.response.SectionSeatCountResponse;
-import com.example.ticketable.domain.stadium.dto.response.SectionTypeSeatCountResponse;
-import com.example.ticketable.domain.stadium.entity.Stadium;
+
 import java.util.List;
+
+import com.example.modulegame.domain.game.entity.Game;
+import com.example.modulegame.domain.stadium.dto.response.SectionSeatCountResponse;
+import com.example.modulegame.domain.stadium.dto.response.SectionTypeSeatCountResponse;
+import com.example.modulegame.domain.stadium.entity.Stadium;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

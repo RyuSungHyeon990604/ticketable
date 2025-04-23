@@ -1,26 +1,26 @@
 package com.example.modulegame.domain.stadium.service;
 
-import static com.example.ticketable.common.exception.ErrorCode.SEAT_NOT_FOUND;
 
-import com.example.ticketable.common.entity.Auth;
-import com.example.ticketable.common.exception.ErrorCode;
-import com.example.ticketable.common.exception.ServerException;
-import com.example.ticketable.common.util.SeatHoldRedisUtil;
-import com.example.ticketable.domain.stadium.dto.request.SeatCreateRequest;
-import com.example.ticketable.domain.stadium.dto.request.SeatHoldRequest;
-import com.example.ticketable.domain.stadium.dto.request.SeatUpdateRequest;
-import com.example.ticketable.domain.stadium.dto.response.SeatCreateResponse;
-import com.example.ticketable.domain.stadium.dto.response.SeatUpdateResponse;
-import com.example.ticketable.domain.stadium.entity.Seat;
-import com.example.ticketable.domain.stadium.entity.Section;
-import com.example.ticketable.domain.stadium.repository.SeatRepository;
-import com.example.ticketable.domain.ticket.service.TicketSeatService;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.example.modulecommon.exception.ErrorCode;
+import com.example.modulegame.domain.stadium.dto.request.SeatCreateRequest;
+import com.example.modulegame.domain.stadium.dto.request.SeatHoldRequest;
+import com.example.modulegame.domain.stadium.dto.request.SeatUpdateRequest;
+import com.example.modulegame.domain.stadium.dto.response.SeatCreateResponse;
+import com.example.modulegame.domain.stadium.dto.response.SeatUpdateResponse;
+import com.example.modulegame.domain.stadium.entity.Seat;
+import com.example.modulegame.domain.stadium.entity.Section;
+import com.example.modulegame.domain.stadium.repository.SeatRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.modulecommon.exception.ServerException;
+
+import static com.example.modulecommon.exception.ErrorCode.SEAT_NOT_FOUND;
+
 
 @Slf4j
 @Service
@@ -31,11 +31,11 @@ public class SeatService {
 
     private final SectionService sectionService;
 
-    private final SeatHoldRedisUtil seatHoldRedisUtil;
-
-    private final TicketSeatService ticketSeatService;
-
-    private final SeatValidator seatValidator;
+//    private final SeatHoldRedisUtil seatHoldRedisUtil;
+//
+//    private final TicketSeatService ticketSeatService;
+//
+//    private final SeatValidator seatValidator;
 
     @Transactional
     public List<SeatCreateResponse> createSeats(Long sectionId, SeatCreateRequest request) {
@@ -79,7 +79,7 @@ public class SeatService {
 
     @Transactional
     public SeatUpdateResponse updateSeat(Long seatId, SeatUpdateRequest request) {
-        Seat seat = seatRepository.findById(seatId).orElseThrow(() -> new ServerException(ErrorCode.SEAT_NOT_FOUND));
+        Seat seat = seatRepository.findById(seatId).orElseThrow(() -> new ServerException(SEAT_NOT_FOUND));
 
         if (seat.isBlind() == request.isBlind()){
             throw new ServerException(ErrorCode.BLIND_STATUS_ALREADY_SET);
@@ -91,25 +91,25 @@ public class SeatService {
 
     @Transactional
     public void delete(Long seatId) {
-        Seat seat = seatRepository.findById(seatId).orElseThrow(() -> new ServerException(ErrorCode.SEAT_NOT_FOUND));
+        Seat seat = seatRepository.findById(seatId).orElseThrow(() -> new ServerException(SEAT_NOT_FOUND));
 
         seat.delete();
     }
 
 
     // PRICE
-    public List<Seat> getAllSeatEntity(List<Long> seatIds) {
-        List<Seat> seats = seatRepository.findAllByIds(seatIds);
-        if (seats.size() != seatIds.size()) {
-            log.debug("요청한 좌석을 찾을 수 없습니다.");
-            throw new ServerException(SEAT_NOT_FOUND);
-        }
-        return seats;
-    }
+//    public List<Seat> getAllSeatEntity(List<Long> seatIds) {
+//        List<Seat> seats = seatRepository.findAllByIds(seatIds);
+//        if (seats.size() != seatIds.size()) {
+//            log.debug("요청한 좌석을 찾을 수 없습니다.");
+//            throw new ServerException(SEAT_NOT_FOUND);
+//        }
+//        return seats;
+//    }
 
-    public void holdSeat(Auth auth, SeatHoldRequest seatHoldRequest) {
-        seatValidator.validateSeatsBelongToGame(seatHoldRequest.getGameId(), seatHoldRequest.getSeatIds());
-        ticketSeatService.checkDuplicateSeats(seatHoldRequest.getSeatIds(), seatHoldRequest.getGameId());
-        seatHoldRedisUtil.holdSeatAtomic(seatHoldRequest.getSeatIds(), seatHoldRequest.getGameId(), String.valueOf(auth.getId()));
-    }
+//    public void holdSeat(Auth auth, SeatHoldRequest seatHoldRequest) {
+//        seatValidator.validateSeatsBelongToGame(seatHoldRequest.getGameId(), seatHoldRequest.getSeatIds());
+//        ticketSeatService.checkDuplicateSeats(seatHoldRequest.getSeatIds(), seatHoldRequest.getGameId());
+//        seatHoldRedisUtil.holdSeatAtomic(seatHoldRequest.getSeatIds(), seatHoldRequest.getGameId(), String.valueOf(auth.getId()));
+//    }
 }

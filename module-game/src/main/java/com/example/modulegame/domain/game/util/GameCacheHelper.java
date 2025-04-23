@@ -1,12 +1,14 @@
 package com.example.modulegame.domain.game.util;
 
-import com.example.ticketable.common.exception.ErrorCode;
-import com.example.ticketable.common.exception.ServerException;
-import com.example.ticketable.domain.game.entity.Game;
-import com.example.ticketable.domain.game.repository.GameRepository;
+
 import java.time.LocalDateTime;
+
+import com.example.modulecommon.exception.ErrorCode;
+import com.example.modulegame.domain.game.entity.Game;
+import com.example.modulegame.domain.game.repository.GameRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import com.example.modulecommon.exception.ServerException;
 
 @Component
 @RequiredArgsConstructor
