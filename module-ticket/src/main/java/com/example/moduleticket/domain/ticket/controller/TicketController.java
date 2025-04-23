@@ -1,5 +1,7 @@
 package com.example.moduleticket.domain.ticket.controller;
 
+import com.example.modulecommon.annotation.LoginUser;
+import com.example.modulecommon.entity.AuthUser;
 import com.example.moduleticket.domain.ticket.dto.request.TicketCreateRequest;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.service.TicketService;
@@ -23,32 +25,34 @@ public class TicketController {
 
 	@GetMapping("/v1/tickets")
 	public ResponseEntity<List<TicketResponse>> getAllTickets(
-		//@AuthenticationPrincipal Auth auth
+		@LoginUser AuthUser authUser
 	) {
-		List<TicketResponse> ticketResponseList = ticketService.getAllTickets(auth);
+		List<TicketResponse> ticketResponseList = ticketService.getAllTickets(authUser);
 		return ResponseEntity.ok(ticketResponseList);
 	}
 
 	@GetMapping("/v1/tickets/{ticketId}")
 	public ResponseEntity<TicketResponse> getTicket(
-		//@AuthenticationPrincipal Auth auth,
+		@LoginUser AuthUser authUser,
 		@PathVariable Long ticketId
 	) {
-		TicketResponse ticketResponse = ticketService.getTicket(auth, ticketId);
+		TicketResponse ticketResponse = ticketService.getTicket(authUser, ticketId);
 		return ResponseEntity.ok(ticketResponse);
 	}
 
 	@PostMapping("/v3/tickets")
-	public ResponseEntity<TicketResponse> createTicketV3(//@AuthenticationPrincipal Auth auth,
+	public ResponseEntity<TicketResponse> createTicketV3(
+		@LoginUser AuthUser authUser,
 		@RequestBody TicketCreateRequest ticketCreateRequest) {
-		TicketResponse ticketResponse = ticketService.reservationTicketV4(auth, ticketCreateRequest);
+		TicketResponse ticketResponse = ticketService.reservationTicketV4(authUser, ticketCreateRequest);
 		return ResponseEntity.ok().body(ticketResponse);
 	}
 
 	@DeleteMapping("/v1/tickets/{ticketId}")
-	public ResponseEntity<Void> deleteTicket(//@AuthenticationPrincipal Auth auth,
+	public ResponseEntity<Void> deleteTicket(
+		@LoginUser AuthUser authUser,
 		@PathVariable Long ticketId) {
-		ticketService.cancelTicket(auth, ticketId);
+		ticketService.cancelTicket(authUser, ticketId);
 
 		return ResponseEntity.noContent().build();
 	}

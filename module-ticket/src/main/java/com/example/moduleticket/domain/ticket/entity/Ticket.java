@@ -1,13 +1,10 @@
 package com.example.moduleticket.domain.ticket.entity;
 
-import com.example.moduleticket.domain.member.entity.Member;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -23,35 +20,33 @@ public class Ticket {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "member_id", nullable = false)
-	private Member member;
+	@Column(nullable = false)
+	private Long memberId;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "game_id", nullable = false)
-	private Game game;
+	@Column(nullable = false)
+	private Long gameId;
 
 	private LocalDateTime deletedAt;
 
 	@Builder
-	public Ticket(Member member, Game game) {
-		this.member = member;
-		this.game = game;
+	public Ticket(Long memberId, Long gameId) {
+		this.memberId = memberId;
+		this.gameId = gameId;
 	}
 
 	public void cancel() {
 		deletedAt = LocalDateTime.now();
 	}
 
-	public void changeOwner(Member targetMember) {
-		this.member = targetMember;
+	public void changeOwner(Long targetMember) {
+		this.memberId = targetMember;
 	}
 
-	public boolean isTimeOverToAuction() {
-		return this.game.getStartTime().minusHours(24).isBefore(LocalDateTime.now());
-	}
+//	public boolean isTimeOverToAuction() {
+//		return this.game.getStartTime().minusHours(24).isBefore(LocalDateTime.now());
+//	}
 
-	public boolean isNotOwner(Member seller) {
-		return !this.member.equals(seller);
+	public boolean isNotOwner(Long seller) {
+		return !this.memberId.equals(seller);
 	}
 }

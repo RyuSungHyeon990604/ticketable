@@ -1,5 +1,6 @@
 package com.example.moduleticket.domain.ticket.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -24,19 +25,17 @@ public class TicketSeat {
 	@JoinColumn(name = "ticket_id", nullable = false)
 	private Ticket ticket;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "seat_id", nullable = false)
-	private Seat seat;
+	@Column(nullable = false)
+	private Long seatId;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "game_id", nullable = false)
-	private Game game;
+	@Column(nullable = false)
+	private Long gameId;
 
 	@Builder
-	public TicketSeat(Ticket ticket, Seat seat, Game game) {
+	public TicketSeat(Ticket ticket, Long seatId, Long gameId) {
 		this.ticket = ticket;
-		this.seat = seat;
-		this.game = game;
+		this.seatId = seatId;
+		this.gameId = gameId;
 	}
 
 }
