@@ -111,7 +111,7 @@ public class TicketService {
 		LocalDateTime startTime = game.getStartTime();
 		log.debug("경기 시작 시간 조회 startTime : {}", startTime);
 
-		List<String> ticketSeats = ticketSeatService.getSeatByTicketSeatId(ticket.getId()).stream()
+		List<String> ticketSeats = ticketSeatService.getSeatByTicketSeatId(game.getId(), ticket.getId()).stream()
 			.map(SeatDto::getPosition)
 			.toList();
 		log.debug("티켓 좌석 조회 ticketSeats: {}", ticketSeats);

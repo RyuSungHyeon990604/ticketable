@@ -33,10 +33,10 @@ public class TicketSeatService {
 		}
 	}
 
-	public List<SeatDto> getSeatByTicketSeatId(Long ticketId) {
+	public List<SeatDto> getSeatByTicketSeatId(Long gameId, Long ticketId) {
 		List<TicketSeat> ticketSeats = ticketSeatRepository.findByTicketId(ticketId);
 		List<Long> seatIds = ticketSeats.stream().map(TicketSeat::getSeatId).toList();
-		List<SeatDto> seatDtos = seatService.getSeats(seatIds);
+		List<SeatDto> seatDtos = seatService.getSeats(gameId, seatIds);
 
 		return  seatDtos;
 	}
