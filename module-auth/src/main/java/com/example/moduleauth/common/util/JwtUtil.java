@@ -1,8 +1,8 @@
-package com.example.modulegateway.util;
+package com.example.moduleauth.common.util;
 
 import static com.example.modulecommon.exception.ErrorCode.INVALID_TOKEN;
 
-import com.example.modulegateway.role.MemberRole;
+import com.example.moduleauth.common.role.MemberRole;
 import com.example.modulecommon.exception.ServerException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

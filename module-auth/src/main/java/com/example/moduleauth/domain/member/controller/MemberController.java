@@ -1,11 +1,13 @@
 package com.example.moduleauth.domain.member.controller;
 
+import com.example.moduleauth.common.entity.Auth;
 import com.example.moduleauth.domain.member.dto.request.DeleteMemberRequest;
 import com.example.moduleauth.domain.member.dto.request.UpdatePasswordRequest;
 import com.example.moduleauth.domain.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +23,7 @@ public class MemberController {
 	
 	@PatchMapping("/v1/members")
 	public ResponseEntity<String> updatePassword(
-		//@AuthenticationPrincipal Auth auth,
+		@AuthenticationPrincipal Auth auth,
 		@Valid @RequestBody UpdatePasswordRequest request
 	) {
 		memberService.updatePassword(auth.getId(), request);
@@ -30,7 +32,7 @@ public class MemberController {
 	
 	@DeleteMapping("/v1/members")
 	public ResponseEntity<String> deleteMember(
-		//@AuthenticationPrincipal Auth auth,
+		@AuthenticationPrincipal Auth auth,
 		@Valid @RequestBody DeleteMemberRequest request
 	) {
 		memberService.deleteMember(auth.getId(), request);

@@ -1,4 +1,4 @@
-package com.example.modulegateway.role;
+package com.example.moduleauth.common.role;
 
 import static com.example.modulecommon.exception.ErrorCode.INVALID_USER_ROLE;
 

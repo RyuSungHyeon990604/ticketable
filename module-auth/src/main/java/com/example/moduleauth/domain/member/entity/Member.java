@@ -1,7 +1,7 @@
 package com.example.moduleauth.domain.member.entity;
 
 import com.example.modulecommon.entity.Timestamped;
-import com.example.moduleticket.domain.member.role.MemberRole;
+import com.example.moduleauth.common.role.MemberRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

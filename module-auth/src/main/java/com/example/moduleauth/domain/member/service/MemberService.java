@@ -10,6 +10,7 @@ import com.example.moduleauth.domain.member.dto.request.UpdatePasswordRequest;
 import com.example.moduleauth.domain.member.entity.Member;
 import com.example.moduleauth.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

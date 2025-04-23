@@ -1,9 +1,9 @@
-package com.example.modulegateway.filter;
+package com.example.moduleauth.common.filter;
 
-import com.example.modulegateway.entity.Auth;
-import com.example.modulegateway.role.MemberRole;
-import com.example.modulegateway.util.JwtAuthenticationToken;
-import com.example.modulegateway.util.JwtUtil;
+import com.example.moduleauth.common.entity.Auth;
+import com.example.moduleauth.common.role.MemberRole;
+import com.example.moduleauth.common.util.JwtAuthenticationToken;
+import com.example.moduleauth.common.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;

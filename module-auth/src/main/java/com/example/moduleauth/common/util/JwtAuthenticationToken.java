@@ -1,7 +1,7 @@
-package com.example.modulegateway.util;
+package com.example.moduleauth.common.util;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import com.example.modulegateway.entity.Auth;
+import com.example.moduleauth.common.entity.Auth;
 
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 	

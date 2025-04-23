@@ -1,7 +1,7 @@
-package com.example.modulegateway.config;
+package com.example.moduleauth.common.config;
 
-import com.example.modulegateway.filter.JwtAuthenticationFilter;
-import com.example.modulegateway.role.MemberRole;
+import com.example.moduleauth.common.filter.JwtAuthenticationFilter;
+import com.example.moduleauth.common.role.MemberRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

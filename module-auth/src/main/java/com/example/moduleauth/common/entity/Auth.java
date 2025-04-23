@@ -1,6 +1,6 @@
-package com.example.modulegateway.entity;
+package com.example.moduleauth.common.entity;
 
-import com.example.modulegateway.role.MemberRole;
+import com.example.moduleauth.common.role.MemberRole;
 import java.util.List;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
