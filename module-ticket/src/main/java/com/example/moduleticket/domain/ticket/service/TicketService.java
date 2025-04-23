@@ -43,7 +43,7 @@ public class TicketService {
 
 	@Transactional(readOnly = true)
 	public TicketResponse getTicket(AuthUser auth, Long ticketId) {
-		Ticket ticket = ticketRepository.findByIdAndMemberIdWithGame(ticketId, auth.getMemberId())
+		Ticket ticket = ticketRepository.findByIdAndMemberIdAndDeletedAtIsNull(ticketId, auth.getMemberId())
 				.orElseThrow(() -> new ServerException(TICKET_NOT_FOUND));
 		Long gameId = ticket.getGameId();
 		//todo : 게임정보 가져오기
@@ -88,7 +88,7 @@ public class TicketService {
 	public void cancelTicket(AuthUser auth, Long ticketId) {
 
 		// 1. 티켓 취소 처리
-		Ticket ticket = ticketRepository.findByIdWithMember(ticketId)
+		Ticket ticket = ticketRepository.findByIdAndDeletedAtIsNull(ticketId, auth.getMemberId())
 				.orElseThrow(() -> new ServerException(TICKET_NOT_FOUND));
 		if (auth.getRole().equals("AMDIN") && !auth.getMemberId().equals(ticket.getMemberId())) {
 			throw new ServerException(USER_ACCESS_DENIED);

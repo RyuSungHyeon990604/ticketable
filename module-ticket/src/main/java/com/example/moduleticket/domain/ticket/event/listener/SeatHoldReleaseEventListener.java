@@ -1,7 +1,7 @@
 package com.example.moduleticket.domain.ticket.event.listener;
 
-import com.example.ticketable.common.event.SeatHoldReleaseEvent;
-import com.example.ticketable.common.util.SeatHoldRedisUtil;
+import com.example.moduleticket.domain.ticket.event.SeatHoldReleaseEvent;
+import com.example.moduleticket.util.SeatHoldRedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

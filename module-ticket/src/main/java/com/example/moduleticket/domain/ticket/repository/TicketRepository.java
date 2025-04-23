@@ -14,13 +14,14 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 		+ "  WHERE t.id = :id "
 		+ "    AND t.memberId = :memberId "
 		+ "    AND t.deletedAt is null ")
-	Optional<Ticket> findByIdAndMemberIdWithGame(Long id, Long memberId);
+	Optional<Ticket> findByIdAndMemberIdAndDeletedAtIsNull(Long id, Long memberId);
 
 	@Query("SELECT t "
-		+ "   FROM Ticket t JOIN FETCH t.member "
+		+ "   FROM Ticket t "
 		+ "  WHERE t.id = :id "
-		+ "    AND t.deletedAt is null ")
-	Optional<Ticket> findByIdWithMember(Long id);
+		+ "    AND t.deletedAt is null "
+		+ "    AND t.memberId = :memberId")
+	Optional<Ticket> findByIdAndDeletedAtIsNull(Long id, Long memberId);
 
 	@Query("SELECT t "
 		+ "   FROM Ticket t  "
@@ -28,15 +29,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 		+ "    AND t.deletedAt is null ")
 	List<Ticket> findAllByMemberIdWithGame(Long memberId);
 
-
 	@Query("SELECT t "
-		+ "   FROM Ticket t JOIN FETCH t.game "
-		+ "  WHERE t.game.id = :gameId "
-		+ "    AND t.deletedAt is null ")
-	List<Ticket> findAllByGameId(Long gameId);
-
-	@Query("SELECT t "
-		+ "   FROM Ticket t JOIN FETCH t.member JOIN FETCH t.game "
+		+ "   FROM Ticket t "
 		+ "  WHERE t.id = :id "
 		+ "    AND t.deletedAt is null ")
 	Optional<Ticket>findByIdWithGameAndMember(Long id);
@@ -44,6 +38,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 	@Modifying
 	@Query("update Ticket t "
 		+ "    set t.deletedAt = now()"
-		+ " where t.game.id = :gameId ")
+		+ " where t.gameId = :gameId ")
 	void softDeleteAllByGameId(Long gameId);
 }
