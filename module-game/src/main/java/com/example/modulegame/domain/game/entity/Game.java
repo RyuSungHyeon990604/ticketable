@@ -1,7 +1,8 @@
 package com.example.modulegame.domain.game.entity;
 
-import com.example.ticketable.domain.game.enums.GameType;
-import com.example.ticketable.domain.stadium.entity.Stadium;
+
+import com.example.modulegame.domain.game.enums.GameType;
+import com.example.modulegame.domain.stadium.entity.Stadium;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

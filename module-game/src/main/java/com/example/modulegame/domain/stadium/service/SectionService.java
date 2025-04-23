@@ -1,17 +1,18 @@
 package com.example.modulegame.domain.stadium.service;
 
-import com.example.ticketable.common.exception.ErrorCode;
-import com.example.ticketable.common.exception.ServerException;
-import com.example.ticketable.domain.stadium.dto.request.SectionCreateRequest;
-import com.example.ticketable.domain.stadium.dto.request.SectionUpdateRequest;
-import com.example.ticketable.domain.stadium.dto.response.SectionCreateResponse;
-import com.example.ticketable.domain.stadium.dto.response.SectionUpdateResponse;
-import com.example.ticketable.domain.stadium.entity.Section;
-import com.example.ticketable.domain.stadium.entity.Stadium;
-import com.example.ticketable.domain.stadium.repository.SectionRepository;
+
+import com.example.modulecommon.exception.ErrorCode;
+import com.example.modulegame.domain.stadium.dto.request.SectionCreateRequest;
+import com.example.modulegame.domain.stadium.dto.request.SectionUpdateRequest;
+import com.example.modulegame.domain.stadium.dto.response.SectionCreateResponse;
+import com.example.modulegame.domain.stadium.dto.response.SectionUpdateResponse;
+import com.example.modulegame.domain.stadium.entity.Section;
+import com.example.modulegame.domain.stadium.entity.Stadium;
+import com.example.modulegame.domain.stadium.repository.SectionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.modulecommon.exception.ServerException;
 
 @Service
 @RequiredArgsConstructor

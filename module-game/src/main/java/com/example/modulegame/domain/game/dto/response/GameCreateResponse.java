@@ -1,8 +1,10 @@
 package com.example.modulegame.domain.game.dto.response;
 
-import com.example.ticketable.domain.game.entity.Game;
-import com.example.ticketable.domain.game.enums.GameType;
+
 import java.time.LocalDateTime;
+
+import com.example.modulegame.domain.game.entity.Game;
+import com.example.modulegame.domain.game.enums.GameType;
 import lombok.Getter;
 
 @Getter
