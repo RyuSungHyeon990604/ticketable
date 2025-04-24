@@ -3,6 +3,7 @@ package com.example.modulegame.domain.game.service;
 import com.example.modulecommon.exception.ErrorCode;
 import com.example.modulecommon.exception.ServerException;
 import com.example.modulegame.common.image.ImageService;
+import com.example.modulegame.domain.game.dto.GameDto;
 import com.example.modulegame.domain.game.dto.request.GameCreateRequest;
 import com.example.modulegame.domain.game.dto.request.GameUpdateRequest;
 import com.example.modulegame.domain.game.dto.response.GameCreateResponse;
@@ -10,10 +11,11 @@ import com.example.modulegame.domain.game.dto.response.GameGetResponse;
 import com.example.modulegame.domain.game.dto.response.GameUpdateResponse;
 import com.example.modulegame.domain.game.entity.Game;
 import com.example.modulegame.domain.game.repository.GameRepository;
-import com.example.modulegame.domain.stadium.dto.response.*;
-import com.example.modulegame.domain.stadium.entity.Seat;
+import com.example.modulegame.domain.stadium.dto.response.SeatGetResponse;
+import com.example.modulegame.domain.stadium.dto.response.SectionSeatCountResponse;
+import com.example.modulegame.domain.stadium.dto.response.SectionTypeSeatCountResponse;
+import com.example.modulegame.domain.stadium.dto.response.StadiumGetResponse;
 import com.example.modulegame.domain.stadium.entity.Stadium;
-import com.example.modulegame.domain.stadium.service.SeatService;
 import com.example.modulegame.domain.stadium.service.StadiumService;
 import com.example.modulegame.feign.client.AuctionClient;
 import com.example.modulegame.feign.client.TicketClient;
@@ -24,8 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -117,5 +119,18 @@ public class GameService {
         LocalDateTime startOfDay = dateTime.toLocalDate().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1);
         return new LocalDateTime[] { startOfDay, endOfDay };
+    }
+
+
+	public GameDto getGameDto(Long gameId) {
+        Game game = gameRepository.findById(gameId).orElseThrow(() -> new ServerException(ErrorCode.GAME_NOT_FOUND));
+
+        return GameDto.from(game);
+    }
+
+    public List<GameDto> getGameDtoList(List<Long> gameIds) {
+        List<Game> games = gameRepository.findAllById(gameIds);
+
+        return games.stream().map(GameDto::from).toList();
     }
 }
