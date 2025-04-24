@@ -1,12 +1,12 @@
 package com.example.modulegame.domain.stadium.service;
 
 
+import com.example.modulegame.domain.game.dto.SeatDto;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.example.modulecommon.exception.ErrorCode;
 import com.example.modulegame.domain.stadium.dto.request.SeatCreateRequest;
-import com.example.modulegame.domain.stadium.dto.request.SeatHoldRequest;
 import com.example.modulegame.domain.stadium.dto.request.SeatUpdateRequest;
 import com.example.modulegame.domain.stadium.dto.response.SeatCreateResponse;
 import com.example.modulegame.domain.stadium.dto.response.SeatUpdateResponse;
@@ -96,8 +96,16 @@ public class SeatService {
         seat.delete();
     }
 
+    //경기에 포함된 좌석을 조회
+	public List<SeatDto> getSeatDtoList(Long gameId, List<Long> seatIds) {
+        List<SeatDto> seats = seatRepository.findSeatDtosByGameIdAndSeatIds(gameId, seatIds);
+        if(seats.size() != seatIds.size()){
+            throw new ServerException(SEAT_NOT_FOUND);
+        }
+        return seats;
+    }
 
-    // PRICE
+	// PRICE
 //    public List<Seat> getAllSeatEntity(List<Long> seatIds) {
 //        List<Seat> seats = seatRepository.findAllByIds(seatIds);
 //        if (seats.size() != seatIds.size()) {
