@@ -4,10 +4,11 @@ import com.example.moduleticket.feign.dto.SeatDto;
 import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name = "seat", url = "http://localhost:8081")
-public interface SeatService {
+public interface SeatClient {
+
 	@GetMapping("/api/internal/seats")
-	List<SeatDto> getSeats(@RequestBody List<Long> seatIds);
+	List<SeatDto> getSeats(@RequestParam Long gameId, @RequestParam List<Long> seatIds);
 }

@@ -34,6 +34,6 @@ public class ReservationController {
 		@LoginUser AuthUser authUser,
 		@PathVariable Long reservationId
 	) {
-		return ResponseEntity.ok(reservationService.completePaymentReservation(authUser, reservationId));
+		return ResponseEntity.ok(reservationService.processReservationCompletion(authUser, reservationId));
 	}
 }

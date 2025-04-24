@@ -1,5 +1,6 @@
 package com.example.moduleticket.util;
 
+import static com.example.modulecommon.exception.ErrorCode.SEAT_HOLD_EXPIRED;
 import static com.example.modulecommon.exception.ErrorCode.TICKET_ALREADY_RESERVED;
 
 import com.example.modulecommon.exception.ServerException;
@@ -25,7 +26,7 @@ public class SeatHoldRedisUtil {
 	private static final Duration SEAT_HOLD_TTL = Duration.ofMinutes(15);
 	private static final String SEAT_HOLD_TTL_STRING = String.valueOf(SEAT_HOLD_TTL.getSeconds());
 
-	public void holdSeatAtomic(List<Long> seatIds, Long gameId, String value) {
+	public void holdSeatAtomic(Long gameId, List<Long> seatIds, String value) {
 		List<String> keys = seatIds.stream().map(id -> createKey(id, gameId)).toList();
 		Long execute = redisTemplate.execute(holdSeatRedisScript, keys, value, SEAT_HOLD_TTL_STRING);
 
@@ -50,6 +51,10 @@ public class SeatHoldRedisUtil {
 		if (isHeld == null || isHeld.equals(0L)) {
 			log.debug("다른 사람이 선점한 좌석입니다.");
 			throw new ServerException(TICKET_ALREADY_RESERVED);
+		}
+
+		if(isHeld.equals(-1L)) {
+			throw new ServerException(SEAT_HOLD_EXPIRED);
 		}
 
 	}
