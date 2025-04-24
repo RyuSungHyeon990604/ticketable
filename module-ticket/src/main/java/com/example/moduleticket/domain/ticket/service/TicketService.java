@@ -1,5 +1,6 @@
 package com.example.moduleticket.domain.ticket.service;
 
+import static com.example.modulecommon.exception.ErrorCode.ALREADY_CANCELED_GAME;
 import static com.example.modulecommon.exception.ErrorCode.TICKET_NOT_FOUND;
 import static com.example.modulecommon.exception.ErrorCode.USER_ACCESS_DENIED;
 
@@ -7,12 +8,16 @@ import com.example.modulecommon.entity.AuthUser;
 import com.example.modulecommon.exception.ServerException;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.ticket.dto.TicketContext;
+import com.example.moduleticket.domain.ticket.dto.RefundDto;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
 import com.example.moduleticket.domain.ticket.repository.TicketRepository;
 import com.example.moduleticket.feign.GameClient;
+import com.example.moduleticket.feign.PaymentClient;
 import com.example.moduleticket.feign.dto.GameDto;
 import com.example.moduleticket.feign.dto.SeatDto;
+import com.example.moduleticket.feign.dto.request.PaymentRequest;
+import com.example.moduleticket.util.IdempotencyKeyUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +38,7 @@ public class TicketService {
 	private final TicketPaymentService ticketPaymentService;
 	private final TicketCreateService ticketCreateService;
 	private final GameClient gameClient;
+	private final PaymentClient paymentClient;
 
 	@Transactional(readOnly = true)
 	public TicketResponse getTicket(AuthUser auth, Long ticketId) {
@@ -88,11 +94,13 @@ public class TicketService {
 		ticket.cancel();
 
 		// 2. 환불금 조회
-		int refund = ticketPaymentService.getTicketTotalPoint(ticketId);
+		long refund = ticketPaymentService.getTicketTotalPoint(ticketId);
 
-		//todo : 포인트 환불 처리
-		// 3. 사용자 포인트 환불
-		//pointService.increasePoint(ticket.getMemberId(), refund, PointHistoryType.REFUND);
+		RefundDto refundDto = new RefundDto(
+			auth.getMemberId(),
+			refund
+		);
+		paymentClient.processRefund(refundDto);
 
 		// 캐싱 삭제
 		//gameCacheService.handleAfterTicketChangeAll(ticket.getGameId(), ticketSeatService.getSeat(ticketId).get(0));
@@ -105,6 +113,12 @@ public class TicketService {
 	@Transactional
 	public void deleteAllTicketsByCanceledGame(Long gameId) {
 		//todo : 환불로직 추가
+		GameDto game = gameClient.getGame(gameId);
+		if(game.getDeletedAt() != null ){
+			throw new ServerException(ALREADY_CANCELED_GAME);
+		}
+		List<RefundDto> refundDtoList = ticketRepository.findRefundDtoByGameId(gameId);
+		paymentClient.processRefundBulk(refundDtoList);
 		ticketRepository.softDeleteAllByGameId(gameId);
 	}
 

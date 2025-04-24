@@ -22,6 +22,7 @@ import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.event.SeatHoldReleaseEvent;
 import com.example.moduleticket.domain.ticket.service.TicketService;
 import com.example.moduleticket.feign.dto.request.PaymentRequest;
+import com.example.moduleticket.util.IdempotencyKeyUtil;
 import com.example.moduleticket.util.SeatHoldRedisUtil;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,15 +53,17 @@ public class ReservationService {
 		ticketSeatService.checkDuplicateSeats(reservationCreateRequest.getSeatIds(),
 			reservationCreateRequest.getGameId());
 		//검증이 완료되면 좌석 점유
-		seatHoldRedisUtil.holdSeatAtomic(reservationCreateRequest.getGameId(), reservationCreateRequest.getSeatIds(),
-			String.valueOf(auth.getMemberId()));
+		seatHoldRedisUtil.holdSeatAtomic(
+			reservationCreateRequest.getGameId(),
+			reservationCreateRequest.getSeatIds(),
+			String.valueOf(auth.getMemberId())
+		);
 
 		GameDto gameDto = null;
 		List<SeatDto> seats = new ArrayList<>();
 		try {
 			gameDto = gameClient.getGame(reservationCreateRequest.getGameId());
-			seats = seatClient.getSeats(reservationCreateRequest.getGameId(),
-				reservationCreateRequest.getSeatIds());
+			seats = seatClient.getSeats(reservationCreateRequest.getGameId(), reservationCreateRequest.getSeatIds());
 		} catch (Exception e) {
 			//경기, 좌석 정보를 가져오는도중 예외발생 시 선점했던 좌석을 해제
 			seatHoldRedisUtil.releaseSeatAtomic(reservationCreateRequest.getSeatIds(),
@@ -71,7 +74,12 @@ public class ReservationService {
 		int seatPrice = seats.stream().mapToInt(SeatDto::getPrice).sum();
 
 		//예약 데이터 생성
-		Reservation reservation = new Reservation(auth.getMemberId(), gameDto.getId(), "WAITING_PAYMENT", seatPrice);
+		Reservation reservation = new Reservation(
+			auth.getMemberId(),
+			gameDto.getId(),
+			"WAITING_PAYMENT",
+			seatPrice
+		);
 		List<ReserveSeat> ReserveSeatList = ReserveSeat.from(seats);
 		for (ReserveSeat reserveSeat : ReserveSeatList) {
 			reservation.addSeat(reserveSeat);
@@ -109,14 +117,15 @@ public class ReservationService {
 
 		PaymentRequest paymentRequest = new PaymentRequest(
 			reservation.getTotalPrice(),
+			"decrement",
 			"reservation",
 			reservationId
 		);
 
 		//결제요청
 		try {
-			paymentClient.decrement(
-				reservation.getIdempotencyKey(),
+			paymentClient.processPayment(
+				IdempotencyKeyUtil.forReservation(reservationId, "decrement"),
 				authUser.getMemberId(),
 				paymentRequest
 			);
@@ -124,15 +133,24 @@ public class ReservationService {
 			throw e;
 		} catch (Exception e) {
 			//알수없는 오류이므로 다시결제요청
-			reTryPayment(paymentRequest, reservation.getIdempotencyKey(), authUser.getMemberId(), reservation);
+			reTryPayment(
+				paymentRequest,
+				IdempotencyKeyUtil.forReservation(reservationId, "decrement"),
+				authUser.getMemberId(),
+				reservation)
+			;
 		}
 
 		GameDto gameDto = gameClient.getGame(gameId);
 		List<SeatDto> seatDtos = seatClient.getSeats(gameId, seatIds);
 
 		//티켓 생성
-		TicketResponse ticketResponse = ticketService.issueTicketFromReservation(authUser, gameDto, seatDtos,
-			reservation);
+		TicketResponse ticketResponse = ticketService.issueTicketFromReservation(
+			authUser,
+			gameDto,
+			seatDtos,
+			reservation
+		);
 
 		reservation.completePayment();
 		eventPublisher.publishEvent(new SeatHoldReleaseEvent(seatIds, gameId));
@@ -142,7 +160,7 @@ public class ReservationService {
 
 	private void reTryPayment(PaymentRequest request, String idempotencyKey, Long memberId, Reservation reservation) {
 		try {
-			paymentClient.decrement(idempotencyKey, memberId, request);
+			paymentClient.processPayment(idempotencyKey, memberId, request);
 		} catch (ServerException e) {
 			throw e;
 		} catch (Exception e) {
