@@ -25,11 +25,13 @@ import com.example.moduleticket.domain.ticket.service.TicketService;
 import com.example.moduleticket.feign.dto.request.PaymentRequest;
 import com.example.moduleticket.util.IdempotencyKeyUtil;
 import com.example.moduleticket.util.SeatHoldRedisUtil;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -184,5 +186,13 @@ public class ReservationService {
 			return;
 		}
 		throw new ServerException(INVALID_RESERVATION_STATE);
+	}
+
+
+	@Scheduled(cron = "0 * * * * *")
+	@Transactional
+	public void proceedReservationExpire() {
+		LocalDateTime expiredLimit = LocalDateTime.now().minusMinutes(15);
+		reservationRepository.updateExpiredReservations(expiredLimit);
 	}
 }
