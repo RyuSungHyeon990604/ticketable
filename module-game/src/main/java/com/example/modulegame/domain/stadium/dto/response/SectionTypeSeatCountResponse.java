@@ -6,10 +6,10 @@ import lombok.Getter;
 @Getter
 public class SectionTypeSeatCountResponse {
     private final String sectionType;
-    private final Long seatCount;
+    private final Long seatsCount;
 
-    public SectionTypeSeatCountResponse(String sectionType, Long seatCount) {
+    public SectionTypeSeatCountResponse(String sectionType, Long seatsCount) {
         this.sectionType = sectionType;
-        this.seatCount = seatCount;
+        this.seatsCount = seatsCount;
     }
 }

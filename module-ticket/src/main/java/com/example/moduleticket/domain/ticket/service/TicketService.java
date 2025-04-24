@@ -18,9 +18,9 @@ import com.example.moduleticket.domain.ticket.event.SeatHoldReleaseEvent;
 import com.example.moduleticket.domain.ticket.repository.TicketRepository;
 import com.example.moduleticket.util.SeatHoldRedisUtil;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -155,5 +155,9 @@ public class TicketService {
 		log.debug("티켓 결제 금액 조회 ticketPayment: {}", totalPoint);
 
 		return new TicketResponse(ticket.getId(), title, ticketSeats, startTime, totalPoint);
+	}
+
+	public Set<Long> getBookedSeatsId(Long gameId) {
+		return ticketRepository.findBookedSeatIdByGameId(gameId);
 	}
 }

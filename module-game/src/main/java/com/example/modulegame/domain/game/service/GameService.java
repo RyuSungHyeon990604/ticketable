@@ -10,11 +10,10 @@ import com.example.modulegame.domain.game.dto.response.GameGetResponse;
 import com.example.modulegame.domain.game.dto.response.GameUpdateResponse;
 import com.example.modulegame.domain.game.entity.Game;
 import com.example.modulegame.domain.game.repository.GameRepository;
-import com.example.modulegame.domain.stadium.dto.response.SeatGetResponse;
-import com.example.modulegame.domain.stadium.dto.response.SectionSeatCountResponse;
-import com.example.modulegame.domain.stadium.dto.response.SectionTypeSeatCountResponse;
-import com.example.modulegame.domain.stadium.dto.response.StadiumGetResponse;
+import com.example.modulegame.domain.stadium.dto.response.*;
+import com.example.modulegame.domain.stadium.entity.Seat;
 import com.example.modulegame.domain.stadium.entity.Stadium;
+import com.example.modulegame.domain.stadium.service.SeatService;
 import com.example.modulegame.domain.stadium.service.StadiumService;
 import com.example.modulegame.feign.client.AuctionClient;
 import com.example.modulegame.feign.client.TicketClient;
@@ -25,8 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -89,16 +87,17 @@ public class GameService {
 
     public StadiumGetResponse getSeatCountsByType(Long gameId) {
         Stadium stadium = gameRepository.getStadiumByGameId(gameId);
-        List<SectionTypeSeatCountResponse> sectionBookedSeatCounts = gameCacheService.getSeatCountsByTypeCached(gameId);
-        return StadiumGetResponse.of(stadium, sectionBookedSeatCounts);
+        List<SectionTypeSeatCountResponse> seatCountsByTypeCached = gameCacheService.getSeatCountsByTypeCached(gameId);
+
+        return StadiumGetResponse.of(stadium, seatCountsByTypeCached);
     }
 
     public List<SectionSeatCountResponse> getSeatCountsBySection(Long gameId, String type) {
-        return gameCacheService.getSeatCountsBySectionCached(gameId, type);
+       return gameCacheService.getSeatCountsBySectionCached(gameId, type);
     }
 
     public List<SeatGetResponse> getSeats(Long sectionId, Long gameId) {
-        return gameCacheService.getSeatsCached(gameId, sectionId);
+        return gameCacheService.getSeatsCached(sectionId, gameId);
     }
 
     @Transactional

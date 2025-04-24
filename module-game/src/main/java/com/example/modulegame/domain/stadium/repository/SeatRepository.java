@@ -19,4 +19,6 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
         + "   join fetch seat.section.stadium "
         + "  where seat.id in :ids ")
     List<Seat> findAllByIds(List<Long> ids);
+
+    List<Seat> findBySectionId(Long sectionId);
 }

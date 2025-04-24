@@ -96,6 +96,10 @@ public class SeatService {
         seat.delete();
     }
 
+    public List<Seat> getSeatsBySectionId(Long sectionId) {
+        return seatRepository.findBySectionId(sectionId);
+    }
+
 
     // PRICE
 //    public List<Seat> getAllSeatEntity(List<Long> seatIds) {
