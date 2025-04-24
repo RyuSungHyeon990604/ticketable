@@ -36,7 +36,7 @@ public class GameService {
     private final ImageService imageService;
     private final GameCacheService gameCacheService;
     private static final String GAME_FOLDER = "game/";
-
+    // 테스트용 주석
     @Transactional
     public GameCreateResponse createGame(GameCreateRequest request, MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
