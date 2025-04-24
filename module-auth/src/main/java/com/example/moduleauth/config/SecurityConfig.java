@@ -21,7 +21,7 @@ import org.springframework.security.web.servletapi.SecurityContextHolderAwareReq
 @RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfig {
-	// 테스트용 주석
+
 	private final JwtAuthenticationFilter authenticationFilter;
 	
 	@Bean
