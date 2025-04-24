@@ -2,6 +2,7 @@ package com.example.moduleticket.domain.ticket.controller;
 
 import com.example.modulecommon.annotation.LoginUser;
 import com.example.modulecommon.entity.AuthUser;
+import com.example.moduleticket.domain.ticket.dto.TicketDto;
 import com.example.moduleticket.domain.ticket.dto.request.TicketCreateRequest;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.service.TicketService;
@@ -55,5 +56,12 @@ public class TicketController {
 		ticketService.cancelTicket(authUser, ticketId);
 
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/internal/members/{memberId}/tickets/{ticketId}")
+	public ResponseEntity<TicketDto> getTicketInternal(
+		@PathVariable Long memberId, Long ticketId
+	) {
+		return ResponseEntity.ok(ticketService.getTicketInternal(memberId, ticketId));
 	}
 }
