@@ -11,13 +11,4 @@ public class SeatDto {
 	private String position;
 	private int SectionExtraCharge;
 	private int price;
-
-	public static SeatDto from(Seat seat) {
-		return new SeatDto(
-			seat.getId(),
-			seat.getPosition(),
-			seat.getSection().getExtraCharge(),
-			seat.getSection().getExtraCharge()
-		);
-	}
 }

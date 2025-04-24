@@ -97,15 +97,23 @@ public class SeatService {
     }
 
     //경기에 포함된 좌석을 조회
-	public List<SeatDto> getSeatDtoList(Long gameId, List<Long> seatIds) {
-        List<SeatDto> seats = seatRepository.findSeatDtosByGameIdAndSeatIds(gameId, seatIds);
+	public List<SeatDto> getSeatsByGameAndSection(Long gameId, Long sectionId, List<Long> seatIds ) {
+        List<SeatDto> seats = seatRepository.findSeatDtosByGameAndSection(gameId, sectionId, seatIds);
         if(seats.size() != seatIds.size()){
             throw new ServerException(SEAT_NOT_FOUND);
         }
         return seats;
     }
 
-	// PRICE
+    public List<SeatDto> getSeatsByGame(Long gameId, List<Long> seatIds) {
+        List<SeatDto> seats = seatRepository.findSeatDtosByGame(gameId, seatIds);
+        if(seats.size() != seatIds.size()){
+            throw new ServerException(SEAT_NOT_FOUND);
+        }
+        return seats;
+    }
+
+    // PRICE
 //    public List<Seat> getAllSeatEntity(List<Long> seatIds) {
 //        List<Seat> seats = seatRepository.findAllByIds(seatIds);
 //        if (seats.size() != seatIds.size()) {

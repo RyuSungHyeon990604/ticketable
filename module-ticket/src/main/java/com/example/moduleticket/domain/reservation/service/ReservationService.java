@@ -63,7 +63,11 @@ public class ReservationService {
 		List<SeatDto> seats = new ArrayList<>();
 		try {
 			gameDto = gameClient.getGame(reservationCreateRequest.getGameId());
-			seats = seatClient.getSeats(reservationCreateRequest.getGameId(), reservationCreateRequest.getSeatIds());
+			seats = seatClient.getSeatsByGameAndSection(
+				reservationCreateRequest.getGameId(),
+				reservationCreateRequest.getSectionId(),
+				reservationCreateRequest.getSeatIds()
+			);
 		} catch (Exception e) {
 			//경기, 좌석 정보를 가져오는도중 예외발생 시 선점했던 좌석을 해제
 			seatHoldRedisUtil.releaseSeatAtomic(reservationCreateRequest.getSeatIds(),
@@ -80,7 +84,7 @@ public class ReservationService {
 			"WAITING_PAYMENT",
 			seatPrice
 		);
-		List<ReserveSeat> ReserveSeatList = ReserveSeat.from(seats);
+		List<ReserveSeat> ReserveSeatList = ReserveSeat.from(reservationCreateRequest.getSectionId(), seats);
 		for (ReserveSeat reserveSeat : ReserveSeatList) {
 			reservation.addSeat(reserveSeat);
 		}
@@ -137,12 +141,12 @@ public class ReservationService {
 				paymentRequest,
 				IdempotencyKeyUtil.forReservation(reservationId, "decrement"),
 				authUser.getMemberId(),
-				reservation)
-			;
+				reservation
+			);
 		}
 
 		GameDto gameDto = gameClient.getGame(gameId);
-		List<SeatDto> seatDtos = seatClient.getSeats(gameId, seatIds);
+		List<SeatDto> seatDtos = seatClient.getSeatsByGame(gameId, seatIds);
 
 		//티켓 생성
 		TicketResponse ticketResponse = ticketService.issueTicketFromReservation(

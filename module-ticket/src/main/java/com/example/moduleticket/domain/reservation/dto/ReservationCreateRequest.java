@@ -14,4 +14,7 @@ public class ReservationCreateRequest {
 
 	@NotNull
 	private List<Long> seatIds;
+
+	@NotNull
+	private Long sectionId;
 }
