@@ -1,5 +1,6 @@
 package com.example.moduleticket.domain.reservation.service;
 
+import static com.example.modulecommon.exception.ErrorCode.INVALID_RESERVATION_STATE;
 import static com.example.modulecommon.exception.ErrorCode.RESERVATION_NOT_FOUND;
 import static com.example.modulecommon.exception.ErrorCode.SEAT_HOLD_EXPIRED;
 import static com.example.modulecommon.exception.ErrorCode.SEAT_NOT_FOUND;
@@ -174,4 +175,14 @@ public class ReservationService {
 		}
 	}
 
+	@Transactional
+	public void cancelReservation(AuthUser authUser, Long reservationId) {
+		Reservation reservation = reservationRepository.findByIdMemberId(reservationId, authUser.getMemberId())
+			.orElseThrow(() -> new ServerException(RESERVATION_NOT_FOUND));
+		if(reservation.getState().equals("WAITING_PAYMENT")) {
+			reservation.cancelPayment();
+			return;
+		}
+		throw new ServerException(INVALID_RESERVATION_STATE);
+	}
 }

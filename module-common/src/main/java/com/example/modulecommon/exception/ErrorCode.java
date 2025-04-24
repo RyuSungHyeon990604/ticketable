@@ -43,6 +43,7 @@ public enum ErrorCode {
 
 	//예약
 	RESERVATION_NOT_FOUND("예약 내역이 존재하지않습니다.", BAD_REQUEST),
+	INVALID_RESERVATION_STATE("취소할 수 없는 예약입니다", BAD_REQUEST),
 
 	//대기열
 	INVALID_WAITING_TOKEN("올바르지않은 대기열 토큰 입니다.", BAD_REQUEST),
