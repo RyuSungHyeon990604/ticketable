@@ -3,12 +3,22 @@ spring:
     gateway:
       routes:
         - id: module-game
-          uri: localhost:8081
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/games/**, /api/v2/games/**, /api/v3/games/**, /api/v1/seats/**, /api/v1/sections/**, /api/v1/stadiums/**
+          filters:
+            - name: ValidateToken
+            - RewritePath=/module-game/(?<segment>.*), /${segment}
 
         - id: module-ticket
-          uri: localhost:8082
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/tickets/**, /api/v3/tickets/**, /api/v1/reservations/**, /api/v1/waiting-queue/**
+          filters:
+            - name: ValidateToken
+            - RewritePath=/module-ticket/(?<segment>.*), /${segment}
 
         - id: module-auth
-          uri: localhost:8083
+          uri: http://localhost:8083
           predicates:
-            - Path=/api/v1/auth/**, /api/v1/members
+            - Path=/api/v1/auth/**, /api/v1/members/**

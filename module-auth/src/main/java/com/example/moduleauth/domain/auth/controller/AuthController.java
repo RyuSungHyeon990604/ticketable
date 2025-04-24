@@ -6,12 +6,11 @@ import com.example.moduleauth.domain.auth.dto.response.AuthResponse;
 import com.example.moduleauth.domain.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
@@ -27,5 +26,14 @@ public class AuthController {
 	@PostMapping("/v1/auth/login")
 	public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
 		return ResponseEntity.ok(authService.login(request));
+	}
+	
+	@PostMapping("/v1/auth/validate")
+	public ResponseEntity<Void> validateToken(
+		@RequestHeader("Authorization") String authToken
+	) {
+		log.info("토큰 검증 진입 성공");
+		authService.validateToken(authToken);
+		return ResponseEntity.ok().build();
 	}
 }

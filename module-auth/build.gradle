@@ -13,13 +13,17 @@ java {
     }
 }
 
+ext {
+    springCloudVersion = "2024.0.1"
+}
+
 repositories {
     mavenCentral()
 }
 
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:2022.0.4"
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
     }
 }
 

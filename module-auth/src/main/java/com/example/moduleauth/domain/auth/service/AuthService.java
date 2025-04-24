@@ -9,6 +9,7 @@ import com.example.modulecommon.exception.ServerException;
 import com.example.moduleauth.common.role.MemberRole;
 import com.example.moduleauth.common.util.JwtUtil;
 import com.example.moduleauth.domain.member.repository.MemberRepository;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -64,5 +65,21 @@ public class AuthService {
 			findMember.getId(), findMember.getEmail(), findMember.getName(), findMember.getRole()
 		);
 		return new AuthResponse(accessToken);
+	}
+	
+	@Transactional
+	public void validateToken(String authToken) {
+		String token = jwtUtil.substringToken(authToken);
+		
+		Claims claims = jwtUtil.extractClaims(token);
+		
+		Long memberId = Long.valueOf(claims.getSubject());
+		String email = claims.get("email", String.class);
+		
+		if (!memberRepository.existsByIdAndEmail(memberId, email)) {
+			throw new ServerException(USER_NOT_FOUND);
+		}
+		String role = claims.get("role", String.class);
+		MemberRole.of(role);
 	}
 }

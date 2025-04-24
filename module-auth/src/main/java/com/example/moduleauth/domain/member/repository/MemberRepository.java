@@ -8,7 +8,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 	
-	boolean existsByEmail(@Param("email") String email);
+	boolean existsByEmail(String email);
+	
+	boolean existsByIdAndEmail(Long memberId, String email);
 	
 	@Query("select m from Member m where m.email = :email and m.deletedAt is null")
 	Optional<Member> findByEmail(@Param("email") String email);
