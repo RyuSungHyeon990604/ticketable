@@ -78,11 +78,7 @@ public class GameService {
             end = range[1];
         }
 
-        List<Game> games = gameCacheService.getGamesCached(team, start, end);
-
-        return games.stream()
-                .map(GameGetResponse::of)
-                .collect(Collectors.toList());
+        return gameCacheService.getGamesCached(team, start, end);
     }
 
     public StadiumGetResponse getSeatCountsByType(Long gameId) {
