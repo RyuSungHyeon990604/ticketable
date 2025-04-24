@@ -41,13 +41,6 @@ public class TicketController {
 		return ResponseEntity.ok(ticketResponse);
 	}
 
-	@PostMapping("/v3/tickets")
-	public ResponseEntity<TicketResponse> createTicketV3(
-		@LoginUser AuthUser authUser,
-		@RequestBody TicketCreateRequest ticketCreateRequest) {
-		TicketResponse ticketResponse = ticketService.reservationTicketV4(authUser, ticketCreateRequest);
-		return ResponseEntity.ok().body(ticketResponse);
-	}
 
 	@DeleteMapping("/v1/tickets/{ticketId}")
 	public ResponseEntity<Void> deleteTicket(
