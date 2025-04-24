@@ -30,10 +30,11 @@ public class AuthController {
 	
 	@PostMapping("/v1/auth/validate")
 	public ResponseEntity<Void> validateToken(
-		@RequestHeader("Authorization") String authToken
+		@RequestHeader("Authorization") String authToken,
+		@RequestParam(required = false) String requiredRole
 	) {
 		log.info("토큰 검증 진입 성공");
-		authService.validateToken(authToken);
+		authService.validateToken(authToken, requiredRole);
 		return ResponseEntity.ok().build();
 	}
 }

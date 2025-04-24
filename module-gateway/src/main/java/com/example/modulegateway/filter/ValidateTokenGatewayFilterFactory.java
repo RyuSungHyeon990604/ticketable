@@ -1,5 +1,7 @@
 package com.example.modulegateway.filter;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
@@ -15,7 +17,9 @@ public class ValidateTokenGatewayFilterFactory
 	extends AbstractGatewayFilterFactory<ValidateTokenGatewayFilterFactory.Config> {
 	
 	// 필터 팩토리가 Config 인스턴스를 받기 위해 사용
-	public static class Config {}
+	@Getter
+	@Setter
+	public static class Config { private String requiredRole; }
 	
 	private final WebClient webClient = WebClient.create("http://localhost:8083");
 	
@@ -36,7 +40,10 @@ public class ValidateTokenGatewayFilterFactory
 			
 			// 인증 서버로 토큰 검증 요청
 			return webClient.post()
-				.uri("/api/v1/auth/validate")
+				.uri(uriBuilder -> uriBuilder
+					.path("/api/v1/auth/validate")
+					.queryParam("requiredRole", config.getRequiredRole())
+					.build())
 				.header(HttpHeaders.AUTHORIZATION, authHeader)
 				.retrieve()
 				.onStatus(HttpStatusCode::isError,

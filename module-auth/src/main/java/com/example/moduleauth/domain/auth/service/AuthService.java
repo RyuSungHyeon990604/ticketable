@@ -68,7 +68,7 @@ public class AuthService {
 	}
 	
 	@Transactional
-	public void validateToken(String authToken) {
+	public void validateToken(String authToken, String requiredRole) {
 		String token = jwtUtil.substringToken(authToken);
 		
 		Claims claims = jwtUtil.extractClaims(token);
@@ -81,5 +81,9 @@ public class AuthService {
 		}
 		String role = claims.get("role", String.class);
 		MemberRole.of(role);
+		
+		if (requiredRole != null && !requiredRole.equals(role)) {
+			throw new ServerException(USER_ACCESS_DENIED);
+		}
 	}
 }
