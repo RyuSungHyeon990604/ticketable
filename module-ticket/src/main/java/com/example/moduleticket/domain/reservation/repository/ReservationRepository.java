@@ -11,7 +11,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 		+ "   from Reservation r "
 		+ "   join fetch r.reservations "
 		+ "  where r.id = :reservationId "
-		+ "    and r.state = :state "
 		+ "    and r.memberId = :memberId ")
-	Optional<Reservation> findByIdAndStateAndMemberId(Long reservationId, Long memberId , String state);
+	Optional<Reservation> findByIdMemberId(Long reservationId , Long memberId);
 }

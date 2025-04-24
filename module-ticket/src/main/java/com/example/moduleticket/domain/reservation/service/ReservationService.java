@@ -7,19 +7,21 @@ import static com.example.modulecommon.exception.ErrorCode.SEAT_NOT_FOUND;
 import com.example.modulecommon.entity.AuthUser;
 import com.example.modulecommon.exception.ServerException;
 import com.example.moduleticket.domain.reservation.dto.ReservationCreateRequest;
-import com.example.moduleticket.domain.reservation.dto.ReservationDto;
 import com.example.moduleticket.domain.reservation.dto.ReservationResponse;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.entity.ReserveSeat;
 import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
+import com.example.moduleticket.domain.ticket.event.ReservationUnknownFailureEvent;
 import com.example.moduleticket.domain.ticket.service.TicketSeatService;
 import com.example.moduleticket.feign.GameClient;
+import com.example.moduleticket.feign.PaymentClient;
 import com.example.moduleticket.feign.SeatClient;
 import com.example.moduleticket.feign.dto.GameDto;
 import com.example.moduleticket.feign.dto.SeatDto;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.event.SeatHoldReleaseEvent;
 import com.example.moduleticket.domain.ticket.service.TicketService;
+import com.example.moduleticket.feign.dto.request.PaymentRequest;
 import com.example.moduleticket.util.SeatHoldRedisUtil;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +43,7 @@ public class ReservationService {
 	private final GameClient gameClient;
 	private final SeatClient seatClient;
 	private final ApplicationEventPublisher eventPublisher;
+	private final PaymentClient paymentClient;
 
 	@Transactional
 	public ReservationResponse createReservation(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
@@ -79,10 +82,15 @@ public class ReservationService {
 	}
 
 	@Transactional
-	public TicketResponse completePaymentReservation(AuthUser authUser, Long reservationId) {
-		Reservation reservation = reservationRepository.findByIdAndStateAndMemberId(reservationId,
-				authUser.getMemberId(), "WAITING_PAYMENT")
+	public TicketResponse processReservationCompletion(AuthUser authUser, Long reservationId) {
+		Reservation reservation = reservationRepository.findByIdMemberId(reservationId, authUser.getMemberId())
 			.orElseThrow(() -> new ServerException(RESERVATION_NOT_FOUND));
+
+		if (reservation.getState().equals("COMPLETE_PAYMENT")) {
+			log.info("이미 결제된 예약입니다.");
+			return ticketService.getTicketByReservationId(reservationId);
+		}
+
 		List<Long> seatIds = reservation.getReservations().stream().map(ReserveSeat::getSeatId).toList();
 		Long gameId = reservation.getGameId();
 
@@ -92,23 +100,56 @@ public class ReservationService {
 			seatHoldRedisUtil.checkHeldSeatAtomic(seatIds, gameId, String.valueOf(authUser.getMemberId()));
 		} catch (ServerException e) {
 			// 선점한 좌석이 만료되었을경우 예약상태를 만료상태로 변경
-			if(e.getErrorCode() == SEAT_HOLD_EXPIRED){
+			if (e.getErrorCode() == SEAT_HOLD_EXPIRED) {
 				log.info("TTL 만료로 예약 만료 처리됨: reservationId = {}", reservationId);
 				reservation.expiredPayment();
 			}
 			throw e;
 		}
 
+		PaymentRequest paymentRequest = new PaymentRequest(
+			reservation.getTotalPrice(),
+			"reservation",
+			reservationId
+		);
+
+		//결제요청
+		try {
+			paymentClient.decrement(
+				reservation.getIdempotencyKey(),
+				authUser.getMemberId(),
+				paymentRequest
+			);
+		} catch (ServerException e) {
+			throw e;
+		} catch (Exception e) {
+			//알수없는 오류이므로 다시결제요청
+			reTryPayment(paymentRequest, reservation.getIdempotencyKey(), authUser.getMemberId(), reservation);
+		}
+
 		GameDto gameDto = gameClient.getGame(gameId);
 		List<SeatDto> seatDtos = seatClient.getSeats(gameId, seatIds);
 
-		//티켓 정보를 생성
-		TicketResponse ticketResponse = ticketService.issueTicketFromReservation(authUser, gameDto, seatDtos, reservation.getTotalPrice());
+		//티켓 생성
+		TicketResponse ticketResponse = ticketService.issueTicketFromReservation(authUser, gameDto, seatDtos,
+			reservation);
 
 		reservation.completePayment();
 		eventPublisher.publishEvent(new SeatHoldReleaseEvent(seatIds, gameId));
 
 		return ticketResponse;
+	}
+
+	private void reTryPayment(PaymentRequest request, String idempotencyKey, Long memberId, Reservation reservation) {
+		try {
+			paymentClient.decrement(idempotencyKey, memberId, request);
+		} catch (ServerException e) {
+			throw e;
+		} catch (Exception e) {
+			//알수없는 예외로 마킹
+			eventPublisher.publishEvent(new ReservationUnknownFailureEvent(reservation.getId()));
+			throw e;
+		}
 	}
 
 }

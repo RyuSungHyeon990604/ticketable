@@ -5,6 +5,7 @@ import static com.example.modulecommon.exception.ErrorCode.USER_ACCESS_DENIED;
 
 import com.example.modulecommon.entity.AuthUser;
 import com.example.modulecommon.exception.ServerException;
+import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.ticket.dto.TicketContext;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
@@ -35,7 +36,7 @@ public class TicketService {
 
 	@Transactional(readOnly = true)
 	public TicketResponse getTicket(AuthUser auth, Long ticketId) {
-		Ticket ticket = ticketRepository.findByIdAndMemberIdAndDeletedAtIsNull(ticketId, auth.getMemberId())
+		Ticket ticket = ticketRepository.findByIdAndDeletedAtIsNull(ticketId, auth.getMemberId())
 			.orElseThrow(() -> new ServerException(TICKET_NOT_FOUND));
 		Long gameId = ticket.getGameId();
 		GameDto gameDto = gameClient.getGame(gameId);
@@ -56,11 +57,20 @@ public class TicketService {
 			.toList();
 	}
 
+	@Transactional(readOnly = true)
+	public TicketResponse getTicketByReservationId(Long reservationId) {
+		Ticket ticket = ticketRepository.findByReservationId(reservationId)
+			.orElseThrow(() -> new ServerException(TICKET_NOT_FOUND));
+		GameDto game = gameClient.getGame(ticket.getGameId());
+		return convertTicketResponse(ticket, game);
+	}
+
+
 	@Transactional
 	public TicketResponse issueTicketFromReservation(AuthUser auth, GameDto gameDto, List<SeatDto> seats,
-		int totalPrice) {
+		Reservation reservation) {
 
-		TicketContext ticketContext = ticketCreateService.createTicket(auth, gameDto, seats, totalPrice);
+		TicketContext ticketContext = ticketCreateService.createTicket(auth, gameDto, seats, reservation);
 		ticketPaymentService.paymentTicket(ticketContext);
 
 		return ticketContext.toResponse();
@@ -116,7 +126,7 @@ public class TicketService {
 			.toList();
 		log.debug("티켓 좌석 조회 ticketSeats: {}", ticketSeats);
 
-		int totalPoint = ticketPaymentService.getTicketTotalPoint(ticket.getId());
+		int totalPoint = ticket.getReservation().getTotalPrice();
 
 		log.debug("티켓 결제 금액 조회 ticketPayment: {}", totalPoint);
 

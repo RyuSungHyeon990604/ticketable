@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,6 +36,9 @@ public class Reservation extends Timestamped {
 	@Column(nullable = false)
 	private int totalPrice;
 
+	@Column(nullable = false)
+	private String idempotencyKey;
+
 	@OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ReserveSeat> reservations = new HashSet<>();
 
@@ -43,6 +47,7 @@ public class Reservation extends Timestamped {
 		this.gameId = gameId;
 		this.state = state;
 		this.totalPrice = totalPrice;
+		this.idempotencyKey = UUID.randomUUID().toString();
 	}
 
 	public void addSeat(ReserveSeat reserveSeat) {
@@ -60,6 +65,10 @@ public class Reservation extends Timestamped {
 
 	public void expiredPayment() {
 		this.state = "EXPIRED_PAYMENT";
+	}
+
+	public void markUnknownFailed() {
+		this.state = "UNKNOWN_FAILED";
 	}
 
 }
