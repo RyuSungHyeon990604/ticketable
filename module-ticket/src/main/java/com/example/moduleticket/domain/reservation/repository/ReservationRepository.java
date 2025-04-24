@@ -10,7 +10,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 	@Query("select r "
 		+ "   from Reservation r "
 		+ "   join fetch r.reservations "
-		+ "  where r.id = :id "
-		+ "    and r.state = :state ")
-	Optional<Reservation> findByIdAndStateWithSeatsAndGame(Long id, String state);
+		+ "  where r.id = :reservationId "
+		+ "    and r.memberId = :memberId ")
+	Optional<Reservation> findByIdMemberId(Long reservationId , Long memberId);
 }

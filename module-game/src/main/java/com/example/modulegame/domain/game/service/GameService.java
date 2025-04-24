@@ -1,6 +1,7 @@
 package com.example.modulegame.domain.game.service;
 
 import com.example.modulecommon.exception.ErrorCode;
+import com.example.modulegame.domain.game.dto.GameDto;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -120,6 +121,15 @@ public class GameService {
     }
 
 
+	public GameDto getGameDto(Long gameId) {
+        Game game = gameRepository.findById(gameId).orElseThrow(() -> new ServerException(ErrorCode.GAME_NOT_FOUND));
 
+        return GameDto.from(game);
+    }
 
+    public List<GameDto> getGameDtoList(List<Long> gameIds) {
+        List<Game> games = gameRepository.findAllById(gameIds);
+
+        return games.stream().map(GameDto::from).toList();
+    }
 }

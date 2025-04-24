@@ -1,10 +1,13 @@
 package com.example.moduleticket.domain.ticket.entity;
 
+import com.example.moduleticket.domain.reservation.entity.Reservation;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -26,10 +29,15 @@ public class Ticket {
 	@Column(nullable = false)
 	private Long gameId;
 
+	@OneToOne
+	@JoinColumn(name = "reservation_id", nullable = false)
+	private Reservation reservation;
+
 	private LocalDateTime deletedAt;
 
 	@Builder
-	public Ticket(Long memberId, Long gameId) {
+	public Ticket(Reservation reservation, Long memberId, Long gameId) {
+		this.reservation = reservation;
 		this.memberId = memberId;
 		this.gameId = gameId;
 	}

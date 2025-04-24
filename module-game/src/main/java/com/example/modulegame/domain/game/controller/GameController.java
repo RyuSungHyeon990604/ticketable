@@ -1,6 +1,7 @@
 package com.example.modulegame.domain.game.controller;
 
 
+import com.example.modulegame.domain.game.dto.GameDto;
 import com.example.modulegame.domain.game.dto.request.GameCreateRequest;
 import com.example.modulegame.domain.game.dto.request.GameUpdateRequest;
 import com.example.modulegame.domain.game.dto.response.GameCreateResponse;
@@ -88,5 +89,18 @@ public class GameController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/internal/games/{gameId}")
+    public ResponseEntity<GameDto> getGame(
+        @PathVariable Long gameId
+    ) {
+        return ResponseEntity.ok(gameService.getGameDto(gameId));
+    }
+
+    @GetMapping("/internal/games")
+    public ResponseEntity<List<GameDto>> getGame(
+        @RequestParam List<Long> gameIds
+    ) {
+        return ResponseEntity.ok(gameService.getGameDtoList(gameIds));
+    }
 
 }
