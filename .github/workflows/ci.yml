@@ -37,6 +37,11 @@ jobs:
           restore-keys: |
               ${{ runner.os }}-gradle-
 
+      # 캐시 디렉토리 생성: Path Validation Error 해결
+      # ./gradlew projects로 Gradle 초기화, ~/.gradle/caches와 ~/.gradle/wrapper 생성
+      - name: Initialize Gradle to make cache directories
+        run: ./gradlew projects
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
