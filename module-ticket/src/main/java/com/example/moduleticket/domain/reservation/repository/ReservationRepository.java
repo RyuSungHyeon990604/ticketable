@@ -21,5 +21,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 		+ "    set r.state = 'EXPIRED_PAYMENT' "
 		+ "  where r.state = 'WAITING_PAYMENT' "
 		+ "    and r.createdAt < :expiredLimit ")
-	void updateExpiredReservations(LocalDateTime expiredLimit);
+	int updateExpiredReservations(LocalDateTime expiredLimit);
 }
