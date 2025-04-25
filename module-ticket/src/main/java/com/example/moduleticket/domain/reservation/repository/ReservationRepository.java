@@ -1,10 +1,12 @@
 package com.example.moduleticket.domain.reservation.repository;
 
 import com.example.moduleticket.domain.reservation.entity.Reservation;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
@@ -27,4 +29,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 			"OR (r.state = 'COMPLETE_PAYMENT' AND t.deletedAt IS NULL)) "
 	)
 	Set<Long> findBookedSeatIdByGameId(Long gameId);
+
+	@Modifying
+	@Query("update Reservation r"
+		+ "    set r.state = 'EXPIRED_PAYMENT' "
+		+ "  where r.state = 'WAITING_PAYMENT' "
+		+ "    and r.createdAt < :expiredLimit ")
+	void updateExpiredReservations(LocalDateTime expiredLimit);
 }

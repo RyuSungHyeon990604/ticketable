@@ -1,5 +1,6 @@
 package com.example.moduleticket.domain.ticket.repository;
 
+import com.example.moduleticket.domain.ticket.dto.RefundDto;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
 import java.util.List;
 import java.util.Optional;
@@ -36,4 +37,13 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 		+ "    set t.deletedAt = now()"
 		+ " where t.gameId = :gameId ")
 	void softDeleteAllByGameId(Long gameId);
+
+	@Query("select new com.example.moduleticket.domain.ticket.dto.RefundDto(t.memberId, sum(tp.totalPoint)) "
+		+ "   from Ticket t "
+		+ "  inner join TicketPayment tp"
+		+ "          on tp.ticket = t "
+		+ "  where t.gameId = :gameId "
+		+ "group by t.memberId "
+	)
+	List<RefundDto> findRefundDtoByGameId(Long gameId);
 }

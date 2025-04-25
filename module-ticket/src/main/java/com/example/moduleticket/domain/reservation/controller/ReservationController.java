@@ -39,4 +39,13 @@ public class ReservationController {
 	public ResponseEntity<Set<Long>> getBookedSeatsId(@PathVariable Long gameId) {
 		return ResponseEntity.ok(reservationService.getBookedSeatsId(gameId));
 	}
+
+	@PostMapping("/v1/reservations/{reservationId}/cancel")
+	public ResponseEntity<String> cancelReservation(
+		@LoginUser AuthUser authUser,
+		@PathVariable Long reservationId
+	) {
+		reservationService.cancelReservation(authUser, reservationId);
+		return ResponseEntity.ok("예약이 취소 되었습니다.");
+	}
 }
