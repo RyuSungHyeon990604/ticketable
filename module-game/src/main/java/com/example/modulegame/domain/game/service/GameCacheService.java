@@ -6,7 +6,9 @@ import com.example.modulegame.domain.game.repository.GameRepository;
 import com.example.modulegame.domain.game.util.GameCacheHelper;
 import com.example.modulegame.domain.stadium.dto.response.*;
 import com.example.modulegame.domain.stadium.entity.Seat;
+import com.example.modulegame.domain.stadium.entity.Section;
 import com.example.modulegame.domain.stadium.service.SeatService;
+import com.example.modulegame.domain.stadium.service.SectionService;
 import com.example.modulegame.feign.client.ReservationClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -100,11 +103,14 @@ public class GameCacheService {
         }
     }
 
+    @Transactional
     public void handleAfterTicketChangeAll(Long gameId, Long seatId) {
         Seat seat = seatService.getSeat(seatId);
+        String sectionType = seat.getSection().getType();
+        Long sectionId = seat.getSection().getId();
         handleAfterTicketChange(gameId);             // sectionType 캐시 처리
-        handleAfterTicketChangeByType(gameId, seat.getSection().getType()); // sectionCode 캐시 처리
-        handleAfterTicketChangeBySeat(gameId, seat.getSection().getId());
+        handleAfterTicketChangeByType(gameId, sectionType); // sectionCode 캐시 처리
+        handleAfterTicketChangeBySeat(gameId, sectionId);
     }
 
     @Scheduled(cron = "0 0 0 * * *") // 매일 자정

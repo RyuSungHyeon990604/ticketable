@@ -70,6 +70,7 @@ public class ReservationService {
 		GameDto gameDto = null;
 		List<SeatDto> seats = new ArrayList<>();
 		try {
+			log.info(	reservationCreateRequest.getGameId()+ " "+ reservationCreateRequest.getSectionId() + " " + 	reservationCreateRequest.getSeatIds());
 			gameDto = gameClient.getGame(reservationCreateRequest.getGameId());
 			seats = seatClient.getSeatsByGameAndSection(
 				reservationCreateRequest.getGameId(),
