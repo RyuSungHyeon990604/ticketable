@@ -4,6 +4,7 @@ import static com.example.modulecommon.exception.ErrorCode.INVALID_RESERVATION_S
 import static com.example.modulecommon.exception.ErrorCode.RESERVATION_NOT_FOUND;
 import static com.example.modulecommon.exception.ErrorCode.SEAT_HOLD_EXPIRED;
 import static com.example.modulecommon.exception.ErrorCode.SEAT_NOT_FOUND;
+import static com.example.modulecommon.exception.ErrorCode.TICKET_ALREADY_RESERVED;
 
 import com.example.modulecommon.entity.AuthUser;
 import com.example.modulecommon.exception.ServerException;
@@ -55,6 +56,14 @@ public class ReservationService {
 		//이미 예약된 좌석이 존재하는지 체크
 		ticketSeatService.checkDuplicateSeats(reservationCreateRequest.getSeatIds(),
 			reservationCreateRequest.getGameId());
+
+		if(reservationRepository.existsByReserveSeats_SeatIdInAndState(
+			reservationCreateRequest.getSeatIds(),
+			"WAITING_PAYMENT")
+		) {
+			throw new ServerException(TICKET_ALREADY_RESERVED);
+		}
+
 		//검증이 완료되면 좌석 점유
 		seatHoldRedisUtil.holdSeatAtomic(
 			reservationCreateRequest.getGameId(),
@@ -106,7 +115,7 @@ public class ReservationService {
 			return ticketService.getTicketByReservationId(reservationId);
 		}
 
-		List<Long> seatIds = reservation.getReservations().stream().map(ReserveSeat::getSeatId).toList();
+		List<Long> seatIds = reservation.getReserveSeats().stream().map(ReserveSeat::getSeatId).toList();
 		Long gameId = reservation.getGameId();
 
 		//authUser가 선점한 좌석이맞는지 최종 확인 & TTL만료시 에약완료 불가

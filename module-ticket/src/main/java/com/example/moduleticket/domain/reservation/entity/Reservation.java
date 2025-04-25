@@ -37,7 +37,7 @@ public class Reservation extends Timestamped {
 	private int totalPrice;
 
 	@OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<ReserveSeat> reservations = new HashSet<>();
+	private Set<ReserveSeat> reserveSeats = new HashSet<>();
 
 	public Reservation(Long memberId, Long gameId, String state, int totalPrice) {
 		this.memberId = memberId;
@@ -48,7 +48,7 @@ public class Reservation extends Timestamped {
 
 	public void addSeat(ReserveSeat reserveSeat) {
 		reserveSeat.setReservation(this);
-		this.reservations.add(reserveSeat);
+		this.reserveSeats.add(reserveSeat);
 	}
 
 	public void completePayment() {
