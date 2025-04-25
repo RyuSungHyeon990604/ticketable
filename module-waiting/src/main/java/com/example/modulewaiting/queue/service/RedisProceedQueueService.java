@@ -1,6 +1,6 @@
-package com.example.moduleticket.domain.queue.service;
+package com.example.modulewaiting.queue.service;
 
-import com.example.moduleticket.domain.queue.QueueSystemConstants;
+import com.example.modulewaiting.queue.QueueSystemConstants;
 import java.util.List;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;

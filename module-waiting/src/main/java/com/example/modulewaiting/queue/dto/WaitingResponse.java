@@ -1,4 +1,4 @@
-package com.example.moduleticket.domain.queue.dto;
+package com.example.modulewaiting.queue.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -193,6 +193,7 @@ public class ReservationService {
 	@Transactional
 	public void proceedReservationExpire() {
 		LocalDateTime expiredLimit = LocalDateTime.now().minusMinutes(15);
-		reservationRepository.updateExpiredReservations(expiredLimit);
+		int updated = reservationRepository.updateExpiredReservations(expiredLimit);
+		log.info("{} rows updated", updated);
 	}
 }

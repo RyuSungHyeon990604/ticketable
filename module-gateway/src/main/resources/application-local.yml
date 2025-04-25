@@ -8,7 +8,12 @@ spring:
             - Path=/api/v*/games/**, /api/v*/seats/**, /api/v*/sections/**, /api/v*/stadiums/**
           filters:
             - name: ValidateToken
+            - name: WaitingQueue
             - RewritePath=/module-game/(?<segment>.*), /${segment}
+          metadata:
+            useWaiting: true
+            applyPath:
+              - "/api/v*/games/{gameId}"
 
         - id: module-ticket
           uri: http://localhost:8082

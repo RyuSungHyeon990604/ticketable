@@ -1,4 +1,4 @@
-package com.example.moduleticket.domain.queue.service;
+package com.example.modulewaiting.queue.service;
 
 public interface WaitingQueueService {
 
