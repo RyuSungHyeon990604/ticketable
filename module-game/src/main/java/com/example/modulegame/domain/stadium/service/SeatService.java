@@ -108,20 +108,7 @@ public class SeatService {
         return seatRepository.findBySectionId(sectionId);
     }
 
-
-	// PRICE
-//    public List<Seat> getAllSeatEntity(List<Long> seatIds) {
-//        List<Seat> seats = seatRepository.findAllByIds(seatIds);
-//        if (seats.size() != seatIds.size()) {
-//            log.debug("요청한 좌석을 찾을 수 없습니다.");
-//            throw new ServerException(SEAT_NOT_FOUND);
-//        }
-//        return seats;
-//    }
-
-//    public void holdSeat(Auth auth, SeatHoldRequest seatHoldRequest) {
-//        seatValidator.validateSeatsBelongToGame(seatHoldRequest.getGameId(), seatHoldRequest.getSeatIds());
-//        ticketSeatService.checkDuplicateSeats(seatHoldRequest.getSeatIds(), seatHoldRequest.getGameId());
-//        seatHoldRedisUtil.holdSeatAtomic(seatHoldRequest.getSeatIds(), seatHoldRequest.getGameId(), String.valueOf(auth.getId()));
-//    }
+    public Seat getSeat(Long seatId) {
+        return seatRepository.findById(seatId).orElseThrow(() -> new ServerException(SEAT_NOT_FOUND));
+    }
 }

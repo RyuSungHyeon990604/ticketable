@@ -57,9 +57,4 @@ public class TicketController {
 		ticketService.deleteAllTicketsByCanceledGame(gameId);
 		return ResponseEntity.ok().build();
 	}
-
-	@GetMapping("/tickets/games/{gameId}")
-	public ResponseEntity<Set<Long>> getBookedSeatsId(@PathVariable Long gameId) {
-		return ResponseEntity.ok(ticketService.getBookedSeatsId(gameId));
-	}
 }

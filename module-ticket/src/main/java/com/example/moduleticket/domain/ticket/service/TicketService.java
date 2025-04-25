@@ -9,6 +9,7 @@ import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.ticket.dto.TicketContext;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
+import com.example.moduleticket.domain.reservation.event.publisher.TicketPublisher;
 import com.example.moduleticket.domain.ticket.repository.TicketRepository;
 import com.example.moduleticket.feign.GameClient;
 import com.example.moduleticket.feign.dto.GameDto;
@@ -16,7 +17,6 @@ import com.example.moduleticket.feign.dto.SeatDto;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -34,6 +34,7 @@ public class TicketService {
 	private final TicketPaymentService ticketPaymentService;
 	private final TicketCreateService ticketCreateService;
 	private final GameClient gameClient;
+
 
 	@Transactional(readOnly = true)
 	public TicketResponse getTicket(AuthUser auth, Long ticketId) {
@@ -74,6 +75,8 @@ public class TicketService {
 		TicketContext ticketContext = ticketCreateService.createTicket(auth, gameDto, seats, reservation);
 		ticketPaymentService.paymentTicket(ticketContext);
 
+
+
 		return ticketContext.toResponse();
 	}
 
@@ -95,8 +98,6 @@ public class TicketService {
 		// 3. 사용자 포인트 환불
 		//pointService.increasePoint(ticket.getMemberId(), refund, PointHistoryType.REFUND);
 
-		// 캐싱 삭제
-		//gameCacheService.handleAfterTicketChangeAll(ticket.getGameId(), ticketSeatService.getSeat(ticketId).get(0));
 	}
 
 	/**
@@ -132,9 +133,5 @@ public class TicketService {
 		log.debug("티켓 결제 금액 조회 ticketPayment: {}", totalPoint);
 
 		return new TicketResponse(ticket.getId(), title, ticketSeats, startTime, totalPoint);
-	}
-
-	public Set<Long> getBookedSeatsId(Long gameId) {
-		return ticketRepository.findBookedSeatIdByGameId(gameId);
 	}
 }
