@@ -1,11 +1,8 @@
 package com.example.modulemember.member.entity;
 
-import com.example.moduleauth.common.role.MemberRole;
 import com.example.modulecommon.entity.Timestamped;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,14 +27,13 @@ public class Member extends Timestamped {
 	@Column(length = 20)
 	private String name;
 	
-	@Column(length = 10)
-	@Enumerated(EnumType.STRING)
-	private MemberRole role;
+	@Column(length = 15)
+	private String role;
 	
 	private LocalDateTime deletedAt;
 	
 	@Builder
-	public Member(String email, String password, String name, MemberRole role) {
+	public Member(String email, String password, String name, String role) {
 		this.email = email;
 		this.password = password;
 		this.name = name;
@@ -50,13 +46,5 @@ public class Member extends Timestamped {
 	
 	public void changePassword(String password) {
 		this.password = password;
-	}
-	
-	private Member(Long id) {
-		this.id = id;
-	}
-	
-	public static Member fromAuth(Long authId) {
-		return new Member(authId);
 	}
 }

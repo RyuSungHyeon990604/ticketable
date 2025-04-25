@@ -34,6 +34,7 @@ public class AuthController {
 		@RequestParam(required = false) String requiredRole
 	) {
 		log.info("토큰 검증 진입 성공");
+		log.info("requiredRole : {}", requiredRole);
 		authService.validateToken(authToken, requiredRole);
 		return ResponseEntity.ok().build();
 	}
