@@ -22,7 +22,7 @@ public class ReservationResponse {
 		List<String> seats = seatDtos.stream().map(SeatDto::getPosition).toList();
 		return new ReservationResponse(
 			reservation.getId(),
-			reservation.getId(),
+			reservation.getGameId(),
 			seats,
 			gameDto.getStartTime(),
 			reservation.getState(),
