@@ -1,0 +1,34 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: module-game
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v*/games/**, /api/v*/seats/**, /api/v*/sections/**, /api/v*/stadiums/**
+          filters:
+            - name: ValidateToken
+            - RewritePath=/module-game/(?<segment>.*), /${segment}
+
+        - id: module-ticket
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v*/tickets/**, /api/v*/reservations/**, /api/v*/waiting-queue/**
+          filters:
+            - name: ValidateToken
+            - RewritePath=/module-ticket/(?<segment>.*), /${segment}
+
+        - id: module-auth
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v*/auth/**, /api/v*/members/**
+
+        - id: admin-game
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v*/admin/**
+          filters:
+            - name: ValidateToken
+              args:
+                requiredRole: ROLE_ADMIN
+            - RewritePath=/admin-game/(?<segment>.*), /${segment}
