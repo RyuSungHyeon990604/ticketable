@@ -30,15 +30,19 @@ public class ReserveSeat {
 	@Column(nullable = false)
 	private Long seatId;
 
-	private ReserveSeat(Long seatId) {
+	@Column(nullable = false)
+	private Long sectionId;
+
+	private ReserveSeat(Long sectionId, Long seatId) {
 		this.seatId = seatId;
+		this.sectionId = sectionId;
 	}
 
 	public void setReservation(Reservation reservation) {
 		this.reservation = reservation;
 	}
 
-	public static List<ReserveSeat> from(List<SeatDto> seatDtos) {
-		return seatDtos.stream().map(seatDto->new ReserveSeat(seatDto.getSeatId())).toList();
+	public static List<ReserveSeat> from(Long sectionId, List<SeatDto> seatDtos) {
+		return seatDtos.stream().map(seatDto->new ReserveSeat(sectionId, seatDto.getSeatId())).toList();
 	}
 }

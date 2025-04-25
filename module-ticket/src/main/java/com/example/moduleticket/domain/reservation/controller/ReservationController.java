@@ -36,4 +36,13 @@ public class ReservationController {
 	) {
 		return ResponseEntity.ok(reservationService.processReservationCompletion(authUser, reservationId));
 	}
+
+	@PostMapping("/v1/reservations/{reservationId}/cancel")
+	public ResponseEntity<String> cancelReservation(
+		@LoginUser AuthUser authUser,
+		@PathVariable Long reservationId
+	) {
+		reservationService.cancelReservation(authUser, reservationId);
+		return ResponseEntity.ok("예약이 취소 되었습니다.");
+	}
 }

@@ -7,7 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public class PaymentRequest {
 	private int amount;
-	//reservation
+	private String action;
+	//reservation, auction
 	private String type;
 	private Long typeIdentity;
 }

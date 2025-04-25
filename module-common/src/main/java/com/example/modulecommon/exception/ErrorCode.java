@@ -30,6 +30,7 @@ public enum ErrorCode {
 	GAME_NOT_FOUND("해당하는 경기를 찾을 수 없습니다.", NOT_FOUND),
 	GAME_SAVE_FAILED("경기 저장 실패", INTERNAL_SERVER_ERROR),
 	INVALID_TICKETING_START_TIME("경기 시작 시간이 유효하지 않습니다. (최소 7일 이후)", BAD_REQUEST),
+	ALREADY_CANCELED_GAME("이미 취소된 경기 입니다", BAD_REQUEST),
 
 	// 이미지
 	IMAGE_UPLOAD_FAILED("S3 이미지 업로드 실패", INTERNAL_SERVER_ERROR),
@@ -42,6 +43,7 @@ public enum ErrorCode {
 
 	//예약
 	RESERVATION_NOT_FOUND("예약 내역이 존재하지않습니다.", BAD_REQUEST),
+	INVALID_RESERVATION_STATE("취소할 수 없는 예약입니다", BAD_REQUEST),
 
 	//대기열
 	INVALID_WAITING_TOKEN("올바르지않은 대기열 토큰 입니다.", BAD_REQUEST),
