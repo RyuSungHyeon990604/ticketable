@@ -91,9 +91,12 @@ public class ReservationService {
 		Reservation reservation = reservationRepository.findByIdMemberId(reservationId, authUser.getMemberId())
 			.orElseThrow(() -> new ServerException(RESERVATION_NOT_FOUND));
 		if(reservation.getState().equals("WAITING_PAYMENT")) {
+			List<Long> seatIds = reservation.getReserveSeats().stream().map(ReserveSeat::getSeatId).toList();
 			reservation.cancelPayment();
+			eventPublisher.publishEvent(new SeatHoldReleaseEvent(seatIds, authUser.getMemberId()));
 			return;
 		}
+
 		throw new ServerException(INVALID_RESERVATION_STATE);
 	}
 
