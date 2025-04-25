@@ -82,7 +82,7 @@ public class LuaScriptConfig {
 	 * @return DefaultRedisScript - Lua 스크립트 실행을 위한 RedisScript Bean
 	 */
 	@Bean
-	public DefaultRedisScript<Long> moveWaitingToProceedScript(){
+	public DefaultRedisScript<Long> moveWaitingToProceedScript() {
 		DefaultRedisScript<Long> script = new DefaultRedisScript<>();
 		script.setResultType(Long.class);
 		script.setLocation(new ClassPathResource("lua/moveWaitingToProceed.lua"));
@@ -90,7 +90,7 @@ public class LuaScriptConfig {
 	}
 
 	@Bean
-	public DefaultRedisScript<Long> moveWaitingToProceedScriptV2(){
+	public DefaultRedisScript<Long> moveWaitingToProceedScriptV2() {
 		DefaultRedisScript<Long> script = new DefaultRedisScript<>();
 		script.setResultType(Long.class);
 		script.setLocation(new ClassPathResource("lua/moveWaitingToProceedV2.lua"));
