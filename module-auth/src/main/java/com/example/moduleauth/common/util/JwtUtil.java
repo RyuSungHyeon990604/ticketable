@@ -36,7 +36,7 @@ public class JwtUtil {
 		byte[] bytes = Base64.getDecoder().decode(secretKey);
 		key = Keys.hmacShaKeyFor(bytes);
 	}
-	
+
 	public String createAccessToken(Long userId, String email, String name, MemberRole role) {
 		Date date = new Date();
 		
