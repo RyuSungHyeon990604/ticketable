@@ -42,8 +42,8 @@ spring:
             - name: ValidateToken
             - RewritePath=/module-member/(?<segment>.*), /${segment}
 
-#        - id: module-point
-#          uri: http://localhost:8087
+        - id: module-point
+          uri: http://localhost:8087
 
         - id: admin-game
           uri: http://localhost:8081

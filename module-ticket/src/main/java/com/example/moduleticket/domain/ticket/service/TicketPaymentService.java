@@ -4,7 +4,6 @@ import static com.example.modulecommon.exception.ErrorCode.TICKET_PAYMENT_NOT_FO
 
 import com.example.modulecommon.exception.ServerException;
 import com.example.moduleticket.domain.point.enums.PointHistoryType;
-import com.example.moduleticket.domain.reservation.dto.ReservationDto;
 import com.example.moduleticket.domain.ticket.dto.TicketContext;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
 import com.example.moduleticket.domain.ticket.entity.TicketPayment;
