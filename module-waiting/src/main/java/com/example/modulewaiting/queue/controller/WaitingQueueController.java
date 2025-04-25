@@ -25,6 +25,9 @@ public class WaitingQueueController {
 	public ResponseEntity<WaitingResponse> handleWaiting(@RequestHeader(name = "waiting-token", required = false) String token) {
 
 		if(token != null && queueManager.isAllowed(token)) {
+
+			queueManager.deleteTokenFromWaitingAndProceedQueue(token);
+
 			return ResponseEntity.ok(
 				new WaitingResponse(
 					0,
