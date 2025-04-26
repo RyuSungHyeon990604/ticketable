@@ -1,5 +1,6 @@
 package com.example.modulepoint.domain.point.controller;
 
+import com.example.modulepoint.domain.point.dto.request.CreatePointRequest;
 import com.example.modulepoint.domain.point.dto.request.ExchangePointRequest;
 import com.example.modulepoint.domain.point.dto.response.PointResponse;
 import com.example.modulepoint.domain.point.service.PointService;
@@ -28,5 +29,13 @@ public class PointController {
 		@PathVariable Long memberId
 	) {
 		return ResponseEntity.ok(pointService.getMemberPoint(memberId));
+	}
+	
+	@PostMapping("/v1/points")
+	public ResponseEntity<Void> createPoint(
+		@RequestBody CreatePointRequest request
+		) {
+		pointService.createPoint(request.getMemberId());
+		return ResponseEntity.ok().build();
 	}
 }

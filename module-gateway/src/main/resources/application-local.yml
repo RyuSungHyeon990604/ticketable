@@ -44,6 +44,11 @@ spring:
 
         - id: module-point
           uri: http://localhost:8087
+          predicates:
+            - Path=/api/v*/members/**
+          filters:
+            - name: ValidateToken
+            - RewritePath=/point-module/(?<segment>.*), /${segment}
 
         - id: admin-game
           uri: http://localhost:8081
@@ -54,3 +59,13 @@ spring:
               args:
                 requiredRole: ROLE_ADMIN
             - RewritePath=/admin-game/(?<segment>.*), /${segment}
+
+        - id: exchange-point
+          uri: http://localhost:8087
+          predicates:
+            - Path=/api/v*/admin/**
+          filters:
+            - name: ValidateToken
+              args:
+                requiredRole: ROLE_ADMIN
+            - RewritePath=/exchange-point/(?<segment>.*), /${segment}

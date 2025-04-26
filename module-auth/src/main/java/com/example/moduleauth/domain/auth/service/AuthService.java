@@ -3,12 +3,13 @@ package com.example.moduleauth.domain.auth.service;
 import com.example.moduleauth.domain.auth.dto.request.LoginRequest;
 import com.example.moduleauth.domain.auth.dto.request.SignupRequest;
 import com.example.moduleauth.domain.auth.dto.response.AuthResponse;
-//import com.example.moduleauth.feign.PointService;
+import com.example.moduleauth.feign.PointService;
 import com.example.modulecommon.exception.ServerException;
 import com.example.moduleauth.common.role.MemberRole;
 import com.example.moduleauth.common.util.JwtUtil;
 import com.example.modulemember.member.entity.Member;
 import com.example.modulemember.member.repository.MemberRepository;
+import com.example.modulepoint.domain.point.dto.request.CreatePointRequest;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,7 +25,7 @@ public class AuthService {
 	private final MemberRepository memberRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtUtil jwtUtil;
-//	private final PointService pointService;
+	private final PointService pointService;
 	
 	@Transactional
 	public AuthResponse signup(SignupRequest request) {
@@ -46,7 +47,7 @@ public class AuthService {
 			.build();
 		Member savedMember = memberRepository.save(member);
 
-//		pointService.createPoint(savedMember);
+		pointService.createPoint(new CreatePointRequest(savedMember.getId()));
 
 		String accessToken = jwtUtil.createAccessToken(
 			savedMember.getId(), savedMember.getEmail(), savedMember.getName(), memberRole
