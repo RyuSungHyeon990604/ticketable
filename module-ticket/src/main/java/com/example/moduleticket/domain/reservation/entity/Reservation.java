@@ -36,9 +36,6 @@ public class Reservation extends Timestamped {
 	@Column(nullable = false)
 	private int totalPrice;
 
-	@Column(nullable = false)
-	private String idempotencyKey;
-
 	@OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ReserveSeat> reservations = new HashSet<>();
 
@@ -47,7 +44,6 @@ public class Reservation extends Timestamped {
 		this.gameId = gameId;
 		this.state = state;
 		this.totalPrice = totalPrice;
-		this.idempotencyKey = UUID.randomUUID().toString();
 	}
 
 	public void addSeat(ReserveSeat reserveSeat) {

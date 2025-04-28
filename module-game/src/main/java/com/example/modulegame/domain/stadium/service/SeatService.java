@@ -98,32 +98,30 @@ public class SeatService {
     }
 
     //경기에 포함된 좌석을 조회
-	public List<SeatDto> getSeatDtoList(Long gameId, List<Long> seatIds) {
-        List<SeatDto> seats = seatRepository.findSeatDtosByGameIdAndSeatIds(gameId, seatIds);
+	public List<SeatDto> getSeatsByGameAndSection(Long gameId, Long sectionId, List<Long> seatIds ) {
+        List<SeatDto> seats = seatRepository.findSeatDtosByGameAndSection(gameId, sectionId, seatIds);
         if(seats.size() != seatIds.size()){
             throw new ServerException(SEAT_NOT_FOUND);
         }
         return seats;
     }
 
+    public List<SeatDto> getSeatsByGame(Long gameId, List<Long> seatIds) {
+        List<SeatDto> seats = seatRepository.findSeatDtosByGame(gameId, seatIds);
+        if(seats.size() != seatIds.size()){
+            throw new ServerException(SEAT_NOT_FOUND);
+        }
+        return seats;
+    }
+    public List<Seat> getSeatsBySectionId(Long sectionId) {
+        return seatRepository.findBySectionId(sectionId);
+    }
     public SectionAndPositionDto getSectionAndPositions(List<Long> seatIds) {
         List<Seat> seats = seatRepository.findAllById(seatIds);
         return SectionAndPositionDto.from(seats);
     }
 
-	// PRICE
-//    public List<Seat> getAllSeatEntity(List<Long> seatIds) {
-//        List<Seat> seats = seatRepository.findAllByIds(seatIds);
-//        if (seats.size() != seatIds.size()) {
-//            log.debug("요청한 좌석을 찾을 수 없습니다.");
-//            throw new ServerException(SEAT_NOT_FOUND);
-//        }
-//        return seats;
-//    }
-
-//    public void holdSeat(Auth auth, SeatHoldRequest seatHoldRequest) {
-//        seatValidator.validateSeatsBelongToGame(seatHoldRequest.getGameId(), seatHoldRequest.getSeatIds());
-//        ticketSeatService.checkDuplicateSeats(seatHoldRequest.getSeatIds(), seatHoldRequest.getGameId());
-//        seatHoldRedisUtil.holdSeatAtomic(seatHoldRequest.getSeatIds(), seatHoldRequest.getGameId(), String.valueOf(auth.getId()));
-//    }
+    public Seat getSeat(Long seatId) {
+        return seatRepository.findById(seatId).orElseThrow(() -> new ServerException(SEAT_NOT_FOUND));
+    }
 }
