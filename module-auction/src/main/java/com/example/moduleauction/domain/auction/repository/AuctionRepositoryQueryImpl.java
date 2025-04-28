@@ -40,7 +40,7 @@ public class AuctionRepositoryQueryImpl implements AuctionRepositoryQuery {
 		List<Long> results = jpaQueryFactory
 			.select(auction.id)
 			.from(auction)
-			.join(auction.auctionTicketInfo, auctionTicketInfo).fetchJoin()
+			.join(auction.auctionTicketInfo, auctionTicketInfo)
 			.where(homeEq, awayEq, startTimeBetween, seatCountEq, isTogether, deletedAtIsNull)
 			.offset(pageable.getPageNumber())
 			.limit(pageable.getPageSize())

@@ -10,5 +10,5 @@ import com.example.moduleauction.feign.dto.GameDto;
 public interface GameClient {
 
 	@GetMapping("/api/internal/games/{gameId}")
-	GameDto getGame(@PathVariable Long gameId);
+	GameDto getGame(@PathVariable("gameId") Long gameId);
 }

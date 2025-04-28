@@ -92,10 +92,13 @@ public class Auction extends Timestamped {
 	}
 
 	public boolean isBidPointEnough(Integer bidPoint) {
-		return this.bidPoint >= bidPoint;
+		return this.bidPoint > bidPoint;
 	}
 
 	public boolean isSameBidder(Long bidderId) {
+		if (this.bidderId == null) {
+			return false;
+		}
 		return this.bidderId.equals(bidderId);
 	}
 }

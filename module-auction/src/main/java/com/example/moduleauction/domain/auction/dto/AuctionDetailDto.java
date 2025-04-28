@@ -17,33 +17,34 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AuctionDetailDto {
 
-	private final Long id;
+	private Long id;
 
-	private final Integer startPoint;
+	private Integer startPoint;
 
-	private final Integer standardPoint;
+	private Integer standardPoint;
 
-	private final String sectionType;
+	private String sectionType;
 
-	private final String sectionCode;
+	private String sectionCode;
 
-	private final String seatInfo;
+	private String seatInfo;
 
-	private final Integer seatCount;
+	private Integer seatCount;
 
-	private final Boolean isTogether;
+	private Boolean isTogether;
 
-	private final LocalDateTime gameStartTime;
+	private LocalDateTime gameStartTime;
 
-	private final String home;
+	private String home;
 
-	private final String away;
+	private String away;
 
-	private final String gameType;
+	private String gameType;
 
-	private final LocalDateTime createdAt;
+	private LocalDateTime createdAt;
 
 	public static AuctionDetailDto of(Auction auction, AuctionTicketInfo auctionTicketInfo, TicketDto ticketDto,
 		GameDto gameDto, SectionAndPositionDto sectionAndPositionDto, List<String> sortedPositions) {

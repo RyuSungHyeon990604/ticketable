@@ -83,9 +83,9 @@ public class SeatController {
         return ResponseEntity.ok(seatService.getSeatsByGame(gameId, seatIds));
     }
 
-    @GetMapping("/internal/sections/seats")
+    @PostMapping("/internal/sections/seats")
     public ResponseEntity<SectionAndPositionDto> getSectionAndPositions(
-        @RequestParam List<Long> seatIds
+        @RequestBody List<Long> seatIds
     ) {
         return ResponseEntity.ok(seatService.getSectionAndPositions(seatIds));
     }

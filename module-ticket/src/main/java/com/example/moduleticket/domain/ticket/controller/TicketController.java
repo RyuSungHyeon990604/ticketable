@@ -61,12 +61,13 @@ public class TicketController {
 
 	@GetMapping("/internal/members/{memberId}/tickets/{ticketId}")
 	public ResponseEntity<TicketDto> getTicketInternal(
-		@PathVariable Long memberId, Long ticketId
+		@PathVariable("memberId") Long memberId,
+		@PathVariable("ticketId") Long ticketId
 	) {
 		return ResponseEntity.ok(ticketService.getTicketInternal(memberId, ticketId));
 	}
 
-	@GetMapping("/api/Internal/games/{gameId}/tickets")
+	@GetMapping("/Internal/games/{gameId}/tickets")
 	public ResponseEntity<List<TicketDto>> getTickets(
 		@PathVariable Long gameId
 	) {

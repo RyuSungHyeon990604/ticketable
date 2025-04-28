@@ -11,9 +11,12 @@ import com.example.moduleauction.feign.dto.TicketDto;
 @FeignClient(name = "ticket", url = "http://localhost:8082")
 public interface TicketClient {
 
-	@GetMapping("/api/Internal/members/{memberId}/tickets/{ticketId}")
-	TicketDto getTicket(@PathVariable Long memberId, Long ticketId);
+	@GetMapping("/api/internal/members/{memberId}/tickets/{ticketId}")
+	TicketDto getTicket(
+		@PathVariable("memberId") Long memberId,
+		@PathVariable("ticketId") Long ticketId
+	);
 
-	@GetMapping("/api/Internal/games/{gameId}/tickets")
-	List<TicketDto> getTickets(@PathVariable Long gameId);
+	@GetMapping("/api/internal/games/{gameId}/tickets")
+	List<TicketDto> getTickets(@PathVariable("gameId") Long gameId);
 }
