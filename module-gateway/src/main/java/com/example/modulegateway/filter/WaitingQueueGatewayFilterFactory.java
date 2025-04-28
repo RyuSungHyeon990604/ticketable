@@ -20,7 +20,6 @@ public class WaitingQueueGatewayFilterFactory
 	extends AbstractGatewayFilterFactory<WaitingQueueGatewayFilterFactory.Config> {
 
 	private final WebClient webClient = WebClient.create("http://localhost:8085");
-	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
 	public WaitingQueueGatewayFilterFactory() {
 		super(Config.class);
@@ -29,19 +28,6 @@ public class WaitingQueueGatewayFilterFactory
 	@Override
 	public GatewayFilter apply(Config config) {
 		return (exchange, chain) -> {
-			Route route = exchange.getAttribute(ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR);
-
-			Boolean isWaiting = (Boolean) route.getMetadata().get("useWaiting");
-			if(Boolean.FALSE.equals(isWaiting)) {
-				return chain.filter(exchange);
-			}
-
-			String requestPath = exchange.getRequest().getPath().value();
-			LinkedHashMap<String, String> applyPaths = (LinkedHashMap<String, String>) route.getMetadata().get("applyPath");
-			if (applyPaths != null && applyPaths.values().stream().noneMatch(pattern -> pathMatcher.match(pattern, requestPath))) {
-				return chain.filter(exchange); // 경로 제외 → 바로 통과
-			}
-
 			String token = exchange.getRequest().getHeaders().getFirst("waiting-token");
 			return webClient.get()
 				.uri("/api/v1/waiting-queue/order")
