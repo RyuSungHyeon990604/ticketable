@@ -14,6 +14,14 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
 
     boolean existsBySectionId(Long sectionId);
 
+    @Query("select seat "
+        + "   from Seat seat "
+        + "   join fetch seat.section "
+        + "   join fetch seat.section.stadium "
+        + "  where seat.id in :ids ")
+    List<Seat> findAllByIds(List<Long> ids);
+
+    List<Seat> findBySectionId(Long sectionId);
     @Query(
         " select new com.example.modulegame.domain.game.dto.SeatDto(" +
         " seat.id, " +

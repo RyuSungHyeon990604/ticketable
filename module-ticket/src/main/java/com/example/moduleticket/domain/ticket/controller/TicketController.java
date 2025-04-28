@@ -6,6 +6,8 @@ import com.example.moduleticket.domain.ticket.dto.request.TicketCreateRequest;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.service.TicketService;
 import java.util.List;
+import java.util.Set;
+
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,5 +50,11 @@ public class TicketController {
 		ticketService.cancelTicket(authUser, ticketId);
 
 		return ResponseEntity.noContent().build();
+	}
+
+	@DeleteMapping("/tickets/games/{gameId}")
+	public ResponseEntity<Void> deleteTicketsByGameId(@PathVariable Long gameId) {
+		ticketService.deleteAllTicketsByCanceledGame(gameId);
+		return ResponseEntity.ok().build();
 	}
 }

@@ -17,6 +17,17 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    set('springCloudVersion', "2024.0.1")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+
 dependencies {
     implementation project(':module-common')
 
@@ -35,6 +46,13 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation("io.micrometer:micrometer-registry-prometheus")
+
+    testImplementation 'com.h2database:h2'  // H2 테스트 전용으로 변경
+    
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // OpenFeign
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 }
 
 tasks.named('test') {

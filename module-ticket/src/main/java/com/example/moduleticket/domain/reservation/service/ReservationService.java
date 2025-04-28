@@ -2,8 +2,6 @@ package com.example.moduleticket.domain.reservation.service;
 
 import static com.example.modulecommon.exception.ErrorCode.INVALID_RESERVATION_STATE;
 import static com.example.modulecommon.exception.ErrorCode.RESERVATION_NOT_FOUND;
-import static com.example.modulecommon.exception.ErrorCode.SEAT_HOLD_EXPIRED;
-import static com.example.modulecommon.exception.ErrorCode.SEAT_NOT_FOUND;
 
 import com.example.modulecommon.entity.AuthUser;
 import com.example.modulecommon.exception.ServerException;
@@ -13,6 +11,8 @@ import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.entity.ReserveSeat;
 import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
 import com.example.moduleticket.domain.ticket.event.ReservationUnknownFailureEvent;
+import com.example.moduleticket.domain.reservation.event.TicketEvent;
+import com.example.moduleticket.domain.reservation.event.publisher.TicketPublisher;
 import com.example.moduleticket.domain.ticket.service.TicketSeatService;
 import com.example.moduleticket.feign.GameClient;
 import com.example.moduleticket.feign.PaymentClient;
@@ -22,12 +22,11 @@ import com.example.moduleticket.feign.dto.SeatDto;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.event.SeatHoldReleaseEvent;
 import com.example.moduleticket.domain.ticket.service.TicketService;
-import com.example.moduleticket.feign.dto.request.PaymentRequest;
-import com.example.moduleticket.util.IdempotencyKeyUtil;
 import com.example.moduleticket.util.SeatHoldRedisUtil;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -41,59 +40,37 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReservationService {
 
 	private final ReservationRepository reservationRepository;
+	private final ReservationCreateService reservationCreateService;
+	private final ReservationPaymentService reservationPaymentService;
+	private final ReservationValidator reservationValidator;
 	private final SeatHoldRedisUtil seatHoldRedisUtil;
 	private final TicketService ticketService;
-	private final TicketSeatService ticketSeatService;
-	private final GameClient gameClient;
-	private final SeatClient seatClient;
 	private final ApplicationEventPublisher eventPublisher;
-	private final PaymentClient paymentClient;
+	private final TicketPublisher ticketPublisher;
 
-	@Transactional
-	public ReservationResponse createReservation(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
-
-		//이미 예약된 좌석이 존재하는지 체크
-		ticketSeatService.checkDuplicateSeats(reservationCreateRequest.getSeatIds(),
-			reservationCreateRequest.getGameId());
-		//검증이 완료되면 좌석 점유
+	public ReservationResponse processReserve(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
 		seatHoldRedisUtil.holdSeatAtomic(
 			reservationCreateRequest.getGameId(),
 			reservationCreateRequest.getSeatIds(),
 			String.valueOf(auth.getMemberId())
 		);
-
-		GameDto gameDto = null;
-		List<SeatDto> seats = new ArrayList<>();
 		try {
-			gameDto = gameClient.getGame(reservationCreateRequest.getGameId());
-			seats = seatClient.getSeatsByGameAndSection(
-				reservationCreateRequest.getGameId(),
-				reservationCreateRequest.getSectionId(),
-				reservationCreateRequest.getSeatIds()
+			ReservationResponse reservation = reservationCreateService.createReservation(
+				auth,
+				reservationCreateRequest
 			);
+			// 캐시 이벤트 발생
+			TicketEvent ticketEvent = new TicketEvent(
+				reservationCreateRequest.getGameId(),
+				reservationCreateRequest.getSeatIds().get(0)
+			);
+			ticketPublisher.publish(ticketEvent);
+
+			return reservation;
 		} catch (Exception e) {
-			//경기, 좌석 정보를 가져오는도중 예외발생 시 선점했던 좌석을 해제
-			seatHoldRedisUtil.releaseSeatAtomic(reservationCreateRequest.getSeatIds(),
-				reservationCreateRequest.getGameId());
-			throw new ServerException(SEAT_NOT_FOUND);
+			seatHoldRedisUtil.releaseSeatAtomic(reservationCreateRequest.getSeatIds(),reservationCreateRequest.getGameId());
+			throw e;
 		}
-
-		int seatPrice = seats.stream().mapToInt(SeatDto::getPrice).sum();
-
-		//예약 데이터 생성
-		Reservation reservation = new Reservation(
-			auth.getMemberId(),
-			gameDto.getId(),
-			"WAITING_PAYMENT",
-			seatPrice
-		);
-		List<ReserveSeat> ReserveSeatList = ReserveSeat.from(reservationCreateRequest.getSectionId(), seats);
-		for (ReserveSeat reserveSeat : ReserveSeatList) {
-			reservation.addSeat(reserveSeat);
-		}
-		reservationRepository.save(reservation);
-
-		return ReservationResponse.from(reservation, gameDto, seats);
 	}
 
 	@Transactional
@@ -106,56 +83,19 @@ public class ReservationService {
 			return ticketService.getTicketByReservationId(reservationId);
 		}
 
-		List<Long> seatIds = reservation.getReservations().stream().map(ReserveSeat::getSeatId).toList();
+		List<Long> seatIds = reservation.getReserveSeats().stream().map(ReserveSeat::getSeatId).toList();
 		Long gameId = reservation.getGameId();
 
 		//authUser가 선점한 좌석이맞는지 최종 확인 & TTL만료시 에약완료 불가
-		try {
-			ticketSeatService.checkDuplicateSeats(seatIds, gameId);
-			seatHoldRedisUtil.checkHeldSeatAtomic(seatIds, gameId, String.valueOf(authUser.getMemberId()));
-		} catch (ServerException e) {
-			// 선점한 좌석이 만료되었을경우 예약상태를 만료상태로 변경
-			if (e.getErrorCode() == SEAT_HOLD_EXPIRED) {
-				log.info("TTL 만료로 예약 만료 처리됨: reservationId = {}", reservationId);
-				reservation.expiredPayment();
-			}
-			throw e;
-		}
+		reservationValidator.validateReservationForComplete(authUser, gameId, seatIds, reservation);
 
-		PaymentRequest paymentRequest = new PaymentRequest(
-			reservation.getTotalPrice(),
-			"decrement",
-			"reservation",
-			reservationId
-		);
-
-		//결제요청
-		try {
-			paymentClient.processPayment(
-				IdempotencyKeyUtil.forReservation(reservationId, "decrement"),
-				authUser.getMemberId(),
-				paymentRequest
-			);
-		} catch (ServerException e) {
-			throw e;
-		} catch (Exception e) {
-			//알수없는 오류이므로 다시결제요청
-			reTryPayment(
-				paymentRequest,
-				IdempotencyKeyUtil.forReservation(reservationId, "decrement"),
-				authUser.getMemberId(),
-				reservation
-			);
-		}
-
-		GameDto gameDto = gameClient.getGame(gameId);
-		List<SeatDto> seatDtos = seatClient.getSeatsByGame(gameId, seatIds);
+		reservationPaymentService.reservePayment(authUser, reservationId, reservation.getTotalPrice());
 
 		//티켓 생성
 		TicketResponse ticketResponse = ticketService.issueTicketFromReservation(
 			authUser,
-			gameDto,
-			seatDtos,
+			gameId,
+			seatIds,
 			reservation
 		);
 
@@ -165,26 +105,18 @@ public class ReservationService {
 		return ticketResponse;
 	}
 
-	private void reTryPayment(PaymentRequest request, String idempotencyKey, Long memberId, Reservation reservation) {
-		try {
-			paymentClient.processPayment(idempotencyKey, memberId, request);
-		} catch (ServerException e) {
-			throw e;
-		} catch (Exception e) {
-			//알수없는 예외로 마킹
-			eventPublisher.publishEvent(new ReservationUnknownFailureEvent(reservation.getId()));
-			throw e;
-		}
-	}
 
 	@Transactional
 	public void cancelReservation(AuthUser authUser, Long reservationId) {
 		Reservation reservation = reservationRepository.findByIdMemberId(reservationId, authUser.getMemberId())
 			.orElseThrow(() -> new ServerException(RESERVATION_NOT_FOUND));
 		if(reservation.getState().equals("WAITING_PAYMENT")) {
+			List<Long> seatIds = reservation.getReserveSeats().stream().map(ReserveSeat::getSeatId).toList();
 			reservation.cancelPayment();
+			eventPublisher.publishEvent(new SeatHoldReleaseEvent(seatIds, authUser.getMemberId()));
 			return;
 		}
+
 		throw new ServerException(INVALID_RESERVATION_STATE);
 	}
 
@@ -195,5 +127,8 @@ public class ReservationService {
 		LocalDateTime expiredLimit = LocalDateTime.now().minusMinutes(15);
 		int updated = reservationRepository.updateExpiredReservations(expiredLimit);
 		log.info("{} rows updated", updated);
+	}
+	public Set<Long> getBookedSeatsId(Long gameId) {
+		return reservationRepository.findBookedSeatIdByGameId(gameId);
 	}
 }
