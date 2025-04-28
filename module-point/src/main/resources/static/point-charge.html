@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <title>포인트 충전</title>
@@ -8,53 +8,41 @@
 </head>
 <body>
 <h2>포인트 충전</h2>
-
-<!-- 금액 입력 -->
-<label for="chargeAmount">충전할 금액 (₩): </label>
-<input type="number" id="chargeAmount" min="1000" step="1000" placeholder="예: 10000"><br><br>
-
-<!-- 충전 버튼 -->
+<input type="number" id="chargeAmount" min="1000" placeholder="예:10000"><br><br>
 <button id="chargeBtn">충전하기</button>
 
-<script th:inline="javascript">
-    var impCode = 'imp67846427';
+<script>
+    IMP.init('imp67846427');
+    $('#chargeBtn').click(function(){
+        const amount = +$('#chargeAmount').val();
+        if(!amount||amount<1000) return alert('1000원 이상 입력');
 
-    $('#chargeBtn').click(function () {
-        const amount = parseInt($('#chargeAmount').val());
+        const userId = localStorage.getItem('userId'),
+            token  = localStorage.getItem('authToken');
+        if(!userId||!token) return alert('로그인 후 이용하세요');
 
-        if (!amount || amount < 1000) {
-            alert('1000원 이상 입력해주세요.');
-            return;
-        }
-
-        // ✅ 결제창 띄우기
-        IMP.init(impCode);
         IMP.request_pay({
-            pg: 'html5_inicis.INIpayTest', // 테스트용 PG사
+            pg: 'html5_inicis.INIpayTest',
             pay_method: 'card',
             merchant_uid: 'order_' + new Date().getTime(),
             name: '포인트 충전',
-            amount: amount,
-            buyer_email: /*[[${user.email}]]*/ 'test@example.com' // 서버에서 전달되면 교체됨
-        }, function (rsp) {
-            if (rsp.success) {
-                const token = localStorage.getItem("Authorization");
-
+            amount,
+            buyer_email: ''
+        }, function(rsp){
+            if(rsp.success){
                 $.ajax({
                     type: 'POST',
-                    url: '/api/v1/members/{memberId}/payments/' + rsp.imp_uid,
-                    headers: {
-                        'Authorization': token
-                    },
-                }).done(function (rsp) {
-                    console.log(rsp)
-                    alert('결제가 완료되었습니다!\n결제금액: ' + rsp.response.amount + '원');
-                    location.reload();
-                }).fail(function () {
-                    alert('결제는 되었지만 서버 검증에 실패했습니다.');
-                });
+                    url: `http://localhost:8087/api/v1/members/${userId}/payments/${rsp.imp_uid}`,
+                    headers: { 'Authorization': `Bearer ${token}` },
+                })
+                    .done(function(res){
+                        alert(`충전 성공! 금액: ${res.response.amount}원`);
+                    })
+                    .fail(function(xhr){
+                        alert('서버 검증 실패: ' + xhr.responseText);
+                    });
             } else {
-                alert('결제가 실패했습니다: ' + rsp.error_msg);
+                alert('결제 실패: ' + rsp.error_msg);
             }
         });
     });
