@@ -34,7 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class GameController {
     private final GameService gameService;
 
-    @PostMapping("/v1/games")
+    @PostMapping("/v1/admin/games")
     public ResponseEntity<GameCreateResponse> createGame(
             @Valid @RequestPart(value = "json") GameCreateRequest request,
             @RequestPart(value = "image") MultipartFile file
@@ -73,7 +73,7 @@ public class GameController {
         return ResponseEntity.ok(gameService.getSeats(sectionId, gameId));
     }
 
-    @PutMapping("/v1/games/{gameId}")
+    @PutMapping("/v1/admin/games/{gameId}")
     public ResponseEntity<GameUpdateResponse> updateGame(
             @PathVariable Long gameId,
             @RequestBody GameUpdateRequest request
@@ -81,7 +81,7 @@ public class GameController {
         return ResponseEntity.ok(gameService.updateGame(gameId, request));
     }
 
-    @DeleteMapping("/v1/games/{gameId}")
+    @DeleteMapping("/v1/admin/games/{gameId}")
     public ResponseEntity<Void> deleteGame(
             @PathVariable Long gameId
     ) {

@@ -13,6 +13,8 @@ import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.entity.ReserveSeat;
 import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
 import com.example.moduleticket.domain.ticket.event.ReservationUnknownFailureEvent;
+import com.example.moduleticket.domain.reservation.event.TicketEvent;
+import com.example.moduleticket.domain.reservation.event.publisher.TicketPublisher;
 import com.example.moduleticket.domain.ticket.service.TicketSeatService;
 import com.example.moduleticket.feign.GameClient;
 import com.example.moduleticket.feign.PaymentClient;
@@ -28,6 +30,8 @@ import com.example.moduleticket.util.SeatHoldRedisUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -48,6 +52,7 @@ public class ReservationService {
 	private final SeatClient seatClient;
 	private final ApplicationEventPublisher eventPublisher;
 	private final PaymentClient paymentClient;
+	private final TicketPublisher ticketPublisher;
 
 	@Transactional
 	public ReservationResponse createReservation(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
@@ -65,6 +70,7 @@ public class ReservationService {
 		GameDto gameDto = null;
 		List<SeatDto> seats = new ArrayList<>();
 		try {
+			log.info(	reservationCreateRequest.getGameId()+ " "+ reservationCreateRequest.getSectionId() + " " + 	reservationCreateRequest.getSeatIds());
 			gameDto = gameClient.getGame(reservationCreateRequest.getGameId());
 			seats = seatClient.getSeatsByGameAndSection(
 				reservationCreateRequest.getGameId(),
@@ -93,6 +99,12 @@ public class ReservationService {
 		}
 		reservationRepository.save(reservation);
 
+		// 캐시 이벤트 발생
+		TicketEvent ticketEvent = new TicketEvent(
+				reservationCreateRequest.getGameId(),
+				reservationCreateRequest.getSeatIds().get(0)
+		);
+		ticketPublisher.publish(ticketEvent);
 		return ReservationResponse.from(reservation, gameDto, seats);
 	}
 
@@ -195,5 +207,8 @@ public class ReservationService {
 		LocalDateTime expiredLimit = LocalDateTime.now().minusMinutes(15);
 		int updated = reservationRepository.updateExpiredReservations(expiredLimit);
 		log.info("{} rows updated", updated);
+	}
+	public Set<Long> getBookedSeatsId(Long gameId) {
+		return reservationRepository.findBookedSeatIdByGameId(gameId);
 	}
 }
