@@ -17,7 +17,7 @@ public class ReservationDto {
 	private final int totalPrice;
 
 	public static ReservationDto from(Reservation reservation) {
-		List<Long> seatIds = reservation.getReservations().stream().map(ReserveSeat::getSeatId).toList();
+		List<Long> seatIds = reservation.getReserveSeats().stream().map(ReserveSeat::getSeatId).toList();
 		return new ReservationDto(
 			reservation.getId(),
 			seatIds,
