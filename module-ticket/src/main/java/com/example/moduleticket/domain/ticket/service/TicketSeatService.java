@@ -26,13 +26,6 @@ public class TicketSeatService {
 		ticketSeatRepository.saveAll(ticketSeats);
 	}
 
-	public void checkDuplicateSeats(List<Long> seatIds, Long gameId) {
-		if(ticketSeatRepository.existsByGameIdAndSeatIdInAndTicketDeletedAtIsNull(gameId, seatIds)) {
-			log.debug("이미 예매된 좌석입니다.");
-			throw new ServerException(TICKET_ALREADY_RESERVED);
-		}
-	}
-
 	public List<SeatDto> getSeatByTicketSeatId(Long gameId, Long ticketId) {
 		List<TicketSeat> ticketSeats = ticketSeatRepository.findByTicketId(ticketId);
 		List<Long> seatIds = ticketSeats.stream().map(TicketSeat::getSeatId).toList();

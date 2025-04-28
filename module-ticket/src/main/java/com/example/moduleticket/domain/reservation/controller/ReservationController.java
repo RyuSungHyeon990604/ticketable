@@ -24,7 +24,7 @@ public class ReservationController {
 		@LoginUser AuthUser authUser,
 		@RequestBody ReservationCreateRequest reservationCreateRequest
 	) {
-		return ResponseEntity.ok(reservationService.createReservation(authUser, reservationCreateRequest));
+		return ResponseEntity.ok(reservationService.processReserve(authUser, reservationCreateRequest));
 	}
 
 	@PostMapping("/v1/reservations/{reservationId}")
