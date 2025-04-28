@@ -1,4 +1,4 @@
-package com.example.moduleticket.domain.queue;
+package com.example.modulewaiting.queue;
 
 public class QueueSystemConstants {
 	public static final String PROCEED_QUEUE_KEY = "proceed";

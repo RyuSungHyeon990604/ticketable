@@ -1,7 +1,7 @@
-package com.example.moduleticket.domain.queue;
+package com.example.modulewaiting.queue;
 
-import com.example.moduleticket.domain.queue.dto.WaitingResponse;
-import com.example.moduleticket.domain.queue.service.QueueManager;
+import com.example.modulewaiting.queue.dto.WaitingResponse;
+import com.example.modulewaiting.queue.service.QueueManager;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

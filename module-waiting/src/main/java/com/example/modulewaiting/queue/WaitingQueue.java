@@ -1,4 +1,4 @@
-package com.example.moduleticket.domain.queue;
+package com.example.modulewaiting.queue;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

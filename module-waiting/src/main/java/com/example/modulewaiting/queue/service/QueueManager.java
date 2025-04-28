@@ -1,9 +1,10 @@
-package com.example.moduleticket.domain.queue.service;
+package com.example.modulewaiting.queue.service;
+
 
 import static com.example.modulecommon.exception.ErrorCode.INVALID_WAITING_TOKEN;
 
 import com.example.modulecommon.exception.ServerException;
-import com.example.moduleticket.domain.queue.QueueSystemConstants;
+import com.example.modulewaiting.queue.QueueSystemConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -30,7 +31,7 @@ public class QueueManager {
 		boolean isProceed = proceedQueueService.isContains(token);
 		//대기열, 작업열 에 존재하지않으면 잘못된 토큰
 		if(waitingOrder == -1 && !isProceed) {
-			log.warn("{} : {}", INVALID_WAITING_TOKEN.getMessage(), token);
+			log.warn(" 토큰이 대기열 / 작업열에 모두 존재하지않습니다 : {}", token);
 			throw new ServerException(INVALID_WAITING_TOKEN);
 		}
 		return waitingOrder;

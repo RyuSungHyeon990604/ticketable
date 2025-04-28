@@ -205,7 +205,8 @@ public class ReservationService {
 	@Transactional
 	public void proceedReservationExpire() {
 		LocalDateTime expiredLimit = LocalDateTime.now().minusMinutes(15);
-		reservationRepository.updateExpiredReservations(expiredLimit);
+		int updated = reservationRepository.updateExpiredReservations(expiredLimit);
+		log.info("{} rows updated", updated);
 	}
 	public Set<Long> getBookedSeatsId(Long gameId) {
 		return reservationRepository.findBookedSeatIdByGameId(gameId);
