@@ -1,14 +1,9 @@
 package com.example.modulegame.domain.game.service;
 
 import com.example.modulecommon.exception.ErrorCode;
-import com.example.modulegame.domain.game.dto.GameDto;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 import com.example.modulecommon.exception.ServerException;
 import com.example.modulegame.common.image.ImageService;
+import com.example.modulegame.domain.game.dto.GameDto;
 import com.example.modulegame.domain.game.dto.request.GameCreateRequest;
 import com.example.modulegame.domain.game.dto.request.GameUpdateRequest;
 import com.example.modulegame.domain.game.dto.response.GameCreateResponse;
@@ -22,11 +17,17 @@ import com.example.modulegame.domain.stadium.dto.response.SectionTypeSeatCountRe
 import com.example.modulegame.domain.stadium.dto.response.StadiumGetResponse;
 import com.example.modulegame.domain.stadium.entity.Stadium;
 import com.example.modulegame.domain.stadium.service.StadiumService;
+import com.example.modulegame.feign.client.AuctionClient;
+import com.example.modulegame.feign.client.TicketClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -36,6 +37,9 @@ public class GameService {
     private final StadiumService stadiumService;
     private final ImageService imageService;
     private final GameCacheService gameCacheService;
+    private final TicketClient ticketClient;
+    private final AuctionClient auctionClient;
+
     private static final String GAME_FOLDER = "game/";
 
     @Transactional
@@ -76,25 +80,22 @@ public class GameService {
             end = range[1];
         }
 
-        List<Game> games = gameCacheService.getGamesCached(team, start, end);
-
-        return games.stream()
-                .map(GameGetResponse::of)
-                .collect(Collectors.toList());
+        return gameCacheService.getGamesCached(team, start, end);
     }
 
     public StadiumGetResponse getSeatCountsByType(Long gameId) {
         Stadium stadium = gameRepository.getStadiumByGameId(gameId);
-        List<SectionTypeSeatCountResponse> sectionBookedSeatCounts = gameCacheService.getSeatCountsByTypeCached(gameId);
-        return StadiumGetResponse.of(stadium, sectionBookedSeatCounts);
+        List<SectionTypeSeatCountResponse> seatCountsByTypeCached = gameCacheService.getSeatCountsByTypeCached(gameId);
+
+        return StadiumGetResponse.of(stadium, seatCountsByTypeCached);
     }
 
     public List<SectionSeatCountResponse> getSeatCountsBySection(Long gameId, String type) {
-        return gameCacheService.getSeatCountsBySectionCached(gameId, type);
+       return gameCacheService.getSeatCountsBySectionCached(gameId, type);
     }
 
     public List<SeatGetResponse> getSeats(Long sectionId, Long gameId) {
-        return gameCacheService.getSeatsCached(gameId, sectionId);
+        return gameCacheService.getSeatsCached(sectionId, gameId);
     }
 
     @Transactional
@@ -108,8 +109,8 @@ public class GameService {
     public void deleteGames(Long gameId) {
         Game game = gameRepository.findById(gameId).orElseThrow(() -> new ServerException(ErrorCode.GAME_NOT_FOUND));
         game.cancel();
-//        ticketService.deleteAllTicketsByCanceledGame(gameId);
-//        auctionService.deleteAllAuctionsByCanceledGame(gameId);
+        ticketClient.deleteAllTicketsByCanceledGame(gameId);
+        auctionClient.deleteAllAuctionsByCanceledGame(gameId);
         gameCacheService.clearAllGameCaches();
     }
 

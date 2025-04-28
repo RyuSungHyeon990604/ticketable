@@ -10,12 +10,23 @@ import com.example.moduleticket.domain.reservation.dto.ReservationResponse;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.entity.ReserveSeat;
 import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
+import com.example.moduleticket.domain.ticket.event.ReservationUnknownFailureEvent;
+import com.example.moduleticket.domain.reservation.event.TicketEvent;
+import com.example.moduleticket.domain.reservation.event.publisher.TicketPublisher;
+import com.example.moduleticket.domain.ticket.service.TicketSeatService;
+import com.example.moduleticket.feign.GameClient;
+import com.example.moduleticket.feign.PaymentClient;
+import com.example.moduleticket.feign.SeatClient;
+import com.example.moduleticket.feign.dto.GameDto;
+import com.example.moduleticket.feign.dto.SeatDto;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.event.SeatHoldReleaseEvent;
 import com.example.moduleticket.domain.ticket.service.TicketService;
 import com.example.moduleticket.util.SeatHoldRedisUtil;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -35,6 +46,7 @@ public class ReservationService {
 	private final SeatHoldRedisUtil seatHoldRedisUtil;
 	private final TicketService ticketService;
 	private final ApplicationEventPublisher eventPublisher;
+	private final TicketPublisher ticketPublisher;
 
 	public ReservationResponse processReserve(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
 		seatHoldRedisUtil.holdSeatAtomic(
@@ -43,10 +55,18 @@ public class ReservationService {
 			String.valueOf(auth.getMemberId())
 		);
 		try {
-			return reservationCreateService.createReservation(
+			ReservationResponse reservation = reservationCreateService.createReservation(
 				auth,
 				reservationCreateRequest
 			);
+			// 캐시 이벤트 발생
+			TicketEvent ticketEvent = new TicketEvent(
+				reservationCreateRequest.getGameId(),
+				reservationCreateRequest.getSeatIds().get(0)
+			);
+			ticketPublisher.publish(ticketEvent);
+
+			return reservation;
 		} catch (Exception e) {
 			seatHoldRedisUtil.releaseSeatAtomic(reservationCreateRequest.getSeatIds(),reservationCreateRequest.getGameId());
 			throw e;
@@ -107,5 +127,8 @@ public class ReservationService {
 		LocalDateTime expiredLimit = LocalDateTime.now().minusMinutes(15);
 		int updated = reservationRepository.updateExpiredReservations(expiredLimit);
 		log.info("{} rows updated", updated);
+	}
+	public Set<Long> getBookedSeatsId(Long gameId) {
+		return reservationRepository.findBookedSeatIdByGameId(gameId);
 	}
 }

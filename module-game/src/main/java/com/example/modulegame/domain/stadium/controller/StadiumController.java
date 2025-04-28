@@ -25,7 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class StadiumController {
     private final StadiumService stadiumService;
 
-    @PostMapping("/v1/stadiums")
+    @PostMapping("/v1/admin/stadiums")
     public ResponseEntity<StadiumCreateResponse> createStadium(
             @Valid @RequestPart(value = "json") StadiumCreateRequest request,
             @RequestPart(value = "image") MultipartFile file
@@ -33,7 +33,7 @@ public class StadiumController {
         return ResponseEntity.ok(stadiumService.createStadium(request, file));
     }
 
-    @PutMapping("/v1/stadiums/{stadiumId}")
+    @PutMapping("/v1/admin/stadiums/{stadiumId}")
     public ResponseEntity<StadiumUpdateResponse> updateStadium(
             @PathVariable Long stadiumId,
             @RequestBody StadiumUpdateRequest requset
@@ -41,7 +41,7 @@ public class StadiumController {
         return ResponseEntity.ok(stadiumService.updateStadium(stadiumId, requset));
     }
 
-    @DeleteMapping("/v1/stadiums/{stadiumId}")
+    @DeleteMapping("/v1/admin/stadiums/{stadiumId}")
     public ResponseEntity<Void> deleteStadium(@PathVariable Long stadiumId) {
         stadiumService.deleteStadium(stadiumId);
         return ResponseEntity.ok().build();
