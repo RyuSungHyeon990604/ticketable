@@ -1,6 +1,6 @@
-package com.example.modulepoint.domain.point.controller;
+package com.example.modulepoint.domain.payment.controller;
 
-import com.example.modulepoint.domain.point.service.PointPaymentService;
+import com.example.modulepoint.domain.payment.service.PointPaymentService;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;

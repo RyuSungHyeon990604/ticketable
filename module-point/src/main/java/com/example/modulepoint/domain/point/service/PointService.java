@@ -4,14 +4,15 @@ import static com.example.modulecommon.exception.ErrorCode.CAN_NOT_EXCHANGE;
 import static com.example.modulecommon.exception.ErrorCode.EXCHANGE_WAITING;
 import static com.example.modulecommon.exception.ErrorCode.NOT_ENOUGH_POINT;
 import static com.example.modulecommon.exception.ErrorCode.USER_NOT_FOUND;
-import static com.example.modulepoint.domain.point.enums.PointHistoryType.EXCHANGE_REQUEST;
+import static com.example.modulepoint.domain.exchange.enums.ExchangeHistoryType.EXCHANGE_REQUEST;
 
 import com.example.modulecommon.exception.ServerException;
+import com.example.modulepoint.domain.exchange.service.ExchangeHistoryService;
 import com.example.modulepoint.domain.point.dto.request.ExchangePointRequest;
 import com.example.modulepoint.domain.point.dto.response.PointResponse;
 import com.example.modulepoint.domain.point.entity.Point;
 import com.example.modulepoint.domain.point.enums.PointHistoryType;
-import com.example.modulepoint.domain.point.repository.PointHistoryRepository;
+import com.example.modulepoint.domain.exchange.repository.ExchangeHistoryRepository;
 import com.example.modulepoint.domain.point.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,8 @@ public class PointService {
 
 	private final PointRepository pointRepository;
 	private final PointHistoryService pointHistoryService;
-	private final PointHistoryRepository pointHistoryRepository;
+	private final ExchangeHistoryRepository exchangeHistoryRepository;
+	private final ExchangeHistoryService exchangeHistoryService;
 
 	/**
 	 * TODO : 포인트를 감소시키고, 환전 유저의 계좌에 돈을 보내는 로직 추가해야함
@@ -39,12 +41,13 @@ public class PointService {
 			throw new ServerException(NOT_ENOUGH_POINT);
 		}
 
-		if (pointHistoryRepository.existsByMemberIdAndType(memberId, EXCHANGE_REQUEST)) {
+		if (exchangeHistoryRepository.existsByMemberIdAndType(memberId, EXCHANGE_REQUEST)) {
 			throw new ServerException(EXCHANGE_WAITING);
 		}
 
 		point.minusPoint(request.getPoint());
-		pointHistoryService.createPointHistory(request.getPoint(), EXCHANGE_REQUEST, memberId);
+		pointHistoryService.createPointHistory(request.getPoint(), PointHistoryType.EXCHANGE_REQUEST, memberId);
+		exchangeHistoryService.createPointExchangeHistory(memberId, EXCHANGE_REQUEST, request.getPoint());
 		return new PointResponse(memberId, request.getPoint());
 	}
 

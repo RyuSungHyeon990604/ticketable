@@ -1,10 +1,11 @@
-package com.example.modulepoint.domain.point.service;
+package com.example.modulepoint.domain.payment.service;
 
 import com.example.modulecommon.exception.ErrorCode;
 import com.example.modulecommon.exception.ServerException;
-import com.example.modulepoint.domain.point.entity.PointPayment;
+import com.example.modulepoint.domain.payment.entity.PointPayment;
 import com.example.modulepoint.domain.point.enums.PointHistoryType;
-import com.example.modulepoint.domain.point.repository.PointPaymentRepository;
+import com.example.modulepoint.domain.payment.repository.PointPaymentRepository;
+import com.example.modulepoint.domain.point.service.PointService;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;

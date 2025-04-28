@@ -1,4 +1,4 @@
-package com.example.modulepoint.domain.point.entity;
+package com.example.modulepoint.domain.payment.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

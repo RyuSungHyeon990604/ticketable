@@ -38,8 +38,4 @@ public class PointHistory extends Timestamped {
 		this.type = type;
 		this.memberId = memberId;
 	}
-
-	public void exchange() {
-		this.type = PointHistoryType.EXCHANGE;
-	}
 }
