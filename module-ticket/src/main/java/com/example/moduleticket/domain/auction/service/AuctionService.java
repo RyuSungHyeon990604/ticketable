@@ -18,7 +18,6 @@ import com.example.moduleticket.domain.auction.dto.response.AuctionBidResponse;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.moduleticket.domain.point.enums.PointHistoryType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
