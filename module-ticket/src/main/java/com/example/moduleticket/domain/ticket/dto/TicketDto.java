@@ -19,7 +19,7 @@ public class TicketDto {
 	private Integer totalPoint;
 	private List<Long> seatIds;
 
-	public static TicketDto from(Ticket ticket, int totalPoint, List<Long> seatIds) {
+	public static TicketDto from(Ticket ticket, Integer totalPoint, List<Long> seatIds) {
 		return new TicketDto(
 			ticket.getId(),
 			ticket.getMemberId(),

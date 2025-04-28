@@ -1,5 +1,8 @@
 package com.example.moduleauction.domain.auction.entity;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,24 +26,23 @@ public class AuctionTicketInfo {
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    private Long id;
 
-   private Integer standardPoint;
+    private Integer seatCount;
 
-   private String sectionInfo;
+    private Boolean isTogether;
 
-   private String seatInfo;
+    private LocalDateTime gameStartTime;
 
-   private Integer seatCount;
+    private String home;
 
-   private Boolean isTogether;
+    private String away;
 
-   @Builder
-   public AuctionTicketInfo(
-       Integer standardPoint, String sectionInfo, String seatInfo, Integer seatCount, Boolean isTogether
-   ) {
-       this.standardPoint = standardPoint;
-       this.sectionInfo = sectionInfo;
-       this.seatInfo = seatInfo;
-       this.seatCount = seatCount;
-       this.isTogether = isTogether;
-   }
+    @Builder
+    public AuctionTicketInfo(Integer seatCount, Boolean isTogether, LocalDateTime gameStartTime, String home,
+        String away) {
+        this.seatCount = seatCount;
+        this.isTogether = isTogether;
+        this.gameStartTime = gameStartTime;
+        this.home = home;
+        this.away = away;
+    }
 }

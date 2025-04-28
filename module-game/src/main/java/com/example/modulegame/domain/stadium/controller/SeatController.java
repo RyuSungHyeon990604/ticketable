@@ -4,6 +4,7 @@ package com.example.modulegame.domain.stadium.controller;
 import com.example.modulegame.domain.game.dto.SeatDto;
 import java.util.List;
 
+import com.example.modulegame.domain.stadium.dto.SectionAndPositionDto;
 import com.example.modulegame.domain.stadium.dto.request.SeatCreateRequest;
 import com.example.modulegame.domain.stadium.dto.request.SeatUpdateRequest;
 import com.example.modulegame.domain.stadium.dto.response.SeatCreateResponse;
@@ -71,5 +72,12 @@ public class SeatController {
         @RequestParam Long gameId
     ) {
         return ResponseEntity.ok(seatService.getSeatDtoList(gameId, seatIds));
+    }
+
+    @GetMapping("/internal/sections/seats")
+    public ResponseEntity<SectionAndPositionDto> getSectionAndPositions(
+        @RequestParam List<Long> seatIds
+    ) {
+        return ResponseEntity.ok(seatService.getSectionAndPositions(seatIds));
     }
 }

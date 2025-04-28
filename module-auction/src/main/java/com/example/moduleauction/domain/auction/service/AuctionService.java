@@ -2,8 +2,16 @@ package com.example.moduleauction.domain.auction.service;
 
 import static com.example.modulecommon.exception.ErrorCode.*;
 
+import com.example.moduleauction.domain.auction.dto.AuctionDetailDto;
+import com.example.moduleauction.domain.auction.event.BidSaveEvent;
+import com.example.moduleauction.domain.auction.event.AuctionDetailSaveEvent;
+import com.example.moduleauction.feign.GameClient;
+import com.example.moduleauction.feign.SeatClient;
 import com.example.moduleauction.feign.TicketClient;
+import com.example.moduleauction.feign.dto.GameDto;
+import com.example.moduleauction.feign.dto.SectionAndPositionDto;
 import com.example.moduleauction.feign.dto.TicketDto;
+import com.example.moduleauction.util.AuctionDetailRedisUtil;
 import com.example.modulecommon.entity.AuthUser;
 import com.example.modulecommon.exception.ServerException;
 import com.example.moduleauction.domain.auction.event.BidUpdateEvent;
@@ -19,10 +27,16 @@ import com.example.moduleauction.domain.auction.repository.AuctionRepository;
 import com.example.moduleauction.domain.auction.repository.AuctionTicketInfoRepository;
 import com.example.moduleauction.util.AuctionBidRedisUtil;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
@@ -44,17 +58,22 @@ public class AuctionService {
 	private final AuctionTicketInfoService auctionTicketInfoService;
 	private final AuctionHistoryService auctionHistoryService;
 	private final AuctionBidRedisUtil auctionBidRedisUtil;
+	private final AuctionDetailRedisUtil auctionDetailRedisUtil;
 	private final ApplicationEventPublisher applicationEventPublisher;
 	private final TicketClient ticketClient;
+	private final GameClient gameClient;
+	private final SeatClient seatClient;
 
 	@Transactional
 	public AuctionResponse createAuction(AuthUser authUser, AuctionCreateRequest dto) {
 		TicketDto ticket = ticketClient.getTicket(authUser.getMemberId(), dto.getTicketId());
+		GameDto game = gameClient.getGame(ticket.getGameId());
+		SectionAndPositionDto sectionAndPositions = seatClient.getSectionAndPositions(ticket.getSeatIds());
 
-		// // GameClient 필요함
-		// if (ticket.isTimeOverToAuction()) {
-		// 	throw new ServerException(AUCTION_TIME_OVER);
-		// }
+		// 경기 시작 24시간 전 경매등록 검증
+		if (game.isTimeOver()) {
+			throw new ServerException(AUCTION_TIME_OVER);
+		}
 
 		// 경매 진행여부 검증
 		if (auctionRepository.existsByTicketIdAndDeletedAtIsNull(ticket.getId())) {
@@ -66,7 +85,12 @@ public class AuctionService {
 			throw new ServerException(AUCTION_ACCESS_DENIED);
 		}
 
-		AuctionTicketInfo auctionTicketInfo = auctionTicketInfoService.createAuctionTicketInfo(ticket);
+		// 좌석 정렬
+		List<String> sortedPositions = sectionAndPositions.getPositions().stream()
+			.sorted(Comparator.comparingInt(pos -> Integer.parseInt(pos.split(" ")[1])))
+			.toList();
+
+		AuctionTicketInfo auctionTicketInfo = auctionTicketInfoService.createAuctionTicketInfo(ticket, game, sortedPositions);
 
 		Auction auction = Auction.builder()
 			.sellerId(authUser.getMemberId())
@@ -78,20 +102,47 @@ public class AuctionService {
 
 		Auction savedAuction = auctionRepository.save(auction);
 
-		auctionBidRedisUtil.createBidKey(savedAuction);
+		AuctionDetailDto auctionDetail = AuctionDetailDto.of(auction, auctionTicketInfo, ticket, game,
+			sectionAndPositions, sortedPositions);
 
-		return AuctionResponse.of(savedAuction);
+		applicationEventPublisher.publishEvent(new AuctionDetailSaveEvent(savedAuction.getId(), auctionDetail));
+		applicationEventPublisher.publishEvent(new BidSaveEvent(savedAuction.getId(), savedAuction.getBidPoint()));
+
+		return AuctionResponse.of(auctionDetail, savedAuction.getBidPoint());
 	}
 
 	@Transactional(readOnly = true)
 	public AuctionResponse getAuction(Long auctionId) {
-		return AuctionResponse.of(findAuction(auctionId));
+		AuctionDetailDto auctionDetail = auctionDetailRedisUtil.getAuctionDetail(auctionId);
+		Integer bidPoint = auctionBidRedisUtil.getBidPoint(auctionId);
+		return AuctionResponse.of(auctionDetail, bidPoint);
 	}
 
 	@Transactional(readOnly = true)
 	public PagedModel<AuctionResponse> getAuctions(AuctionSearchCondition dto, Pageable pageable) {
-		Page<Auction> pages = auctionRepository.findByConditions(dto, pageable);
-		return new PagedModel<>(pages.map(AuctionResponse::of));
+		Page<Long> pages = auctionRepository.findByConditions(dto, pageable);
+		List<Long> ids = pages.getContent();
+		if (ids.isEmpty()) {
+			Page<AuctionResponse> emptyPages = new PageImpl<>(Collections.emptyList(), pageable, pages.getTotalElements());
+			return new PagedModel<>(emptyPages);
+		}
+
+		// 2) Redis에서 상세정보와 입찰가 일괄 조회
+		Map<Long, AuctionDetailDto> detailMap = auctionDetailRedisUtil.getAuctionDetails(ids);
+		Map<Long, Integer> bidMap = auctionBidRedisUtil.getBidPoints(ids);
+
+		// 3) ID 순서 유지하며 AuctionResponse 리스트 생성
+		List<AuctionResponse> responses = ids.stream()
+			.map(id -> {
+				AuctionDetailDto detail = detailMap.get(id);
+				Integer bidPoint = bidMap.getOrDefault(id, detail.getStartPoint());
+				return AuctionResponse.of(detail, bidPoint);
+			})
+			.collect(Collectors.toList());
+
+		// 4) PageImpl으로 반환
+		Page<AuctionResponse> auctionResponses = new PageImpl<>(responses, pageable, pages.getTotalElements());
+		return new PagedModel<>(auctionResponses);
 	}
 
 	public AuctionBidResponse getBidPoint(Long auctionId) {
@@ -106,7 +157,7 @@ public class AuctionService {
 		auctionBidRedisUtil.validateBid(auctionId, dto.getCurrentBidPoint());
 
 		// 1. 경매 조회
-		Auction auction = findAuctionForBid(auctionId);
+		Auction auction = findAuction(auctionId);
 
 		// 2. 입찰자가 눈으로 확인한 금액과, 실제 입찰가가 맞지 않는 경우 예외처리
 		if (auction.isBidPointChanged(dto.getCurrentBidPoint())) {
@@ -146,13 +197,14 @@ public class AuctionService {
 		// }
 
 		// 11. 입찰내용 업데이트
-		int nextBid = auction.getBidPoint() + BID_UNIT;
+		Integer nextBid = auction.getBidPoint() + BID_UNIT;
 		auction.updateBid(authUser.getMemberId(), nextBid);
 
 		// 12. Event 발행을 통한 로직 실행순서 통제
 		applicationEventPublisher.publishEvent(new BidUpdateEvent(auctionId, nextBid));
 
-		return AuctionResponse.of(auction);
+		AuctionDetailDto auctionDetail = auctionDetailRedisUtil.getAuctionDetail(auctionId);
+		return AuctionResponse.of(auctionDetail, nextBid);
 	}
 
 	@Transactional
@@ -168,16 +220,12 @@ public class AuctionService {
 		}
 
 		auctionBidRedisUtil.deleteBidKey(auctionId);
+		auctionDetailRedisUtil.deleteAuctionDetail(auctionId);
 
 		auction.setDeletedAt();
 	}
 
 	private Auction findAuction(Long auctionId) {
-		return auctionRepository.findByIdAndDeletedAtIsNullWithFetchJoin(auctionId)
-			.orElseThrow(() -> new ServerException(AUCTION_NOT_FOUND));
-	}
-
-	private Auction findAuctionForBid(Long auctionId) {
 		return auctionRepository.findByIdWithPessimisticLock(auctionId)
 			.orElseThrow(() -> new ServerException(AUCTION_NOT_FOUND));
 	}
@@ -191,6 +239,7 @@ public class AuctionService {
 		// }
 
 		auctionBidRedisUtil.deleteBidKey(auction.getId());
+		auctionDetailRedisUtil.deleteAuctionDetail(auction.getId());
 	}
 
 	/*
@@ -199,7 +248,8 @@ public class AuctionService {
 	 */
 	@Transactional
 	public void deleteAllAuctionsByCanceledGame(Long gameId) {
-		List<Auction> auctions = auctionRepository.findAllByGameId(gameId);
+		List<Long> ticketIds = ticketClient.getTickets(gameId).stream().map(TicketDto::getId).toList();
+		List<Auction> auctions = auctionRepository.findAllByTicketIdIn(ticketIds);
 
 		if (auctions.isEmpty()) {
 			return;

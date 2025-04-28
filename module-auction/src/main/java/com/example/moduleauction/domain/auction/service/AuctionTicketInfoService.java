@@ -1,11 +1,12 @@
 package com.example.moduleauction.domain.auction.service;
 
-import java.util.stream.Collectors;
+import java.util.Comparator;
+import java.util.List;
 
-import com.example.moduleauction.domain.auction.dto.AuctionTicketInfoDto;
 import com.example.moduleauction.domain.auction.entity.AuctionTicketInfo;
 import com.example.moduleauction.domain.auction.repository.AuctionTicketInfoRepository;
-import com.example.moduleauction.domain.ticket.entity.Ticket;
+import com.example.moduleauction.feign.dto.GameDto;
+import com.example.moduleauction.feign.dto.SectionAndPositionDto;
 import com.example.moduleauction.feign.dto.TicketDto;
 
 import lombok.RequiredArgsConstructor;
@@ -19,25 +20,16 @@ public class AuctionTicketInfoService {
 	private final AuctionTicketInfoRepository auctionTicketInfoRepository;
 
 	@Transactional
-	public AuctionTicketInfo createAuctionTicketInfo(TicketDto ticket) {
-		String type = ticket.getSeatIds().get(0).getSection().getType();
-		String code = ticket.getSeatIds().get(0).getSection().getCode();
-		String sectionInfo = type + " | " + code;
-
-		String seatInfo = ticket.getSeatIds().stream()
-			.map(SeatIds::getPosition)
-			.collect(Collectors.joining(" "));
-
-		Integer seatCount = seats.size();
-
+	public AuctionTicketInfo createAuctionTicketInfo(TicketDto ticket, GameDto game, List<String> sortedPositions) {
+		// 연석 여부 검증
 		Boolean isTogether = false;
-		if (seats.size() > 1) {
+		if (sortedPositions.size() > 1) {
 			String prevRow = null;
 			Integer prevColumn = null;
 			isTogether = true; // 일단 연석이라고 가정하고, 조건을 깨면 false로 전환
 
-			for (int i = 0; i < seats.size(); i++) {
-				String[] parts = seats.get(i).getPosition().split("열 ");
+			for (int i = 0; i < sortedPositions.size(); i++) {
+				String[] parts = sortedPositions.get(i).split("열 ");
 				String currentRow = parts[0];
 				int currentColumn = Integer.parseInt(parts[1].replaceAll("\\D", ""));
 
@@ -58,11 +50,11 @@ public class AuctionTicketInfoService {
 		}
 
 		AuctionTicketInfo auctionTicketInfo = AuctionTicketInfo.builder()
-			.standardPoint(ticketInfo.getStandardPoint())
-			.sectionInfo(ticketInfo.getSectionInfo())
-			.seatInfo(ticketInfo.getSeatInfo())
-			.seatCount(ticketInfo.getSeatCount())
-			.isTogether(ticketInfo.getIsTogether())
+			.seatCount(sortedPositions.size())
+			.isTogether(isTogether)
+			.gameStartTime(game.getStartTime())
+			.home(game.getHome())
+			.away(game.getAway())
 			.build();
 
 		return auctionTicketInfoRepository.save(auctionTicketInfo);

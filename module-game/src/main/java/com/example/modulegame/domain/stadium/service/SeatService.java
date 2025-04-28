@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.modulecommon.exception.ErrorCode;
+import com.example.modulegame.domain.stadium.dto.SectionAndPositionDto;
 import com.example.modulegame.domain.stadium.dto.request.SeatCreateRequest;
 import com.example.modulegame.domain.stadium.dto.request.SeatUpdateRequest;
 import com.example.modulegame.domain.stadium.dto.response.SeatCreateResponse;
@@ -103,6 +104,11 @@ public class SeatService {
             throw new ServerException(SEAT_NOT_FOUND);
         }
         return seats;
+    }
+
+    public SectionAndPositionDto getSectionAndPositions(List<Long> seatIds) {
+        List<Seat> seats = seatRepository.findAllById(seatIds);
+        return SectionAndPositionDto.from(seats);
     }
 
 	// PRICE

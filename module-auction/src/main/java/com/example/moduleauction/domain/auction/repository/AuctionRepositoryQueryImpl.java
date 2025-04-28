@@ -1,5 +1,8 @@
 package com.example.moduleauction.domain.auction.repository;
 
+import static com.example.moduleauction.domain.auction.entity.QAuction.*;
+import static com.example.moduleauction.domain.auction.entity.QAuctionTicketInfo.*;
+
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -9,7 +12,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import com.example.moduleauction.domain.auction.dto.request.AuctionSearchCondition;
-import com.example.moduleauction.domain.auction.entity.Auction;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -19,11 +21,11 @@ public class AuctionRepositoryQueryImpl implements AuctionRepositoryQuery {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	@Override
-	public Page<Auction> findByConditions(AuctionSearchCondition dto, Pageable pageable) {
-		BooleanExpression homeEq = dto.getHome() != null ? auction.ticket.game.home.eq(dto.getHome()) : null;
-		BooleanExpression awayEq = dto.getAway() != null ? auction.ticket.game.away.eq(dto.getAway()) : null;
+	public Page<Long> findByConditions(AuctionSearchCondition dto, Pageable pageable) {
+		BooleanExpression homeEq = dto.getHome() != null ? auction.auctionTicketInfo.home.eq(dto.getHome()) : null;
+		BooleanExpression awayEq = dto.getAway() != null ? auction.auctionTicketInfo.away.eq(dto.getAway()) : null;
 		BooleanExpression startTimeBetween = dto.getStartTime() != null
-			? auction.ticket.game.startTime.between(
+			? auction.auctionTicketInfo.gameStartTime.between(
 			dto.getStartTime().toLocalDate().atStartOfDay(),
 			dto.getStartTime().toLocalDate().atStartOfDay().plusDays(1).minusSeconds(1)
 		)
@@ -35,13 +37,10 @@ public class AuctionRepositoryQueryImpl implements AuctionRepositoryQuery {
 			: auction.auctionTicketInfo.isTogether.isFalse();
 		BooleanExpression deletedAtIsNull = auction.deletedAt.isNull();
 
-		List<Auction> results = jpaQueryFactory
-			.selectFrom(auction)
-			.join(auction.ticket, ticket).fetchJoin()
-			.join(ticket.game, game).fetchJoin()
+		List<Long> results = jpaQueryFactory
+			.select(auction.id)
+			.from(auction)
 			.join(auction.auctionTicketInfo, auctionTicketInfo).fetchJoin()
-			.join(auction.seller, member).fetchJoin()
-			.leftJoin(auction.bidder, member).fetchJoin()
 			.where(homeEq, awayEq, startTimeBetween, seatCountEq, isTogether, deletedAtIsNull)
 			.offset(pageable.getPageNumber())
 			.limit(pageable.getPageSize())

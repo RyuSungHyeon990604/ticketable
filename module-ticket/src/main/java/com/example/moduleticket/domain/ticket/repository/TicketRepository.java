@@ -34,4 +34,10 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 		+ "    set t.deletedAt = now()"
 		+ " where t.gameId = :gameId ")
 	void softDeleteAllByGameId(Long gameId);
+
+	@Query("SELECT t "
+		+ "   FROM Ticket t "
+		+ "  WHERE t.deletedAt is null "
+		+ "    AND t.gameId = :gameId")
+	List<Ticket> findByGameId(Long gameId);
 }

@@ -6,5 +6,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface AuctionRepositoryQuery {
-	Page<Auction> findByConditions(AuctionSearchCondition dto, Pageable pageable);
+	Page<Long> findByConditions(AuctionSearchCondition dto, Pageable pageable);
 }

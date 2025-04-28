@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class BidUpdateEvent {
+public class BidSaveEvent {
 
 	private final Long auctionId;
-	private final Integer nextBid;
+	private final Integer bidPoint;
 }

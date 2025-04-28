@@ -1,5 +1,6 @@
 package com.example.moduleauction.domain.auction.dto.response;
 
+import com.example.moduleauction.domain.auction.dto.AuctionDetailDto;
 import com.example.moduleauction.domain.auction.entity.Auction;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,9 @@ public class AuctionResponse {
 
 	private final Integer standardPoint;
 
-	private final String sectionInfo;
+	private final String sectionType;
+
+	private final String sectionCode;
 
 	private final String seatInfo;
 
@@ -31,26 +34,27 @@ public class AuctionResponse {
 
 	private final String away;
 
-	private final String type;
+	private final String gameType;
 
 	private final LocalDateTime createdAt;
 
 
-	public static AuctionResponse of(Auction auction) {
+	public static AuctionResponse of(AuctionDetailDto auctionDetailDto, Integer bidPoint) {
 		return new AuctionResponse(
-			auction.getId(),
-			auction.getStartPoint(),
-			auction.getBidPoint(),
-			auction.getAuctionTicketInfo().getStandardPoint(),
-			auction.getAuctionTicketInfo().getSectionInfo(),
-			auction.getAuctionTicketInfo().getSeatInfo(),
-			auction.getAuctionTicketInfo().getSeatCount(),
-			auction.getAuctionTicketInfo().getIsTogether(),
-			auction.getTicket().getGame().getStartTime(),
-			auction.getTicket().getGame().getHome(),
-			auction.getTicket().getGame().getAway(),
-			auction.getTicket().getGame().getType().toString(),
-			auction.getCreatedAt()
+			auctionDetailDto.getId(),
+			auctionDetailDto.getStartPoint(),
+			bidPoint,
+			auctionDetailDto.getStandardPoint(),
+			auctionDetailDto.getSectionType(),
+			auctionDetailDto.getSectionCode(),
+			auctionDetailDto.getSeatInfo(),
+			auctionDetailDto.getSeatCount(),
+			auctionDetailDto.getIsTogether(),
+			auctionDetailDto.getGameStartTime(),
+			auctionDetailDto.getHome(),
+			auctionDetailDto.getAway(),
+			auctionDetailDto.getGameType(),
+			auctionDetailDto.getCreatedAt()
 		);
 	}
 }

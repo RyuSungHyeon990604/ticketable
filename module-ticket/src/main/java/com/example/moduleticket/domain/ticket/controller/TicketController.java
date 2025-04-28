@@ -57,4 +57,11 @@ public class TicketController {
 	) {
 		return ResponseEntity.ok(ticketService.getTicketInternal(memberId, ticketId));
 	}
+
+	@GetMapping("/api/Internal/games/{gameId}/tickets")
+	public ResponseEntity<List<TicketDto>> getTickets(
+		@PathVariable Long gameId
+	) {
+		return ResponseEntity.ok(ticketService.getTicketsInternal(gameId));
+	}
 }

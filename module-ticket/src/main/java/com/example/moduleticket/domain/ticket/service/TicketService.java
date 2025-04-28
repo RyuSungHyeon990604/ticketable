@@ -7,8 +7,10 @@ import com.example.modulecommon.entity.AuthUser;
 import com.example.modulecommon.exception.ServerException;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.ticket.dto.TicketContext;
+import com.example.moduleticket.domain.ticket.dto.TicketDto;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
+import com.example.moduleticket.domain.ticket.entity.TicketSeat;
 import com.example.moduleticket.domain.ticket.repository.TicketRepository;
 import com.example.moduleticket.feign.GameClient;
 import com.example.moduleticket.feign.dto.GameDto;
@@ -20,6 +22,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -134,11 +138,18 @@ public class TicketService {
 	}
 
 	public TicketDto getTicketInternal(Long memberId, Long ticketId) {
-		Ticket ticket = ticketRepository.findByIdAndMemberIdAndDeletedAtIsNull(ticketId, memberId)
+		Ticket ticket = ticketRepository.findByIdAndDeletedAtIsNull(ticketId, memberId)
 			.orElseThrow(() -> new ServerException(TICKET_NOT_FOUND));
 		int ticketTotalPoint = ticketPaymentService.getTicketTotalPoint(ticketId);
 		List<Long> ticketSeatIds = ticketSeatService.getSeat(ticketId).stream().map(TicketSeat::getSeatId).toList();
 
 		return TicketDto.from(ticket, ticketTotalPoint, ticketSeatIds);
+	}
+
+	public List<TicketDto> getTicketsInternal(Long gameId) {
+		return ticketRepository.findByGameId(gameId)
+			.stream()
+			.map(ticket -> TicketDto.from(ticket, null, null))
+			.toList();
 	}
 }
