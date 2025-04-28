@@ -1,6 +1,8 @@
 package com.example.modulepoint.domain.exchange.entity;
 
 import com.example.modulecommon.entity.Timestamped;
+import com.example.modulecommon.exception.ErrorCode;
+import com.example.modulecommon.exception.ServerException;
 import com.example.modulepoint.domain.exchange.enums.ExchangeHistoryType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -32,6 +34,9 @@ public class ExchangeHistory extends Timestamped {
 	}
 	
 	public void exchange() {
+		if (this.type.equals(ExchangeHistoryType.EXCHANGE)) {
+			throw new ServerException(ErrorCode.ALREADY_EXCHANGE_STATE);
+		}
 		this.type = ExchangeHistoryType.EXCHANGE;
 	}
 }
