@@ -18,13 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class TicketPaymentService {
 
 	private final TicketPaymentRepository ticketPaymentRepository;
-	//private PointService pointService;
-
-	@Transactional
-	public void paymentTicket(TicketContext ticketContext) {
-		//pointService.decreasePoint(ticketContext.getMemberId(), ticketContext.getTotalPoint(),PointHistoryType.RESERVATION);
-		create(ticketContext.getTicket(), ticketContext.getMemberId(), ticketContext.getTotalPoint());
-	}
 
 	public void create(Ticket ticket, Long memberId, int point) {
 		TicketPayment ticketPayment = new TicketPayment(point, ticket, memberId);

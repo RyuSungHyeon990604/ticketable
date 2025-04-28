@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SectionController {
     private final SectionService sectionService;
 
-    @PostMapping("/v1/stadiums/{stadiumId}/sections")
+    @PostMapping("/v1/admin/stadiums/{stadiumId}/sections")
     public ResponseEntity<SectionCreateResponse> createSection(
             @PathVariable Long stadiumId,
             @RequestBody SectionCreateRequest request
@@ -30,7 +30,7 @@ public class SectionController {
         return ResponseEntity.ok(sectionService.createSection(stadiumId, request));
     }
 
-    @PutMapping("/v1/sections/{sectionId}")
+    @PutMapping("/v1/admin/sections/{sectionId}")
     public ResponseEntity<SectionUpdateResponse> updateSection(
             @PathVariable Long sectionId,
             @RequestBody SectionUpdateRequest request
@@ -39,7 +39,7 @@ public class SectionController {
     }
 
 
-    @DeleteMapping("/v1/sections/{sectionId}")
+    @DeleteMapping("/v1/admin /sections/{sectionId}")
     public ResponseEntity<Void> deleteSection(
             @PathVariable Long sectionId
     ) {

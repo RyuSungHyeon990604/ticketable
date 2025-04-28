@@ -7,17 +7,19 @@ import static com.example.modulecommon.exception.ErrorCode.USER_ACCESS_DENIED;
 import com.example.modulecommon.entity.AuthUser;
 import com.example.modulecommon.exception.ServerException;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
+import com.example.moduleticket.domain.reservation.event.TicketEvent;
 import com.example.moduleticket.domain.ticket.dto.TicketContext;
 import com.example.moduleticket.domain.ticket.dto.RefundDto;
+import com.example.moduleticket.domain.ticket.dto.TicketContext;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
+import com.example.moduleticket.domain.reservation.event.publisher.TicketPublisher;
 import com.example.moduleticket.domain.ticket.repository.TicketRepository;
 import com.example.moduleticket.feign.GameClient;
 import com.example.moduleticket.feign.PaymentClient;
+import com.example.moduleticket.feign.SeatClient;
 import com.example.moduleticket.feign.dto.GameDto;
 import com.example.moduleticket.feign.dto.SeatDto;
-import com.example.moduleticket.feign.dto.request.PaymentRequest;
-import com.example.moduleticket.util.IdempotencyKeyUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +40,10 @@ public class TicketService {
 	private final TicketPaymentService ticketPaymentService;
 	private final TicketCreateService ticketCreateService;
 	private final GameClient gameClient;
+	private final SeatClient seatClient;
 	private final PaymentClient paymentClient;
+	private final TicketPublisher ticketPublisher;
+
 
 	@Transactional(readOnly = true)
 	public TicketResponse getTicket(AuthUser auth, Long ticketId) {
@@ -73,11 +78,18 @@ public class TicketService {
 
 
 	@Transactional
-	public TicketResponse issueTicketFromReservation(AuthUser auth, GameDto gameDto, List<SeatDto> seats,
+	public TicketResponse issueTicketFromReservation(AuthUser auth, Long gameId, List<Long> seatIds,
 		Reservation reservation) {
 
-		TicketContext ticketContext = ticketCreateService.createTicket(auth, gameDto, seats, reservation);
-		ticketPaymentService.paymentTicket(ticketContext);
+		GameDto gameDto = gameClient.getGame(gameId);
+		List<SeatDto> seatDtos = seatClient.getSeatsByGame(gameId, seatIds);
+
+		TicketContext ticketContext = ticketCreateService.createTicket(auth, gameDto, seatDtos, reservation);
+		ticketPaymentService.create(
+			ticketContext.getTicket(),
+			ticketContext.getMemberId(),
+			ticketContext.getTotalPoint()
+		);
 
 		return ticketContext.toResponse();
 	}
@@ -91,6 +103,8 @@ public class TicketService {
 		if (auth.getRole().equals("AMDIN") && !auth.getMemberId().equals(ticket.getMemberId())) {
 			throw new ServerException(USER_ACCESS_DENIED);
 		}
+		Long gameId = ticket.getGameId();
+		Long seatId = ticketSeatService.getSeat(ticketId).get(0).getSeatId();
 		ticket.cancel();
 
 		// 2. 환불금 조회
@@ -102,8 +116,9 @@ public class TicketService {
 		);
 		paymentClient.processRefund(refundDto);
 
-		// 캐싱 삭제
-		//gameCacheService.handleAfterTicketChangeAll(ticket.getGameId(), ticketSeatService.getSeat(ticketId).get(0));
+		// 캐시 이벤트 발생
+		TicketEvent ticketEvent = new TicketEvent(gameId, seatId);
+		ticketPublisher.publish(ticketEvent);
 	}
 
 	/**

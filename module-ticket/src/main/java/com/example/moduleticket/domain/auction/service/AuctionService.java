@@ -1,48 +1,37 @@
-//package com.example.moduleticket.domain.auction.service;
-//
-//import static com.example.modulecommon.exception.ErrorCode.AUCTION_ACCESS_DENIED;
-//import static com.example.modulecommon.exception.ErrorCode.AUCTION_DUPLICATION;
-//import static com.example.modulecommon.exception.ErrorCode.AUCTION_NOT_FOUND;
-//import static com.example.modulecommon.exception.ErrorCode.AUCTION_TIME_OVER;
-//import static com.example.modulecommon.exception.ErrorCode.EXIST_BID;
-//import static com.example.modulecommon.exception.ErrorCode.INVALID_BIDDING_AMOUNT;
-//import static com.example.modulecommon.exception.ErrorCode.TICKET_NOT_FOUND;
-//import static com.example.modulecommon.exception.ErrorCode.USER_NOT_FOUND;
-//
-//import com.example.modulecommon.exception.ServerException;
-//import com.example.moduleticket.domain.auction.dto.event.BidUpdateEvent;
-//import com.example.moduleticket.domain.auction.dto.request.AuctionBidRequest;
-//import com.example.moduleticket.domain.auction.dto.request.AuctionCreateRequest;
-//import com.example.moduleticket.domain.auction.dto.request.AuctionSearchCondition;
-//import com.example.moduleticket.domain.auction.dto.response.AuctionBidResponse;
-//import com.example.moduleticket.domain.auction.dto.response.AuctionResponse;
-//import com.example.moduleticket.domain.auction.entity.Auction;
-//import com.example.moduleticket.domain.auction.entity.AuctionTicketInfo;
-//import com.example.moduleticket.domain.auction.repository.AuctionHistoryRepository;
-//import com.example.moduleticket.domain.auction.repository.AuctionRepository;
-//import com.example.moduleticket.domain.auction.repository.AuctionTicketInfoRepository;
-//import com.example.moduleticket.domain.member.entity.Member;
-//import com.example.moduleticket.domain.member.repository.MemberRepository;
-//import com.example.moduleticket.domain.point.enums.PointHistoryType;
-//import com.example.moduleticket.domain.point.service.PointService;
-//import com.example.moduleticket.domain.ticket.entity.Ticket;
-//import com.example.moduleticket.domain.ticket.repository.TicketRepository;
-//import com.example.moduleticket.util.AuctionBidRedisUtil;
-//import java.time.LocalDateTime;
-//import java.util.List;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.context.ApplicationEventPublisher;
-//import org.springframework.data.domain.Page;
-//import org.springframework.data.domain.PageRequest;
-//import org.springframework.data.domain.Pageable;
-//import org.springframework.data.web.PagedModel;
-//import org.springframework.scheduling.annotation.Scheduled;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//@Service
-//@RequiredArgsConstructor
-//public class AuctionService {
+package com.example.moduleticket.domain.auction.service;
+
+import static com.example.modulecommon.exception.ErrorCode.AUCTION_ACCESS_DENIED;
+import static com.example.modulecommon.exception.ErrorCode.AUCTION_DUPLICATION;
+import static com.example.modulecommon.exception.ErrorCode.AUCTION_NOT_FOUND;
+import static com.example.modulecommon.exception.ErrorCode.AUCTION_TIME_OVER;
+import static com.example.modulecommon.exception.ErrorCode.EXIST_BID;
+import static com.example.modulecommon.exception.ErrorCode.INVALID_BIDDING_AMOUNT;
+import static com.example.modulecommon.exception.ErrorCode.TICKET_NOT_FOUND;
+import static com.example.modulecommon.exception.ErrorCode.USER_NOT_FOUND;
+
+import com.example.modulecommon.exception.ServerException;
+import com.example.moduleticket.domain.auction.dto.event.BidUpdateEvent;
+import com.example.moduleticket.domain.auction.dto.request.AuctionBidRequest;
+import com.example.moduleticket.domain.auction.dto.request.AuctionCreateRequest;
+import com.example.moduleticket.domain.auction.dto.request.AuctionSearchCondition;
+import com.example.moduleticket.domain.auction.dto.response.AuctionBidResponse;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.example.moduleticket.domain.point.enums.PointHistoryType;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class AuctionService {
 //
 //	public static final int BID_UNIT = 100;
 //	private static final int CHUNK_SIZE = 500;
@@ -225,8 +214,8 @@
 //	 * 경기 취소 시 로직
 //	 * 최종 낙찰자에 대한 포인트 환불 + 판매자 포인트 회수
 //	 */
-//	@Transactional
-//	public void deleteAllAuctionsByCanceledGame(Long gameId) {
+	@Transactional
+	public void deleteAllAuctionsByCanceledGame(Long gameId) {
 //		List<Auction> auctions = auctionRepository.findAllByGameId(gameId);
 //
 //		if (auctions.isEmpty()) {
@@ -239,7 +228,7 @@
 //			// 티켓 원래 주인 경매금액 뺏기
 //			pointService.decreasePoint(auction.getSeller().getId(), auction.getBidPoint(), PointHistoryType.REFUND);
 //		}
-//	}
+	}
 //
 //	// 경매 종료 스케쥴러
 //	@Scheduled(fixedRate = 60000) // 1분마다 실행
@@ -261,4 +250,4 @@
 //			expireAuction(auction);
 //		}
 //	}
-//}
+}

@@ -1,35 +1,34 @@
-//package com.example.moduleticket.domain.auction.controller;
-//
-//import static com.example.modulecommon.util.PageUtil.correctPageIndex;
-//
-//import com.example.moduleticket.domain.auction.dto.request.AuctionBidRequest;
-//import com.example.moduleticket.domain.auction.dto.request.AuctionCreateRequest;
-//import com.example.moduleticket.domain.auction.dto.request.AuctionSearchCondition;
-//import com.example.moduleticket.domain.auction.dto.response.AuctionBidResponse;
-//import com.example.moduleticket.domain.auction.dto.response.AuctionResponse;
-//import com.example.moduleticket.domain.auction.service.AuctionService;
-//import jakarta.validation.Valid;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.data.domain.Pageable;
-//import org.springframework.data.web.PageableDefault;
-//import org.springframework.data.web.PagedModel;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.web.bind.annotation.DeleteMapping;
-//import org.springframework.web.bind.annotation.GetMapping;
-//import org.springframework.web.bind.annotation.ModelAttribute;
-//import org.springframework.web.bind.annotation.PathVariable;
-//import org.springframework.web.bind.annotation.PostMapping;
-//import org.springframework.web.bind.annotation.RequestBody;
-//import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.RestController;
-//
-//@RestController
-//@RequiredArgsConstructor
-//@RequestMapping("/api")
-//public class AuctionController {
-//
-//	private final AuctionService auctionService;
-//
+package com.example.moduleticket.domain.auction.controller;
+
+import static com.example.modulecommon.util.PageUtil.correctPageIndex;
+
+import com.example.moduleticket.domain.auction.dto.request.AuctionBidRequest;
+import com.example.moduleticket.domain.auction.dto.request.AuctionCreateRequest;
+import com.example.moduleticket.domain.auction.dto.request.AuctionSearchCondition;
+import com.example.moduleticket.domain.auction.dto.response.AuctionBidResponse;
+import com.example.moduleticket.domain.auction.service.AuctionService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedModel;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api")
+public class AuctionController {
+
+	private final AuctionService auctionService;
+
 //	@PostMapping("/v1/auctions")
 //	public ResponseEntity<AuctionResponse> createAuction(
 //		//@AuthenticationPrincipal Auth auth,
@@ -75,5 +74,10 @@
 //		auctionService.deleteAuction(auth, auctionId);
 //		return ResponseEntity.ok().build();
 //	}
-//
-//}
+
+    @DeleteMapping("/auctions/game/{gameId}")
+    public ResponseEntity<Void> deleteTicketsByGameId(@PathVariable Long gameId) {
+        auctionService.deleteAllAuctionsByCanceledGame(gameId);
+        return ResponseEntity.ok().build();
+    }
+}

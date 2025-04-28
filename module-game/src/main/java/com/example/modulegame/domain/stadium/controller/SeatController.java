@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SeatController {
     private final SeatService seatService;
 
-    @PostMapping("/v1/sections/{sectionId}/seats")
+    @PostMapping("/v1/admin/sections/{sectionId}/seats")
     public ResponseEntity<List<SeatCreateResponse>> createSeats(
             @PathVariable Long sectionId,
             @RequestBody SeatCreateRequest request
@@ -37,7 +37,7 @@ public class SeatController {
         return ResponseEntity.ok(seatService.createSeats(sectionId, request));
     }
 
-    @PutMapping("/v1/seats/{seatId}")
+    @PutMapping("/v1/admin/seats/{seatId}")
     public ResponseEntity<SeatUpdateResponse> updateSeat(
             @PathVariable Long seatId,
             @RequestBody SeatUpdateRequest request
@@ -45,7 +45,7 @@ public class SeatController {
         return ResponseEntity.ok(seatService.updateSeat(seatId, request));
     }
 
-    @DeleteMapping("/v1/seats/{seatId}")
+    @DeleteMapping("/v1/admin/seats/{seatId}")
     public ResponseEntity<Void> deleteSeat(
             @PathVariable Long seatId
     ) {
