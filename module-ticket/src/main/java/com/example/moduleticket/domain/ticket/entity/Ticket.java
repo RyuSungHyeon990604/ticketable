@@ -49,12 +49,4 @@ public class Ticket {
 	public void changeOwner(Long targetMember) {
 		this.memberId = targetMember;
 	}
-
-//	public boolean isTimeOverToAuction() {
-//		return this.game.getStartTime().minusHours(24).isBefore(LocalDateTime.now());
-//	}
-
-	public boolean isNotOwner(Long seller) {
-		return !this.memberId.equals(seller);
-	}
 }

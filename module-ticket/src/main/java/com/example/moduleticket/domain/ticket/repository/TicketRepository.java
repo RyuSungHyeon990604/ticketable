@@ -46,4 +46,10 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 		+ "group by t.memberId "
 	)
 	List<RefundDto> findRefundDtoByGameId(Long gameId);
+
+	@Query("SELECT t "
+		+ "   FROM Ticket t "
+		+ "  WHERE t.deletedAt is null "
+		+ "    AND t.gameId = :gameId")
+	List<Ticket> findByGameId(Long gameId);
 }
