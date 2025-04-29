@@ -1,8 +1,8 @@
-package com.example.modulemember.member.controller;
+package com.example.moduleauth.domain.member.controller;
 
-import com.example.modulemember.member.dto.request.DeleteMemberRequest;
-import com.example.modulemember.member.dto.request.UpdatePasswordRequest;
-import com.example.modulemember.member.service.MemberService;
+import com.example.moduleauth.domain.member.dto.request.DeleteMemberRequest;
+import com.example.moduleauth.domain.member.dto.request.UpdatePasswordRequest;
+import com.example.moduleauth.domain.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

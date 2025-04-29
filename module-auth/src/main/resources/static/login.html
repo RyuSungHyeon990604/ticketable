@@ -26,7 +26,7 @@
                 localStorage.setItem('userId',   res.id);
                 localStorage.setItem('authToken',res.accessToken);
                 alert('로그인 성공');
-                window.location.href = 'http://localhost:8087/point-charge.html';
+                window.location.href = '../../../../../module-point/src/main/resources/static/point-charge.html';
             },
             error(xhr) {
                 alert('로그인 실패: ' + xhr.responseText);

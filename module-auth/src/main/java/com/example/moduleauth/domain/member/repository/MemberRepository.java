@@ -1,8 +1,8 @@
-package com.example.modulemember.member.repository;
+package com.example.moduleauth.domain.member.repository;
 
 import java.util.Optional;
 
-import com.example.modulemember.member.entity.Member;
+import com.example.moduleauth.domain.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

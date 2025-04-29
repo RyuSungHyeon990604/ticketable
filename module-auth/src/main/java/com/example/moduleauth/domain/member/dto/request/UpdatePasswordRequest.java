@@ -1,4 +1,4 @@
-package com.example.modulemember.member.dto.request;
+package com.example.moduleauth.domain.member.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

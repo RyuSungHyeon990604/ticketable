@@ -1,4 +1,4 @@
-package com.example.modulemember.member.entity;
+package com.example.moduleauth.domain.member.entity;
 
 import com.example.modulecommon.entity.Timestamped;
 import jakarta.persistence.Column;

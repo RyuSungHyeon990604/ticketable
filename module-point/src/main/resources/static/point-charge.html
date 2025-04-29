@@ -32,7 +32,7 @@
             if(rsp.success){
                 $.ajax({
                     type: 'POST',
-                    url: `http://localhost:8087/api/v1/members/${userId}/payments/${rsp.imp_uid}`,
+                    url: `http://localhost:8086/api/v1/members/${userId}/payments/${rsp.imp_uid}`,
                     headers: { 'Authorization': `Bearer ${token}` },
                 })
                     .done(function(res){
