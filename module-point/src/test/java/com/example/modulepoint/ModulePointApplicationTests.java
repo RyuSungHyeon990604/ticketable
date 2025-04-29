@@ -1,24 +1,17 @@
-package com.example.modulegame;
+package com.example.modulepoint;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
-@SpringBootTest(
-	classes = {
-		RedisAutoConfiguration.class,
-		RedisReactiveAutoConfiguration.class
-	}
-)
+@SpringBootTest
 @ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:application-test.properties")
-class ModuleGameApplicationTests {
-
+class ModulePointApplicationTests {
+	
 	@Test
 	void contextLoads() {
 	}
-
+	
 }
