@@ -9,7 +9,6 @@ import com.example.moduleauth.common.role.MemberRole;
 import com.example.moduleauth.common.util.JwtUtil;
 import com.example.moduleauth.domain.member.entity.Member;
 import com.example.moduleauth.domain.member.repository.MemberRepository;
-import com.example.modulepoint.domain.point.dto.request.CreatePointRequest;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,7 +46,7 @@ public class AuthService {
 			.build();
 		Member savedMember = memberRepository.save(member);
 
-		pointService.createPoint(new CreatePointRequest(savedMember.getId()));
+		pointService.createPoint(savedMember.getId());
 
 		String accessToken = jwtUtil.createAccessToken(
 			savedMember.getId(), savedMember.getEmail(), savedMember.getName(), memberRole
