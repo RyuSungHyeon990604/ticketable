@@ -13,13 +13,14 @@ java {
     }
 }
 
-ext {
-    springCloudVersion = "2024.0.1"
-}
-
 repositories {
     mavenCentral()
+    // IamPort
     maven { url 'https://jitpack.io' }
+}
+
+ext {
+    springCloudVersion = "2024.0.1"
 }
 
 dependencyManagement {
@@ -31,19 +32,17 @@ dependencyManagement {
 dependencies {
     implementation project(':module-common')
 
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    implementation 'org.springframework.boot:spring-boot-starter'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'com.h2database:h2'
 
-    // JWT
-    compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
-    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
-    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
-
-    testImplementation 'com.h2database:h2'  // H2 테스트 전용으로 변경
+    // IamPort
+    implementation 'com.github.iamport:iamport-rest-client-java:0.1.6'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
+
 tasks.register("prepareKotlinBuildScriptModel"){}

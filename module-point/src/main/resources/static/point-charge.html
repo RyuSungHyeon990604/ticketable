@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>포인트 충전</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+</head>
+<body>
+<h2>포인트 충전</h2>
+<input type="number" id="chargeAmount" min="1000" placeholder="예:10000"><br><br>
+<button id="chargeBtn">충전하기</button>
+
+<script>
+    IMP.init('imp67846427');
+    $('#chargeBtn').click(function(){
+        const amount = +$('#chargeAmount').val();
+        if(!amount||amount<1000) return alert('1000원 이상 입력');
+
+        const userId = localStorage.getItem('userId'),
+            token  = localStorage.getItem('authToken');
+        if(!userId||!token) return alert('로그인 후 이용하세요');
+
+        IMP.request_pay({
+            pg: 'html5_inicis.INIpayTest',
+            pay_method: 'card',
+            merchant_uid: 'order_' + new Date().getTime(),
+            name: '포인트 충전',
+            amount,
+            buyer_email: ''
+        }, function(rsp){
+            if(rsp.success){
+                $.ajax({
+                    type: 'POST',
+                    url: `http://localhost:8086/api/v1/members/${userId}/payments/${rsp.imp_uid}`,
+                    headers: { 'Authorization': `Bearer ${token}` },
+                })
+                    .done(function(res){
+                        alert(`충전 성공! 금액: ${res.response.amount}원`);
+                    })
+                    .fail(function(xhr){
+                        alert('서버 검증 실패: ' + xhr.responseText);
+                    });
+            } else {
+                alert('결제 실패: ' + rsp.error_msg);
+            }
+        });
+    });
+</script>
+</body>
+</html>
