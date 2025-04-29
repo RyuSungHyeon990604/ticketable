@@ -6,6 +6,7 @@ import static com.example.modulecommon.exception.ErrorCode.USER_ACCESS_DENIED;
 
 import com.example.modulecommon.entity.AuthUser;
 import com.example.modulecommon.exception.ServerException;
+import com.example.moduleticket.RefundQueueService;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.event.TicketEvent;
 import com.example.moduleticket.domain.reservation.event.publisher.TicketPublisher;
@@ -21,7 +22,6 @@ import com.example.moduleticket.feign.PaymentClient;
 import com.example.moduleticket.feign.SeatClient;
 import com.example.moduleticket.feign.dto.GameDto;
 import com.example.moduleticket.feign.dto.SeatDetailDto;
-import com.example.moduleticket.feign.dto.SeatDto;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +43,7 @@ public class TicketService {
 	private final TicketCreateService ticketCreateService;
 	private final GameClient gameClient;
 	private final SeatClient seatClient;
-	private final PaymentClient paymentClient;
+	private final RefundQueueService refundQueueService;
 	private final TicketPublisher ticketPublisher;
 
 
@@ -109,13 +109,7 @@ public class TicketService {
 		ticket.cancel();
 
 		// 2. 환불금 조회
-		long refund = ticketPaymentService.getTicketTotalPoint(ticketId);
-
-		RefundDto refundDto = new RefundDto(
-			auth.getMemberId(),
-			refund
-		);
-		paymentClient.processRefund(refundDto);
+		ticketPaymentService.refundPrice(auth.getMemberId(), ticket.getId());
 
 		// 캐시 이벤트 발생
 		TicketEvent ticketEvent = new TicketEvent(gameId, seatId);
@@ -134,7 +128,7 @@ public class TicketService {
 			throw new ServerException(ALREADY_CANCELED_GAME);
 		}
 		List<RefundDto> refundDtoList = ticketRepository.findRefundDtoByGameId(gameId);
-		paymentClient.processRefundBulk(refundDtoList);
+		refundDtoList.forEach(refundQueueService::enqueueRefundTicket);
 		ticketRepository.softDeleteAllByGameId(gameId);
 	}
 
