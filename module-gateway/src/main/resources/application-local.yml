@@ -23,22 +23,27 @@ spring:
           predicates:
             - Path=/api/v*/auth/**
 
+        - id: member
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v*/members/**
+          filters:
+            - name: ValidateToken
+            - RewritePath=/member/(?<segment>.*), /${segment}
+
 #        - id: module-auction
 #          uri: http://localhost:8084
 
 #        - id: module-waiting
 #          uri: http://localhost:8085
 
-        - id: module-member
+        - id: module-point
           uri: http://localhost:8086
           predicates:
             - Path=/api/v*/members/**
           filters:
             - name: ValidateToken
-            - RewritePath=/module-member/(?<segment>.*), /${segment}
-
-#        - id: module-point
-#          uri: http://localhost:8087
+            - RewritePath=/point-module/(?<segment>.*), /${segment}
 
         - id: admin-game
           uri: http://localhost:8081
@@ -56,6 +61,16 @@ spring:
         connect-timeout: 10000
         response-timeout: 60000
 
+
+        - id: exchange-point
+          uri: http://localhost:8086
+          predicates:
+            - Path=/api/v*/admin/**
+          filters:
+            - name: ValidateToken
+              args:
+                requiredRole: ROLE_ADMIN
+            - RewritePath=/exchange-point/(?<segment>.*), /${segment}
 
 management:
   endpoints:
