@@ -26,7 +26,24 @@ spring:
         - id: module-auth
           uri: http://localhost:8083
           predicates:
-            - Path=/api/v*/auth/**, /api/v*/members/**
+            - Path=/api/v*/auth/**
+
+#        - id: module-auction
+#          uri: http://localhost:8084
+
+#        - id: module-waiting
+#          uri: http://localhost:8085
+
+        - id: module-member
+          uri: http://localhost:8086
+          predicates:
+            - Path=/api/v*/members/**
+          filters:
+            - name: ValidateToken
+            - RewritePath=/module-member/(?<segment>.*), /${segment}
+
+#        - id: module-point
+#          uri: http://localhost:8087
 
         - id: admin-game
           uri: http://localhost:8081

@@ -1,16 +1,16 @@
-package com.example.moduleauth.domain.member.service;
+package com.example.modulemember.member.service;
 
 import static com.example.modulecommon.exception.ErrorCode.INVALID_PASSWORD;
 import static com.example.modulecommon.exception.ErrorCode.PASSWORD_SAME_AS_OLD;
 import static com.example.modulecommon.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.example.modulecommon.exception.ServerException;
-import com.example.moduleauth.domain.member.dto.request.DeleteMemberRequest;
-import com.example.moduleauth.domain.member.dto.request.UpdatePasswordRequest;
-import com.example.moduleauth.domain.member.entity.Member;
-import com.example.moduleauth.domain.member.repository.MemberRepository;
+import com.example.modulemember.config.PasswordEncoder;
+import com.example.modulemember.member.dto.request.DeleteMemberRequest;
+import com.example.modulemember.member.dto.request.UpdatePasswordRequest;
+import com.example.modulemember.member.entity.Member;
+import com.example.modulemember.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,20 +22,20 @@ public class MemberService {
 	private final PasswordEncoder passwordEncoder;
 	
 	@Transactional
-	public void updatePassword(Long authId, UpdatePasswordRequest request) {
+	public void updatePassword(Long memberId, UpdatePasswordRequest request) {
 		if (request.getOldPassword().equals(request.getNewPassword())) {
 			throw new ServerException(PASSWORD_SAME_AS_OLD);
 		}
 		
-		Member member = getMember(authId);
+		Member member = getMember(memberId);
 		matchPassword(request.getOldPassword(), member.getPassword());
 		
 		member.changePassword(passwordEncoder.encode(request.getNewPassword()));
 	}
 	
 	@Transactional
-	public void deleteMember(Long authId, DeleteMemberRequest request) {
-		Member member = getMember(authId);
+	public void deleteMember(Long memberId, DeleteMemberRequest request) {
+		Member member = getMember(memberId);
 		matchPassword(request.getPassword(), member.getPassword());
 		
 		member.memberDelete();
