@@ -67,38 +67,38 @@ public class GameCacheService {
     }
 
 
-    public void handleAfterTicketChange(Long gameId) {
+    public void handleAfterTicketChange(Long gameId, Set<Long> bookedSeatsId) {
         Cache cache = cacheManager.getCache("seatCountsBySectionType");
 
         if (gameCacheHelper.isEvictStrategy(gameId+":")) {
             cache.evict(gameId);
             log.info("캐시 삭제");
         } else {
-            cache.put(gameId, calculateSeatCountBySectionType(gameId));
+            cache.put(gameId, calculateSeatCountBySectionType(gameId, bookedSeatsId));
             log.info("캐시 갱신");
         }
     }
 
-    public void handleAfterTicketChangeByType(Long gameId, String type) {
+    public void handleAfterTicketChangeByType(Long gameId, String type, Set<Long> bookedSeatsId) {
         Cache cache = cacheManager.getCache("seatCountsBySectionCode");
         String key = String.format("%s:%s", gameId, type);
         if (gameCacheHelper.isEvictStrategy(key)) {
             cache.evict(key);
             log.info("캐시 삭제");
         } else {
-            cache.put(key, calculateSeatCountBySection(gameId, type));
+            cache.put(key, calculateSeatCountBySection(gameId, type, bookedSeatsId));
             log.info("캐시 갱신");
         }
     }
 
-    public void handleAfterTicketChangeBySeat(Long gameId, Long sectionId) {
+    public void handleAfterTicketChangeBySeat(Long gameId, Long sectionId, Set<Long> bookedSeatsId) {
         Cache cache = cacheManager.getCache("seat");
         String key = String.format("%s:%s", gameId, sectionId);
         if (gameCacheHelper.isEvictStrategy(key)) {
             cache.evict(key);
             log.info("캐시 삭제");
         } else {
-            cache.put(key,seatInfo(gameId, sectionId));
+            cache.put(key,seatInfo(gameId, sectionId, bookedSeatsId));
             log.info("캐시 갱신");
         }
     }
@@ -108,9 +108,10 @@ public class GameCacheService {
         Seat seat = seatService.getSeat(seatId);
         String sectionType = seat.getSection().getType();
         Long sectionId = seat.getSection().getId();
-        handleAfterTicketChange(gameId);             // sectionType 캐시 처리
-        handleAfterTicketChangeByType(gameId, sectionType); // sectionCode 캐시 처리
-        handleAfterTicketChangeBySeat(gameId, sectionId);
+        Set<Long> bookedSeatsId = reservationClient.getBookedSeatsId(gameId);
+        handleAfterTicketChange(gameId, bookedSeatsId);             // sectionType 캐시 처리
+        handleAfterTicketChangeByType(gameId, sectionType, bookedSeatsId); // sectionCode 캐시 처리
+        handleAfterTicketChangeBySeat(gameId, sectionId, bookedSeatsId);
     }
 
     @Scheduled(cron = "0 0 0 * * *") // 매일 자정
@@ -172,6 +173,57 @@ public class GameCacheService {
         List<Seat> seats = seatService.getSeatsBySectionId(sectionId);
         // 예매된 좌석 ID 조회
         Set<Long> bookedSeatsId = reservationClient.getBookedSeatsId(gameId);
+
+        // 계산 로직
+        return seats.stream()
+                .map(seat -> SeatGetResponse.of(seat, bookedSeatsId.contains(seat.getId())))
+                .toList();
+    }
+
+    private List<SectionTypeSeatCountResponse> calculateSeatCountBySectionType(Long gameId, Set<Long> bookedSeatsId) {
+        // 좌석 ID 별 타입 정보 조회
+        List<SectionTypeMapping> seats = gameRepository.findSeatsId(gameId);
+
+        // 게산 로직
+        Map<String, Long> remainingCount = new LinkedHashMap<>();
+
+        for (SectionTypeMapping seat : seats) {
+            String type = seat.getSectionType();
+            remainingCount.putIfAbsent(type,0L);
+            if (!bookedSeatsId.contains(seat.getSeatId())) {
+                remainingCount.put(type, remainingCount.get(type)+ 1);
+            }
+        }
+
+        return remainingCount
+                .entrySet()
+                .stream()
+                .map(entry -> new SectionTypeSeatCountResponse(entry.getKey(), entry.getValue()))
+                .toList();
+    }
+
+    private List<SectionSeatCountResponse> calculateSeatCountBySection(Long gameId, String type, Set<Long> bookedSeatsId) {
+        List<SectionCodeMapping> seats = gameRepository.findSeatsIdBySectionType(gameId, type);
+
+        Map<String, Long> remainingCount = new LinkedHashMap<>();
+
+        for (SectionCodeMapping seat : seats) {
+            String code = seat.getSectionCode();
+            remainingCount.putIfAbsent(code, 0L);
+            if (!bookedSeatsId.contains(seat.getSeatId())) {
+                remainingCount.put(code, remainingCount.get(code) + 1);
+            }
+        }
+
+        return remainingCount.entrySet()
+                .stream()
+                .map(entry -> new SectionSeatCountResponse(entry.getKey(), entry.getValue()))
+                .toList();
+    }
+
+    private List<SeatGetResponse> seatInfo(Long gameId, Long sectionId, Set<Long> bookedSeatsId) {
+        // 해당 구역의 좌석 ID 조회
+        List<Seat> seats = seatService.getSeatsBySectionId(sectionId);
 
         // 계산 로직
         return seats.stream()
