@@ -2,6 +2,7 @@ package com.example.moduleticket.domain.ticket.controller;
 
 import com.example.modulecommon.annotation.LoginUser;
 import com.example.modulecommon.entity.AuthUser;
+import com.example.moduleticket.domain.ticket.dto.TicketDto;
 import com.example.moduleticket.domain.ticket.dto.request.TicketCreateRequest;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.service.TicketService;
@@ -56,5 +57,20 @@ public class TicketController {
 	public ResponseEntity<Void> deleteTicketsByGameId(@PathVariable Long gameId) {
 		ticketService.deleteAllTicketsByCanceledGame(gameId);
 		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping("/internal/members/{memberId}/tickets/{ticketId}")
+	public ResponseEntity<TicketDto> getTicketInternal(
+		@PathVariable("memberId") Long memberId,
+		@PathVariable("ticketId") Long ticketId
+	) {
+		return ResponseEntity.ok(ticketService.getTicketInternal(memberId, ticketId));
+	}
+
+	@GetMapping("/Internal/games/{gameId}/tickets")
+	public ResponseEntity<List<TicketDto>> getTickets(
+		@PathVariable Long gameId
+	) {
+		return ResponseEntity.ok(ticketService.getTicketsInternal(gameId));
 	}
 }

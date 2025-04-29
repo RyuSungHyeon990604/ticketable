@@ -11,9 +11,11 @@ import com.example.moduleticket.domain.reservation.event.TicketEvent;
 import com.example.moduleticket.domain.ticket.dto.TicketContext;
 import com.example.moduleticket.domain.ticket.dto.RefundDto;
 import com.example.moduleticket.domain.ticket.dto.TicketContext;
+import com.example.moduleticket.domain.ticket.dto.TicketDto;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
 import com.example.moduleticket.domain.reservation.event.publisher.TicketPublisher;
+import com.example.moduleticket.domain.ticket.entity.TicketSeat;
 import com.example.moduleticket.domain.ticket.repository.TicketRepository;
 import com.example.moduleticket.feign.GameClient;
 import com.example.moduleticket.feign.PaymentClient;
@@ -160,5 +162,21 @@ public class TicketService {
 		log.debug("티켓 결제 금액 조회 ticketPayment: {}", totalPoint);
 
 		return new TicketResponse(ticket.getId(), title, ticketSeats, startTime, totalPoint);
+	}
+
+	public TicketDto getTicketInternal(Long memberId, Long ticketId) {
+		Ticket ticket = ticketRepository.findByIdAndDeletedAtIsNull(ticketId, memberId)
+			.orElseThrow(() -> new ServerException(TICKET_NOT_FOUND));
+		int ticketTotalPoint = ticketPaymentService.getTicketTotalPoint(ticketId);
+		List<Long> ticketSeatIds = ticketSeatService.getSeat(ticketId).stream().map(TicketSeat::getSeatId).toList();
+
+		return TicketDto.from(ticket, ticketTotalPoint, ticketSeatIds);
+	}
+
+	public List<TicketDto> getTicketsInternal(Long gameId) {
+		return ticketRepository.findByGameId(gameId)
+			.stream()
+			.map(ticket -> TicketDto.from(ticket, null, null))
+			.toList();
 	}
 }
