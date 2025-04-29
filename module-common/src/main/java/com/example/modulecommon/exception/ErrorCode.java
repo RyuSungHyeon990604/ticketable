@@ -78,6 +78,7 @@ public enum ErrorCode {
 	USER_ACCESS_DENIED("사용자가 접근할 수 있는 권한이 없습니다.", FORBIDDEN),
 	USER_ROLE_SAME_AS_OLD("이전 역활과 동일할 수 없습니다.", BAD_REQUEST),
 	INVALID_USER_ROLE("유효하지 않는 role 입니다.", BAD_REQUEST),
+	INVALID_RECAPTCHA_TOKEN("Recaptcha 토큰이 유효하지 않습니다.", BAD_REQUEST),
 	INVALID_TOKEN("유효하지 않은 토큰입니다.", INTERNAL_SERVER_ERROR);
 
 	private final String message;

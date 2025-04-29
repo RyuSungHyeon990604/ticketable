@@ -3,12 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>로그인</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
 <h2>로그인</h2>
 <input type="email" id="email" placeholder="email@example.com"><br><br>
 <input type="password" id="password" placeholder="비밀번호"><br><br>
+
+<div class="g-recaptcha" data-sitekey=6LdTOigrAAAAAEhf7jAMvZGjPa4epXepwpyoEYQL> </div>
+<br>
+
 <button id="loginBtn">로그인</button>
 
 <script>
@@ -17,19 +22,29 @@
             pw    = $('#password').val();
         if(!email||!pw) return alert('모두 입력하세요.');
 
+        const recaptchaResponse = grecaptcha.getResponse();
+        if (!recaptchaResponse) {
+            return alert('체크박스를 클릭해 주세요.');
+        }
+
         $.ajax({
             type: 'POST',
             url: 'http://localhost:8083/api/v1/auth/login',
             contentType: 'application/json',
-            data: JSON.stringify({ email, password: pw }),
+            data: JSON.stringify({
+                email: email,
+                password: pw,
+                recaptchaToken: recaptchaResponse
+            }),
             success(res) {
                 localStorage.setItem('userId',   res.id);
                 localStorage.setItem('authToken',res.accessToken);
                 alert('로그인 성공');
-                window.location.href = '../../../../../module-point/src/main/resources/static/point-charge.html';
+                window.location.href = "http://localhost:8086/point-charge.html";
             },
             error(xhr) {
                 alert('로그인 실패: ' + xhr.responseText);
+                grecaptcha.reset();
             }
         });
     });
