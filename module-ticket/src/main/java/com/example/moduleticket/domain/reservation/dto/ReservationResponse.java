@@ -2,6 +2,7 @@ package com.example.moduleticket.domain.reservation.dto;
 
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.feign.dto.GameDto;
+import com.example.moduleticket.feign.dto.SeatDetailDto;
 import com.example.moduleticket.feign.dto.SeatDto;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,13 +19,13 @@ public class ReservationResponse {
 	private final String state;
 	private final Long memberId;
 
-	public static ReservationResponse from(Reservation reservation, GameDto gameDto, List<SeatDto> seatDtos) {
-		List<String> seats = seatDtos.stream().map(SeatDto::getPosition).toList();
+	public static ReservationResponse from(Reservation reservation, List<SeatDetailDto> seatDetailDto) {
+		List<String> seats = seatDetailDto.stream().map(SeatDetailDto::getPosition).toList();
 		return new ReservationResponse(
 			reservation.getId(),
 			reservation.getGameId(),
 			seats,
-			gameDto.getStartTime(),
+			seatDetailDto.get(0).getStartTime(),
 			reservation.getState(),
 			reservation.getMemberId()
 			);

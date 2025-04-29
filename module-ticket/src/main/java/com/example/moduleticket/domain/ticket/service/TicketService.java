@@ -8,19 +8,19 @@ import com.example.modulecommon.entity.AuthUser;
 import com.example.modulecommon.exception.ServerException;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.event.TicketEvent;
-import com.example.moduleticket.domain.ticket.dto.TicketContext;
+import com.example.moduleticket.domain.reservation.event.publisher.TicketPublisher;
 import com.example.moduleticket.domain.ticket.dto.RefundDto;
 import com.example.moduleticket.domain.ticket.dto.TicketContext;
 import com.example.moduleticket.domain.ticket.dto.TicketDto;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
-import com.example.moduleticket.domain.reservation.event.publisher.TicketPublisher;
 import com.example.moduleticket.domain.ticket.entity.TicketSeat;
 import com.example.moduleticket.domain.ticket.repository.TicketRepository;
 import com.example.moduleticket.feign.GameClient;
 import com.example.moduleticket.feign.PaymentClient;
 import com.example.moduleticket.feign.SeatClient;
 import com.example.moduleticket.feign.dto.GameDto;
+import com.example.moduleticket.feign.dto.SeatDetailDto;
 import com.example.moduleticket.feign.dto.SeatDto;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -83,10 +83,9 @@ public class TicketService {
 	public TicketResponse issueTicketFromReservation(AuthUser auth, Long gameId, List<Long> seatIds,
 		Reservation reservation) {
 
-		GameDto gameDto = gameClient.getGame(gameId);
-		List<SeatDto> seatDtos = seatClient.getSeatsByGame(gameId, seatIds);
+		List<SeatDetailDto> seatDetailDtos = seatClient.getSeatsByGame(gameId, seatIds);
 
-		TicketContext ticketContext = ticketCreateService.createTicket(auth, gameDto, seatDtos, reservation);
+		TicketContext ticketContext = ticketCreateService.createTicket(auth, seatDetailDtos, reservation);
 		ticketPaymentService.create(
 			ticketContext.getTicket(),
 			ticketContext.getMemberId(),
@@ -152,9 +151,8 @@ public class TicketService {
 		LocalDateTime startTime = game.getStartTime();
 		log.debug("경기 시작 시간 조회 startTime : {}", startTime);
 
-		List<String> ticketSeats = ticketSeatService.getSeatByTicketSeatId(game.getId(), ticket.getId()).stream()
-			.map(SeatDto::getPosition)
-			.toList();
+		List<String> ticketSeats = ticketSeatService.getPositionsByTicketSeatId(game.getId(), ticket.getId());
+
 		log.debug("티켓 좌석 조회 ticketSeats: {}", ticketSeats);
 
 		int totalPoint = ticket.getReservation().getTotalPrice();

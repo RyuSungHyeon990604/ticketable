@@ -1,11 +1,11 @@
 package com.example.modulegame.domain.stadium.service;
 
 
-import com.example.modulegame.domain.game.dto.SeatDto;
-import java.util.ArrayList;
-import java.util.List;
+import static com.example.modulecommon.exception.ErrorCode.SEAT_NOT_FOUND;
 
 import com.example.modulecommon.exception.ErrorCode;
+import com.example.modulecommon.exception.ServerException;
+import com.example.modulegame.domain.game.dto.SeatDetailDto;
 import com.example.modulegame.domain.stadium.dto.SectionAndPositionDto;
 import com.example.modulegame.domain.stadium.dto.request.SeatCreateRequest;
 import com.example.modulegame.domain.stadium.dto.request.SeatUpdateRequest;
@@ -14,13 +14,12 @@ import com.example.modulegame.domain.stadium.dto.response.SeatUpdateResponse;
 import com.example.modulegame.domain.stadium.entity.Seat;
 import com.example.modulegame.domain.stadium.entity.Section;
 import com.example.modulegame.domain.stadium.repository.SeatRepository;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.modulecommon.exception.ServerException;
-
-import static com.example.modulecommon.exception.ErrorCode.SEAT_NOT_FOUND;
 
 
 @Slf4j
@@ -98,16 +97,16 @@ public class SeatService {
     }
 
     //경기에 포함된 좌석을 조회
-	public List<SeatDto> getSeatsByGameAndSection(Long gameId, Long sectionId, List<Long> seatIds ) {
-        List<SeatDto> seats = seatRepository.findSeatDtosByGameAndSection(gameId, sectionId, seatIds);
+	public List<SeatDetailDto> getSeatsByGameAndSection(Long gameId, Long sectionId, List<Long> seatIds ) {
+        List<SeatDetailDto> seats = seatRepository.findSeatDtosByGameAndSection(gameId, sectionId, seatIds);
         if(seats.size() != seatIds.size()){
             throw new ServerException(SEAT_NOT_FOUND);
         }
         return seats;
     }
 
-    public List<SeatDto> getSeatsByGame(Long gameId, List<Long> seatIds) {
-        List<SeatDto> seats = seatRepository.findSeatDtosByGame(gameId, seatIds);
+    public List<SeatDetailDto> getSeatsByGame(Long gameId, List<Long> seatIds) {
+        List<SeatDetailDto> seats = seatRepository.findSeatDtosByGame(gameId, seatIds);
         if(seats.size() != seatIds.size()){
             throw new ServerException(SEAT_NOT_FOUND);
         }

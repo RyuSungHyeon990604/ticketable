@@ -1,10 +1,7 @@
 package com.example.moduleticket.domain.ticket.service;
 
-import static com.example.modulecommon.exception.ErrorCode.TICKET_ALREADY_RESERVED;
-
-import com.example.modulecommon.exception.ServerException;
 import com.example.moduleticket.feign.SeatClient;
-import com.example.moduleticket.feign.dto.GameDto;
+import com.example.moduleticket.feign.dto.SeatDetailDto;
 import com.example.moduleticket.feign.dto.SeatDto;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
 import com.example.moduleticket.domain.ticket.entity.TicketSeat;
@@ -21,17 +18,17 @@ public class TicketSeatService {
 	private final TicketSeatRepository ticketSeatRepository;
 	private final SeatClient seatService;
 
-	public void createAll(List<SeatDto> seats, GameDto game, Ticket ticket) {
-		List<TicketSeat> ticketSeats = seats.stream().map(seat -> new TicketSeat(ticket, seat.getSeatId(), game.getId())).toList();
+	public void createAll(List<Long> seatIds, long gameId, Ticket ticket) {
+		List<TicketSeat> ticketSeats = seatIds.stream().map(seatId -> new TicketSeat(ticket, seatId, gameId)).toList();
 		ticketSeatRepository.saveAll(ticketSeats);
 	}
 
-	public List<SeatDto> getSeatByTicketSeatId(Long gameId, Long ticketId) {
+	public List<String> getPositionsByTicketSeatId(Long gameId, Long ticketId) {
 		List<TicketSeat> ticketSeats = ticketSeatRepository.findByTicketId(ticketId);
 		List<Long> seatIds = ticketSeats.stream().map(TicketSeat::getSeatId).toList();
-		List<SeatDto> seatDtos = seatService.getSeatsByGame(gameId, seatIds);
+		List<SeatDetailDto> seatDtos = seatService.getSeatsByGame(gameId, seatIds);
 
-		return  seatDtos;
+		return  seatDtos.stream().map(SeatDetailDto::getPosition).toList();
 	}
 
 	public void deleteAllTicketSeats(Long ticketId) {

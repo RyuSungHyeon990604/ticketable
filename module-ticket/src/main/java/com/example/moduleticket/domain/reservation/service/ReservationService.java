@@ -9,16 +9,9 @@ import com.example.moduleticket.domain.reservation.dto.ReservationCreateRequest;
 import com.example.moduleticket.domain.reservation.dto.ReservationResponse;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.entity.ReserveSeat;
-import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
-import com.example.moduleticket.domain.ticket.event.ReservationUnknownFailureEvent;
 import com.example.moduleticket.domain.reservation.event.TicketEvent;
 import com.example.moduleticket.domain.reservation.event.publisher.TicketPublisher;
-import com.example.moduleticket.domain.ticket.service.TicketSeatService;
-import com.example.moduleticket.feign.GameClient;
-import com.example.moduleticket.feign.PaymentClient;
-import com.example.moduleticket.feign.SeatClient;
-import com.example.moduleticket.feign.dto.GameDto;
-import com.example.moduleticket.feign.dto.SeatDto;
+import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.event.SeatHoldReleaseEvent;
 import com.example.moduleticket.domain.ticket.service.TicketService;
@@ -26,7 +19,6 @@ import com.example.moduleticket.util.SeatHoldRedisUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -89,7 +81,7 @@ public class ReservationService {
 		//authUser가 선점한 좌석이맞는지 최종 확인 & TTL만료시 에약완료 불가
 		reservationValidator.validateReservationForComplete(authUser, gameId, seatIds, reservation);
 
-		reservationPaymentService.reservePayment(authUser, reservationId, reservation.getTotalPrice());
+		//reservationPaymentService.reservePayment(authUser, reservationId, reservation.getTotalPrice());
 
 		//티켓 생성
 		TicketResponse ticketResponse = ticketService.issueTicketFromReservation(
