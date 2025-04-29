@@ -53,7 +53,7 @@ public class AuthService {
 		);
 		return new AuthResponse(accessToken);
 	}
-	
+
 	@Transactional
 	public AuthResponse login(LoginRequest request) {
 		Member findMember = memberRepository.findByEmail(request.getEmail())
