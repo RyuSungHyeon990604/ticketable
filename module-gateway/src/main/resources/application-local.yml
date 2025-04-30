@@ -7,7 +7,7 @@ spring:
           predicates:
             - Path=/api/v*/games/**, /api/v*/seats/**, /api/v*/sections/**, /api/v*/stadiums/**
           filters:
-#            - name: ValidateToken
+            - name: ValidateToken
             - RewritePath=/module-game/(?<segment>.*), /${segment}
 
         - id: module-ticket
@@ -15,7 +15,7 @@ spring:
           predicates:
             - Path=/api/v*/tickets/**, /api/v*/reservations/**, /api/v*/waiting-queue/**
           filters:
-#            - name: ValidateToken
+            - name: ValidateToken
             - RewritePath=/module-ticket/(?<segment>.*), /${segment}
 
         - id: module-auth
@@ -31,11 +31,11 @@ spring:
             - name: ValidateToken
             - RewritePath=/member/(?<segment>.*), /${segment}
 
-#        - id: module-auction
-#          uri: http://localhost:8084
+        - id: module-auction
+          uri: http://localhost:8084
 
-#        - id: module-waiting
-#          uri: http://localhost:8085
+        - id: module-waiting
+          uri: http://localhost:8085
 
         - id: module-point
           uri: http://localhost:8086
@@ -50,18 +50,10 @@ spring:
           predicates:
             - Path=/api/v*/admin/**
           filters:
-#            - name: ValidateToken
-#              args:
-#                requiredRole: ROLE_ADMIN
+            - name: ValidateToken
+              args:
+                requiredRole: ROLE_ADMIN
             - RewritePath=/admin-game/(?<segment>.*), /${segment}
-      httpclient:
-        pool:
-          maxConnections: 1000
-          acquireTimeout: 10000
-        connect-timeout: 10000
-        response-timeout: 60000
-
-
         - id: exchange-point
           uri: http://localhost:8086
           predicates:
@@ -71,6 +63,13 @@ spring:
               args:
                 requiredRole: ROLE_ADMIN
             - RewritePath=/exchange-point/(?<segment>.*), /${segment}
+      httpclient:
+        pool:
+          maxConnections: 1000
+          acquireTimeout: 10000
+          connect-timeout: 10000
+          response-timeout: 60000
+
 
 management:
   endpoints:
