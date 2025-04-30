@@ -10,15 +10,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 
-@Service
-@RequiredArgsConstructor
-public class GameRSocketClientService {
-
-    private final RSocketRequester rSocketRequester;
-    public Mono<Set<Long>> getBookedSeatIds(Long gameId) {
-        return rSocketRequester
-                .route("ticket.bookedSeats")           // 서버의 @MessageMapping과 일치해야 함
-                .data(gameId)                          // 보내는 데이터
-                .retrieveMono(new ParameterizedTypeReference<Set<Long>>() {});
-    }
-}
+//@Service
+//@RequiredArgsConstructor
+//public class GameRSocketClientService {
+//
+//    private final RSocketRequester rSocketRequester;
+//    public Mono<Set<Long>> getBookedSeatIds(Long gameId) {
+//        return rSocketRequester
+//                .route("ticket.bookedSeats")           // 서버의 @MessageMapping과 일치해야 함
+//                .data(gameId)                          // 보내는 데이터
+//                .retrieveMono(new ParameterizedTypeReference<Set<Long>>() {});
+//    }
+//}

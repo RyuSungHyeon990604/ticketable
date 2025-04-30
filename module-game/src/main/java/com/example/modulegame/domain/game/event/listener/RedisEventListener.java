@@ -30,6 +30,8 @@ public class RedisEventListener implements MessageListener {
             log.error("❌ 이벤트 수신 중 에러 발생", e);
         }
     }
+
+// Rsocket 용 Listener
 //    public void onMessage(Message message, byte[] pattern) {
 //        try {
 //            String json = new String(message.getBody());
