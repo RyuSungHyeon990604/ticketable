@@ -21,6 +21,7 @@ import static com.example.modulecommon.exception.ErrorCode.*;
 @Service
 public class AuthService {
 	
+	private final ReCaptchaService reCaptchaService;
 	private final MemberRepository memberRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtUtil jwtUtil;
@@ -56,6 +57,10 @@ public class AuthService {
 
 	@Transactional
 	public AuthResponse login(LoginRequest request) {
+		if (!reCaptchaService.isValid(request.getRecaptchaToken())) {
+			throw new ServerException(INVALID_RECAPTCHA_TOKEN);
+		}
+		
 		Member findMember = memberRepository.findByEmail(request.getEmail())
 			.orElseThrow(() -> new ServerException(USER_NOT_FOUND));
 		
