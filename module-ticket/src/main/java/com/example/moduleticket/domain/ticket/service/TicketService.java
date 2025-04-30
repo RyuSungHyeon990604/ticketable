@@ -122,13 +122,12 @@ public class TicketService {
 	 */
 	@Transactional
 	public void deleteAllTicketsByCanceledGame(Long gameId) {
-		//todo : 환불로직 추가
 		GameDto game = gameClient.getGame(gameId);
 		if(game.getDeletedAt() != null ){
 			throw new ServerException(ALREADY_CANCELED_GAME);
 		}
 		List<RefundDto> refundDtoList = ticketRepository.findRefundDtoByGameId(gameId);
-		refundDtoList.forEach(refundQueueService::enqueueRefundTicket);
+		refundQueueService.enqueueRefundTicket(refundDtoList);
 		ticketRepository.softDeleteAllByGameId(gameId);
 	}
 
