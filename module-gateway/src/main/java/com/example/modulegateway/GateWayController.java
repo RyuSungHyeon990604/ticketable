@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.cloud.gateway.filter.FilterDefinition;
 import org.springframework.cloud.gateway.handler.predicate.PredicateDefinition;
@@ -22,12 +23,14 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class GateWayController {
 	private final RouteDefinitionWriter routeDefinitionWriter;
 	private final RouteDefinitionLocator routeDefinitionLocator;
 	private final ApplicationEventPublisher publisher;
+	private final GateWayQueueService gateWayQueueService;
 
 	@PostMapping("/admin/routes")
 	public Mono<Void> addRoute(@RequestBody RouteCreateRequest routeCreateRequest) {
@@ -77,5 +80,20 @@ public class GateWayController {
 	@GetMapping("/admin/routes")
 	public Flux<RouteDefinition> getRoutes() {
 		return routeDefinitionLocator.getRouteDefinitions();
+	}
+
+	@PostMapping("/admin/waiting-trigger")
+	public Mono<Void> check(@RequestBody(required = false) Map<String, Object> body){
+		log.info("대기열 트리거 요청 수신! payload");
+		String status = (String) body.get("status");
+		if(status.equals("firing")){
+			log.info("대기열 적용 요청 수신!");
+			return gateWayQueueService.applyQueue();
+		}
+		if(status.equals("resolved")){
+			log.info("대기열 해제 요청 수신!");
+			return gateWayQueueService.deactivateQueue();
+		}
+		return Mono.empty();
 	}
 }

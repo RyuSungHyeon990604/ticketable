@@ -1,4 +1,9 @@
 spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   cloud:
     gateway:
       routes:
@@ -10,6 +15,7 @@ spring:
             - name: ValidateToken
             - RewritePath=/module-game/(?<segment>.*), /${segment}
 
+
         - id: module-ticket
           uri: http://localhost:8082
           predicates:
@@ -18,24 +24,46 @@ spring:
             - name: ValidateToken
             - RewritePath=/module-ticket/(?<segment>.*), /${segment}
 
-        - id: module-auth
+
+        - id: auth-login
           uri: http://localhost:8083
           predicates:
-            - Path=/api/v*/auth/**
+            - Path=/api/v*/auth/login
+          filters:
+            - name: RequestRateLimiter
+              args:
+                keyResolver: "#{@ipKeyResolver}"
+                redis-rate-limiter.replenishRate: 1   # 초당 최대 1 토큰 생성
+                redis-rate-limiter.burstCapacity: 2   # 2 토큰시 버스트
 
-        - id: member
+
+        - id: auth-signup
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/v*/auth/signup
+
+
+        - id: auth-member
           uri: http://localhost:8083
           predicates:
             - Path=/api/v*/members/**
           filters:
             - name: ValidateToken
-            - RewritePath=/member/(?<segment>.*), /${segment}
+            - RewritePath=/auth-member/(?<segment>.*), /${segment}
 
-#        - id: module-auction
-#          uri: http://localhost:8084
+
+        - id: module-auction
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/v*/auctions/**
+          filters:
+            - name: ValidateToken
+            - RewritePath=/module-auction/(?<segment>.*), /${segment}
+
 
 #        - id: module-waiting
 #          uri: http://localhost:8085
+
 
         - id: module-point
           uri: http://localhost:8086
@@ -44,6 +72,7 @@ spring:
           filters:
             - name: ValidateToken
             - RewritePath=/point-module/(?<segment>.*), /${segment}
+
 
         - id: admin-game
           uri: http://localhost:8081
@@ -55,6 +84,7 @@ spring:
                 requiredRole: ROLE_ADMIN
             - RewritePath=/admin-game/(?<segment>.*), /${segment}
 
+
         - id: exchange-point
           uri: http://localhost:8086
           predicates:
@@ -64,6 +94,7 @@ spring:
               args:
                 requiredRole: ROLE_ADMIN
             - RewritePath=/exchange-point/(?<segment>.*), /${segment}
+
 
 management:
   endpoints:
