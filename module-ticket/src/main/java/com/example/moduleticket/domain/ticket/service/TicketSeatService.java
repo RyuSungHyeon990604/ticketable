@@ -2,7 +2,6 @@ package com.example.moduleticket.domain.ticket.service;
 
 import com.example.moduleticket.feign.SeatClient;
 import com.example.moduleticket.feign.dto.SeatDetailDto;
-import com.example.moduleticket.feign.dto.SeatDto;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
 import com.example.moduleticket.domain.ticket.entity.TicketSeat;
 import com.example.moduleticket.domain.ticket.repository.TicketSeatRepository;

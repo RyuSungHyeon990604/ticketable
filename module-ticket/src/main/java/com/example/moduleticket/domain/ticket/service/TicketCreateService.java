@@ -1,11 +1,11 @@
 package com.example.moduleticket.domain.ticket.service;
 
-import com.example.modulecommon.entity.AuthUser;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.ticket.dto.TicketContext;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
 import com.example.moduleticket.domain.ticket.repository.TicketRepository;
 import com.example.moduleticket.feign.dto.SeatDetailDto;
+import com.example.moduleticket.global.argumentresolver.AuthUser;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

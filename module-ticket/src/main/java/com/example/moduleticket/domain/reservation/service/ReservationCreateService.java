@@ -1,6 +1,5 @@
 package com.example.moduleticket.domain.reservation.service;
 
-import com.example.modulecommon.entity.AuthUser;
 import com.example.moduleticket.domain.reservation.dto.ReservationCreateRequest;
 import com.example.moduleticket.domain.reservation.dto.ReservationResponse;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
@@ -8,6 +7,7 @@ import com.example.moduleticket.domain.reservation.entity.ReserveSeat;
 import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
 import com.example.moduleticket.feign.SeatClient;
 import com.example.moduleticket.feign.dto.SeatDetailDto;
+import com.example.moduleticket.global.argumentresolver.AuthUser;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

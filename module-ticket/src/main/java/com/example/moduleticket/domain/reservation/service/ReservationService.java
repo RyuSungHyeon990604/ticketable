@@ -1,10 +1,9 @@
 package com.example.moduleticket.domain.reservation.service;
 
-import static com.example.modulecommon.exception.ErrorCode.INVALID_RESERVATION_STATE;
-import static com.example.modulecommon.exception.ErrorCode.RESERVATION_NOT_FOUND;
 
-import com.example.modulecommon.entity.AuthUser;
-import com.example.modulecommon.exception.ServerException;
+import static com.example.moduleticket.global.exception.ErrorCode.INVALID_RESERVATION_STATE;
+import static com.example.moduleticket.global.exception.ErrorCode.RESERVATION_NOT_FOUND;
+
 import com.example.moduleticket.domain.reservation.dto.ReservationCreateRequest;
 import com.example.moduleticket.domain.reservation.dto.ReservationResponse;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
@@ -15,6 +14,8 @@ import com.example.moduleticket.domain.reservation.repository.ReservationReposit
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.event.SeatHoldReleaseEvent;
 import com.example.moduleticket.domain.ticket.service.TicketService;
+import com.example.moduleticket.global.argumentresolver.AuthUser;
+import com.example.moduleticket.global.exception.ServerException;
 import com.example.moduleticket.util.SeatHoldRedisUtil;
 import java.time.LocalDateTime;
 import java.util.List;

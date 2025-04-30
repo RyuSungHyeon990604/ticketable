@@ -1,9 +1,9 @@
-package com.example.moduleticket.global.exception;
+package com.example.modulegame.common.exception;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
-import com.example.moduleticket.global.exception.ServerException;
-import com.example.moduleticket.global.exception.ErrorCode;
+import com.example.modulecommon.exception.ErrorCode;
+import com.example.modulecommon.exception.ServerException;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.HttpStatus;

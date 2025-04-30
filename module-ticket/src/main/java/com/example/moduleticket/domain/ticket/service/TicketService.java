@@ -1,11 +1,10 @@
 package com.example.moduleticket.domain.ticket.service;
 
-import static com.example.modulecommon.exception.ErrorCode.ALREADY_CANCELED_GAME;
-import static com.example.modulecommon.exception.ErrorCode.TICKET_NOT_FOUND;
-import static com.example.modulecommon.exception.ErrorCode.USER_ACCESS_DENIED;
 
-import com.example.modulecommon.entity.AuthUser;
-import com.example.modulecommon.exception.ServerException;
+import static com.example.moduleticket.global.exception.ErrorCode.ALREADY_CANCELED_GAME;
+import static com.example.moduleticket.global.exception.ErrorCode.TICKET_NOT_FOUND;
+import static com.example.moduleticket.global.exception.ErrorCode.USER_ACCESS_DENIED;
+
 import com.example.moduleticket.RefundQueueService;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.event.TicketEvent;
@@ -18,10 +17,11 @@ import com.example.moduleticket.domain.ticket.entity.Ticket;
 import com.example.moduleticket.domain.ticket.entity.TicketSeat;
 import com.example.moduleticket.domain.ticket.repository.TicketRepository;
 import com.example.moduleticket.feign.GameClient;
-import com.example.moduleticket.feign.PaymentClient;
 import com.example.moduleticket.feign.SeatClient;
 import com.example.moduleticket.feign.dto.GameDto;
 import com.example.moduleticket.feign.dto.SeatDetailDto;
+import com.example.moduleticket.global.argumentresolver.AuthUser;
+import com.example.moduleticket.global.exception.ServerException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;

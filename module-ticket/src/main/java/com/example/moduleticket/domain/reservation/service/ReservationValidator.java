@@ -1,13 +1,14 @@
 package com.example.moduleticket.domain.reservation.service;
 
-import static com.example.modulecommon.exception.ErrorCode.SEAT_HOLD_EXPIRED;
-import static com.example.modulecommon.exception.ErrorCode.TICKET_ALREADY_RESERVED;
 
-import com.example.modulecommon.entity.AuthUser;
-import com.example.modulecommon.exception.ServerException;
+import static com.example.moduleticket.global.exception.ErrorCode.SEAT_HOLD_EXPIRED;
+import static com.example.moduleticket.global.exception.ErrorCode.TICKET_ALREADY_RESERVED;
+
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
 import com.example.moduleticket.domain.ticket.repository.TicketSeatRepository;
+import com.example.moduleticket.global.argumentresolver.AuthUser;
+import com.example.moduleticket.global.exception.ServerException;
 import com.example.moduleticket.util.SeatHoldRedisUtil;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

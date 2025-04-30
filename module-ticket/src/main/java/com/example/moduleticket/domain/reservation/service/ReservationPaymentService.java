@@ -1,10 +1,10 @@
 package com.example.moduleticket.domain.reservation.service;
 
-import com.example.modulecommon.entity.AuthUser;
-import com.example.modulecommon.exception.ServerException;
 import com.example.moduleticket.domain.ticket.event.ReservationUnknownFailureEvent;
 import com.example.moduleticket.feign.PaymentClient;
 import com.example.moduleticket.feign.dto.request.PointPaymentRequestDto;
+import com.example.moduleticket.global.argumentresolver.AuthUser;
+import com.example.moduleticket.global.exception.ServerException;
 import com.example.moduleticket.util.IdempotencyKeyUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
