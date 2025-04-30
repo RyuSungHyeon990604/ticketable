@@ -8,7 +8,10 @@ import com.example.moduleticket.domain.reservation.service.ReservationService;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Set;
 
@@ -47,5 +50,10 @@ public class ReservationController {
 	) {
 		reservationService.cancelReservation(authUser, reservationId);
 		return ResponseEntity.ok("예약이 취소 되었습니다.");
+	}
+
+	@MessageMapping("ticket.bookedSeats")
+	public Mono<Set<Long>> getBookedSeats(Long gameId) {
+		return Mono.fromCallable(() -> reservationService.getBookedSeatsId(gameId));
 	}
 }
