@@ -94,6 +94,12 @@ spring:
               args:
                 requiredRole: ROLE_ADMIN
             - RewritePath=/exchange-point/(?<segment>.*), /${segment}
+      httpclient:
+        pool:
+          maxConnections: 1000
+          acquireTimeout: 10000
+          connect-timeout: 10000
+          response-timeout: 60000
 
 
 management:
