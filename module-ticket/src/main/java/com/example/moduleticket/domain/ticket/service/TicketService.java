@@ -1,27 +1,27 @@
 package com.example.moduleticket.domain.ticket.service;
 
-import static com.example.modulecommon.exception.ErrorCode.ALREADY_CANCELED_GAME;
-import static com.example.modulecommon.exception.ErrorCode.TICKET_NOT_FOUND;
-import static com.example.modulecommon.exception.ErrorCode.USER_ACCESS_DENIED;
 
-import com.example.modulecommon.entity.AuthUser;
-import com.example.modulecommon.exception.ServerException;
+import static com.example.moduleticket.global.exception.ErrorCode.ALREADY_CANCELED_GAME;
+import static com.example.moduleticket.global.exception.ErrorCode.TICKET_NOT_FOUND;
+import static com.example.moduleticket.global.exception.ErrorCode.USER_ACCESS_DENIED;
+
+import com.example.moduleticket.RefundQueueService;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.event.TicketEvent;
-import com.example.moduleticket.domain.ticket.dto.TicketContext;
+import com.example.moduleticket.domain.reservation.event.publisher.TicketPublisher;
 import com.example.moduleticket.domain.ticket.dto.RefundDto;
 import com.example.moduleticket.domain.ticket.dto.TicketContext;
 import com.example.moduleticket.domain.ticket.dto.TicketDto;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
-import com.example.moduleticket.domain.reservation.event.publisher.TicketPublisher;
 import com.example.moduleticket.domain.ticket.entity.TicketSeat;
 import com.example.moduleticket.domain.ticket.repository.TicketRepository;
 import com.example.moduleticket.feign.GameClient;
-import com.example.moduleticket.feign.PaymentClient;
 import com.example.moduleticket.feign.SeatClient;
 import com.example.moduleticket.feign.dto.GameDto;
-import com.example.moduleticket.feign.dto.SeatDto;
+import com.example.moduleticket.feign.dto.SeatDetailDto;
+import com.example.moduleticket.global.argumentresolver.AuthUser;
+import com.example.moduleticket.global.exception.ServerException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +43,7 @@ public class TicketService {
 	private final TicketCreateService ticketCreateService;
 	private final GameClient gameClient;
 	private final SeatClient seatClient;
-	private final PaymentClient paymentClient;
+	private final RefundQueueService refundQueueService;
 	private final TicketPublisher ticketPublisher;
 
 
@@ -83,10 +83,9 @@ public class TicketService {
 	public TicketResponse issueTicketFromReservation(AuthUser auth, Long gameId, List<Long> seatIds,
 		Reservation reservation) {
 
-		GameDto gameDto = gameClient.getGame(gameId);
-		List<SeatDto> seatDtos = seatClient.getSeatsByGame(gameId, seatIds);
+		List<SeatDetailDto> seatDetailDtos = seatClient.getSeatsByGame(gameId, seatIds);
 
-		TicketContext ticketContext = ticketCreateService.createTicket(auth, gameDto, seatDtos, reservation);
+		TicketContext ticketContext = ticketCreateService.createTicket(auth, seatDetailDtos, reservation);
 		ticketPaymentService.create(
 			ticketContext.getTicket(),
 			ticketContext.getMemberId(),
@@ -110,13 +109,7 @@ public class TicketService {
 		ticket.cancel();
 
 		// 2. 환불금 조회
-		long refund = ticketPaymentService.getTicketTotalPoint(ticketId);
-
-		RefundDto refundDto = new RefundDto(
-			auth.getMemberId(),
-			refund
-		);
-		paymentClient.processRefund(refundDto);
+		ticketPaymentService.refundPrice(auth.getMemberId(), ticket.getId());
 
 		// 캐시 이벤트 발생
 		TicketEvent ticketEvent = new TicketEvent(gameId, seatId);
@@ -129,13 +122,12 @@ public class TicketService {
 	 */
 	@Transactional
 	public void deleteAllTicketsByCanceledGame(Long gameId) {
-		//todo : 환불로직 추가
 		GameDto game = gameClient.getGame(gameId);
 		if(game.getDeletedAt() != null ){
 			throw new ServerException(ALREADY_CANCELED_GAME);
 		}
 		List<RefundDto> refundDtoList = ticketRepository.findRefundDtoByGameId(gameId);
-		paymentClient.processRefundBulk(refundDtoList);
+		refundQueueService.enqueueRefundTicket(refundDtoList);
 		ticketRepository.softDeleteAllByGameId(gameId);
 	}
 
@@ -152,9 +144,8 @@ public class TicketService {
 		LocalDateTime startTime = game.getStartTime();
 		log.debug("경기 시작 시간 조회 startTime : {}", startTime);
 
-		List<String> ticketSeats = ticketSeatService.getSeatByTicketSeatId(game.getId(), ticket.getId()).stream()
-			.map(SeatDto::getPosition)
-			.toList();
+		List<String> ticketSeats = ticketSeatService.getPositionsByTicketSeatId(game.getId(), ticket.getId());
+
 		log.debug("티켓 좌석 조회 ticketSeats: {}", ticketSeats);
 
 		int totalPoint = ticket.getReservation().getTotalPrice();

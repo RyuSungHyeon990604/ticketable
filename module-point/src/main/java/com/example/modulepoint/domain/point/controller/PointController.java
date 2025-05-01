@@ -3,7 +3,9 @@ package com.example.modulepoint.domain.point.controller;
 import com.example.modulecommon.annotation.LoginUser;
 import com.example.modulecommon.entity.AuthUser;
 import com.example.modulepoint.domain.point.dto.request.ExchangePointRequest;
+import com.example.modulepoint.domain.point.dto.request.PointPaymentRequestDto;
 import com.example.modulepoint.domain.point.dto.response.PointResponse;
+import com.example.modulepoint.domain.point.enums.PointHistoryType;
 import com.example.modulepoint.domain.point.service.PointService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,4 +41,33 @@ public class PointController {
 		pointService.createPoint(memberId);
 		return ResponseEntity.ok().build();
 	}
+
+	@PostMapping("/internal/members/{memberId}/points/increment")
+	public ResponseEntity<Void> increasePoint(
+		@PathVariable Long memberId,
+		@RequestBody PointPaymentRequestDto pointPaymentRequestDto
+	) {
+		PointHistoryType type = PointHistoryType.valueOf(pointPaymentRequestDto.getType());
+		pointService.increasePoint(
+			memberId,
+			pointPaymentRequestDto.getAmount(),
+			type
+		);
+		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping("/internal/members/{memberId}/points/decrement")
+	public ResponseEntity<Void> decreasePoint(
+		@PathVariable Long memberId,
+		@RequestBody PointPaymentRequestDto pointPaymentRequestDto
+	) {
+		PointHistoryType type = PointHistoryType.valueOf(pointPaymentRequestDto.getType());
+		pointService.decreasePoint(
+			memberId,
+			pointPaymentRequestDto.getAmount(),
+			type
+		);
+		return ResponseEntity.ok().build();
+	}
+
 }

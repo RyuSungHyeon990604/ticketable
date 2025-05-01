@@ -1,9 +1,8 @@
 package com.example.moduleticket.domain.ticket.dto;
 
-import com.example.moduleticket.feign.dto.GameDto;
-import com.example.moduleticket.feign.dto.SeatDto;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
+import com.example.moduleticket.feign.dto.SeatDetailDto;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,16 +12,16 @@ import lombok.Getter;
 public class TicketContext {
 	private final Ticket ticket;
 	private final Long memberId;
-	private final GameDto game;
-	private final List<SeatDto> seats;
+	private final List<SeatDetailDto> seatDetailDtos;
 	private final int totalPoint;
 
 	public TicketResponse toResponse() {
+		String title = seatDetailDtos.get(0).getHome() + " vs " + seatDetailDtos.get(0).getAway();
 		return new TicketResponse(
 			ticket.getId(),
-			game.getHome() + " vs " + game.getAway(),
-			seats.stream().map(SeatDto::getPosition).toList(),
-			game.getStartTime(),
+			title,
+			seatDetailDtos.stream().map(SeatDetailDto::getPosition).toList(),
+			seatDetailDtos.get(0).getStartTime(),
 			totalPoint
 		);
 	}

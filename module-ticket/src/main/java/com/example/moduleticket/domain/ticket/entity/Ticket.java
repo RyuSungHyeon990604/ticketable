@@ -1,6 +1,7 @@
 package com.example.moduleticket.domain.ticket.entity;
 
 import com.example.moduleticket.domain.reservation.entity.Reservation;
+import com.example.moduleticket.global.entity.Timestamped;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-public class Ticket {
+public class Ticket extends Timestamped {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

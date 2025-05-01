@@ -1,32 +1,25 @@
 package com.example.moduleticket.feign;
 
-import com.example.moduleticket.domain.ticket.dto.RefundDto;
+import com.example.moduleticket.config.OpenFeignConfig;
 import com.example.moduleticket.feign.dto.PaymentDto;
-import com.example.moduleticket.feign.dto.request.PaymentRequest;
-import java.util.List;
+import com.example.moduleticket.feign.dto.request.PointPaymentRequestDto;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 
-@FeignClient(name = "payment", url = "http://localhost:8081")
+@FeignClient(name = "payment", url = "http://localhost:8086/api", configuration = OpenFeignConfig.class)
 public interface PaymentClient {
 
-	@PostMapping("/api/internal/payments")
+	@PostMapping("/internal/members/{memberId}/points/decrement")
 	PaymentDto processPayment(
-		@RequestHeader String idempotencyKey,
-		@RequestHeader Long memberId,
-		@RequestBody PaymentRequest paymentRequest
+		@PathVariable Long memberId,
+		@RequestBody PointPaymentRequestDto pointPaymentRequestDto
 	);
 
-	@PostMapping("/api/internal/refund")
+	@PostMapping("/internal/members/{memberId}/points/increment")
 	PaymentDto processRefund(
-		@RequestBody RefundDto refundDto
+		@PathVariable Long memberId,
+		@RequestBody PointPaymentRequestDto pointPaymentRequestDto
 	);
-
-	@PostMapping("/api/internal/refund-bulk")
-	PaymentDto processRefundBulk(
-		@RequestBody List<RefundDto> refundDtoList
-	);
-
 }

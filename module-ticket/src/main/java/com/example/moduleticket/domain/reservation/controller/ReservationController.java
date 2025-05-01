@@ -1,11 +1,11 @@
 package com.example.moduleticket.domain.reservation.controller;
 
-import com.example.modulecommon.annotation.LoginUser;
-import com.example.modulecommon.entity.AuthUser;
 import com.example.moduleticket.domain.reservation.dto.ReservationCreateRequest;
 import com.example.moduleticket.domain.reservation.dto.ReservationResponse;
 import com.example.moduleticket.domain.reservation.service.ReservationService;
 import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
+import com.example.moduleticket.global.annotation.LoginUser;
+import com.example.moduleticket.global.argumentresolver.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

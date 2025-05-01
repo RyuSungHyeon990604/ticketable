@@ -1,9 +1,10 @@
 package com.example.moduleticket.util;
 
-import static com.example.modulecommon.exception.ErrorCode.SEAT_HOLD_EXPIRED;
-import static com.example.modulecommon.exception.ErrorCode.TICKET_ALREADY_RESERVED;
 
-import com.example.modulecommon.exception.ServerException;
+import static com.example.moduleticket.global.exception.ErrorCode.SEAT_HOLD_EXPIRED;
+import static com.example.moduleticket.global.exception.ErrorCode.TICKET_ALREADY_RESERVED;
+
+import com.example.moduleticket.global.exception.ServerException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;

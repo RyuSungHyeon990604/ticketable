@@ -43,7 +43,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 		+ "  inner join TicketPayment tp"
 		+ "          on tp.ticket = t "
 		+ "  where t.gameId = :gameId "
-		+ "group by t.memberId "
+		+ "    and t.deletedAt is null "
+		+ "  group by t.memberId "
 	)
 	List<RefundDto> findRefundDtoByGameId(Long gameId);
 

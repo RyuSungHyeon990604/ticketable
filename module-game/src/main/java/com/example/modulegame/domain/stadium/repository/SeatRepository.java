@@ -1,11 +1,9 @@
 package com.example.modulegame.domain.stadium.repository;
 
 
-
-import com.example.modulegame.domain.game.dto.SeatDto;
-import java.util.List;
-
+import com.example.modulegame.domain.game.dto.SeatDetailDto;
 import com.example.modulegame.domain.stadium.entity.Seat;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -23,10 +21,16 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
 
     List<Seat> findBySectionId(Long sectionId);
     @Query(
-        " select new com.example.modulegame.domain.game.dto.SeatDto(" +
+        " select new com.example.modulegame.domain.game.dto.SeatDetailDto(" +
         " seat.id, " +
         " seat.position, " +
-        " section.extraCharge, " +
+        " game.id, " +
+        " game.startTime, " +
+        " game.home, " +
+        " game.away, " +
+        " section.id, " +
+        " section.type, " +
+        " game.point, " +
         " section.extraCharge " +
         " ) " +
         "   from Game game " +
@@ -40,17 +44,23 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
         " where seat.id in :seatIds" +
         "   and game.id = :gameId "
     )
-    List<SeatDto> findSeatDtosByGameAndSection(
+    List<SeatDetailDto> findSeatDtosByGameAndSection(
         Long gameId,
         Long sectionId,
         List<Long> seatIds
     );
 
     @Query(
-        " select new com.example.modulegame.domain.game.dto.SeatDto(" +
+        " select new com.example.modulegame.domain.game.dto.SeatDetailDto(" +
         " seat.id, " +
         " seat.position, " +
-        " section.extraCharge, " +
+        " game.id, " +
+        " game.startTime, " +
+        " game.home, " +
+        " game.away, " +
+        " section.id, " +
+        " section.type, " +
+        " game.point, " +
         " section.extraCharge " +
         " ) " +
         "   from Game game " +
@@ -63,5 +73,5 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
         " where seat.id in :seatIds" +
         "   and game.id = :gameId "
     )
-    List<SeatDto> findSeatDtosByGame(Long gameId, List<Long> seatIds);
+    List<SeatDetailDto> findSeatDtosByGame(Long gameId, List<Long> seatIds);
 }
