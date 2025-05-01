@@ -60,7 +60,7 @@ public class Auction extends Timestamped {
 		this.bidderId = bidderId;
 	}
 
-	public void setDeletedAt() {
+	public void softDelete() {
 		if (this.deletedAt == null) {
 			this.deletedAt = LocalDateTime.now();
 		}
@@ -101,4 +101,8 @@ public class Auction extends Timestamped {
 		}
 		return this.bidderId.equals(bidderId);
 	}
+
+	public boolean isExpired() { return this.deletedAt != null; }
+
+	public boolean isInProgress() { return this.deletedAt == null; }
 }

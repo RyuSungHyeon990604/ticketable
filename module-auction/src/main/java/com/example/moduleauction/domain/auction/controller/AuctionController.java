@@ -79,4 +79,11 @@ public class AuctionController {
 		return ResponseEntity.ok().build();
 	}
 
+	@DeleteMapping("/auctions/game/{gameId}")
+	void deleteAllAuctionsByCanceledGame(
+		@PathVariable("gameId") Long gameId
+	) {
+		auctionService.deleteAllAuctionsByCanceledGame(gameId);
+	};
+
 }
