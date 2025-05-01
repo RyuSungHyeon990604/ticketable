@@ -38,7 +38,7 @@ public class ReservationController {
 		return ResponseEntity.ok(reservationService.processReservationCompletion(authUser, reservationId));
 	}
 
-	@GetMapping("/v1/reservations/games/{gameId}")
+	@GetMapping("/internal/reservations/games/{gameId}")
 	public ResponseEntity<Set<Long>> getBookedSeatsId(@PathVariable Long gameId) {
 		return ResponseEntity.ok(reservationService.getBookedSeatsId(gameId));
 	}
@@ -50,10 +50,5 @@ public class ReservationController {
 	) {
 		reservationService.cancelReservation(authUser, reservationId);
 		return ResponseEntity.ok("예약이 취소 되었습니다.");
-	}
-
-	@MessageMapping("ticket.bookedSeats")
-	public Mono<Set<Long>> getBookedSeats(Long gameId) {
-		return Mono.fromCallable(() -> reservationService.getBookedSeatsId(gameId));
 	}
 }
