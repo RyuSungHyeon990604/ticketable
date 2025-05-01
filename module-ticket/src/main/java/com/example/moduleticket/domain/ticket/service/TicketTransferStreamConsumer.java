@@ -32,9 +32,9 @@ public class TicketTransferStreamConsumer {
 	private final TicketRepository ticketRepository; // 직접 접근
 	private final PaymentClient paymentClient;
 
-	private static final String STREAM_KEY = "ticket_transfer_stream";
-	private static final String GROUP_NAME = "ticket_transfer_group";
-	private static final String CONSUMER_NAME = "ticket-transfer-consumer-1";
+	private static final String STREAM_KEY = "ticket_change_owner_stream";
+	private static final String GROUP_NAME = "ticket_change_owner_group";
+	private static final String CONSUMER_NAME = "ticket-change_owner-consumer-1";
 
 	@Async
 	@EventListener(ApplicationReadyEvent.class)
