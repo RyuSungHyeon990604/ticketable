@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TicketChangeOwnerDto {
-
 	private Long ticketId;
 	private Long newOwnerId;
 	private Long bidPoint;
