@@ -8,7 +8,10 @@ import com.example.moduleticket.global.annotation.LoginUser;
 import com.example.moduleticket.global.argumentresolver.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Set;
 
@@ -35,7 +38,7 @@ public class ReservationController {
 		return ResponseEntity.ok(reservationService.processReservationCompletion(authUser, reservationId));
 	}
 
-	@GetMapping("/v1/reservations/games/{gameId}")
+	@GetMapping("/internal/reservations/games/{gameId}")
 	public ResponseEntity<Set<Long>> getBookedSeatsId(@PathVariable Long gameId) {
 		return ResponseEntity.ok(reservationService.getBookedSeatsId(gameId));
 	}

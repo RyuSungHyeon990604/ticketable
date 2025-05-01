@@ -1,11 +1,17 @@
 package com.example.modulegame.domain.stadium.repository;
 
 
+
+import com.example.modulegame.domain.game.dto.SeatDto;
+import java.util.List;
+import java.util.Optional;
+
 import com.example.modulegame.domain.game.dto.SeatDetailDto;
 import com.example.modulegame.domain.stadium.entity.Seat;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 
 public interface SeatRepository extends JpaRepository<Seat, Long> {
@@ -74,4 +80,7 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
         "   and game.id = :gameId "
     )
     List<SeatDetailDto> findSeatDtosByGame(Long gameId, List<Long> seatIds);
+
+    @Query("SELECT s FROM Seat s JOIN FETCH s.section WHERE s.id = :seatId")
+    Optional<Seat> findByIdWithSection(@Param("seatId") Long seatId);
 }
