@@ -39,7 +39,7 @@ public class SectionController {
     }
 
 
-    @DeleteMapping("/v1/admin /sections/{sectionId}")
+    @DeleteMapping("/v1/admin/sections/{sectionId}")
     public ResponseEntity<Void> deleteSection(
             @PathVariable Long sectionId
     ) {
