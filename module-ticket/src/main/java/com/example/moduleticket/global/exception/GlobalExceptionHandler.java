@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> responseStatusExceptionException(ServerException e) {
 		ErrorCode errorCode = e.getErrorCode();
 		String status = errorCode.getStatus().toString();
-		String message = errorCode.getMessage();
+		String message = e.getMessage();
 		String code = errorCode.name();
 		ErrorResponse response = new ErrorResponse(status, message, code);
 		return ResponseEntity.status(errorCode.getStatus()).body(response);

@@ -31,7 +31,7 @@ public class FeignClientErrorDecoder implements ErrorDecoder {
 			String body = Util.toString(response.body().asReader());
 			Map<String, String> map = mapper.readValue(body, Map.class);
 			if(map.get("code") == null) {
-				return new RuntimeException(body);
+				return new ServerException(ErrorCode.UNKNOWN_ERROR, body);
 			} else {
 				return new ServerException(ErrorCode.valueOf(map.get("code")));
 			}
