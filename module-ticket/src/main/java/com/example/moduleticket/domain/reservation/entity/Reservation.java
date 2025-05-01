@@ -1,6 +1,6 @@
 package com.example.moduleticket.domain.reservation.entity;
 
-import com.example.modulecommon.entity.Timestamped;
+import com.example.moduleticket.global.entity.Timestamped;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

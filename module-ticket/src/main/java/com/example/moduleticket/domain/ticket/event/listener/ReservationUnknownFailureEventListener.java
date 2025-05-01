@@ -1,10 +1,10 @@
 package com.example.moduleticket.domain.ticket.event.listener;
 
-import com.example.modulecommon.exception.ErrorCode;
-import com.example.modulecommon.exception.ServerException;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
 import com.example.moduleticket.domain.ticket.event.ReservationUnknownFailureEvent;
+import com.example.moduleticket.global.exception.ErrorCode;
+import com.example.moduleticket.global.exception.ServerException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;

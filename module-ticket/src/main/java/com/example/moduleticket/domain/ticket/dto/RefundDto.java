@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class RefundDto {
-	private Long id;
+	private Long memberId;
 	private Long price;
 }

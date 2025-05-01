@@ -1,11 +1,10 @@
 package com.example.moduleticket.domain.reservation.service;
 
-import com.example.modulecommon.entity.AuthUser;
-import com.example.modulecommon.exception.ServerException;
-import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.ticket.event.ReservationUnknownFailureEvent;
 import com.example.moduleticket.feign.PaymentClient;
-import com.example.moduleticket.feign.dto.request.PaymentRequest;
+import com.example.moduleticket.feign.dto.request.PointPaymentRequestDto;
+import com.example.moduleticket.global.argumentresolver.AuthUser;
+import com.example.moduleticket.global.exception.ServerException;
 import com.example.moduleticket.util.IdempotencyKeyUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -20,36 +19,34 @@ public class ReservationPaymentService {
 
 	public void reservePayment(AuthUser authUser, Long reservationId, int price) {
 
-		PaymentRequest paymentRequest = new PaymentRequest(
+		PointPaymentRequestDto requestDto = new PointPaymentRequestDto(
+			IdempotencyKeyUtil.forReservation(reservationId, "decrement"),
+			"RESERVATION",
 			price,
-			"decrement",
-			"reservation",
-			reservationId
+			authUser.getMemberId()
 		);
 
 		//결제요청
 		try {
 			paymentClient.processPayment(
-				IdempotencyKeyUtil.forReservation(reservationId, "decrement"),
 				authUser.getMemberId(),
-				paymentRequest
+				requestDto
 			);
 		} catch (ServerException e) {
 			throw e;
 		} catch (Exception e) {
 			//알수없는 오류이므로 다시결제요청
 			reTryPayment(
-				paymentRequest,
-				IdempotencyKeyUtil.forReservation(reservationId, "decrement"),
+				requestDto,
 				authUser.getMemberId(),
 				reservationId
 			);
 		}
 	}
 
-	private void reTryPayment(PaymentRequest request, String idempotencyKey, Long memberId, Long reservationId) {
+	private void reTryPayment(PointPaymentRequestDto request, Long memberId, Long reservationId) {
 		try {
-			paymentClient.processPayment(idempotencyKey, memberId, request);
+			paymentClient.processPayment(memberId, request);
 		} catch (ServerException e) {
 			throw e;
 		} catch (Exception e) {
