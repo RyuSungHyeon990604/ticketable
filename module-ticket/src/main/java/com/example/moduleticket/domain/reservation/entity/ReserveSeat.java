@@ -1,6 +1,5 @@
 package com.example.moduleticket.domain.reservation.entity;
 
-import com.example.moduleticket.feign.dto.SeatDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -42,7 +41,7 @@ public class ReserveSeat {
 		this.reservation = reservation;
 	}
 
-	public static List<ReserveSeat> from(Long sectionId, List<SeatDto> seatDtos) {
-		return seatDtos.stream().map(seatDto->new ReserveSeat(sectionId, seatDto.getSeatId())).toList();
+	public static List<ReserveSeat> from(Long sectionId, List<Long> seatIds) {
+		return seatIds.stream().map(seatId->new ReserveSeat(sectionId, seatId)).toList();
 	}
 }

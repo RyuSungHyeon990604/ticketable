@@ -1,6 +1,6 @@
 package com.example.moduleticket.config;
 
-import com.example.modulecommon.argumentresolver.AuthUserArgumentResolver;
+import com.example.moduleticket.global.argumentresolver.AuthUserArgumentResolver;
 import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

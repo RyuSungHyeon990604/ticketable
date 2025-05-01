@@ -1,15 +1,14 @@
 package com.example.modulegame.domain.stadium.controller;
 
 
-import com.example.modulegame.domain.game.dto.SeatDto;
-import java.util.List;
-
+import com.example.modulegame.domain.game.dto.SeatDetailDto;
 import com.example.modulegame.domain.stadium.dto.SectionAndPositionDto;
 import com.example.modulegame.domain.stadium.dto.request.SeatCreateRequest;
 import com.example.modulegame.domain.stadium.dto.request.SeatUpdateRequest;
 import com.example.modulegame.domain.stadium.dto.response.SeatCreateResponse;
 import com.example.modulegame.domain.stadium.dto.response.SeatUpdateResponse;
 import com.example.modulegame.domain.stadium.service.SeatService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -67,7 +66,7 @@ public class SeatController {
     }
 
     @GetMapping("/internal/seats/by-section")
-    public ResponseEntity<List<SeatDto>> getSeatsByGameAndSection(
+    public ResponseEntity<List<SeatDetailDto>> getSeatsByGameAndSection(
         @RequestParam Long gameId,
         @RequestParam Long sectionId,
         @RequestParam List<Long> seatIds
@@ -76,7 +75,7 @@ public class SeatController {
     }
 
     @GetMapping("/internal/seats/by-game")
-    public ResponseEntity<List<SeatDto>> getSeatsByGame(
+    public ResponseEntity<List<SeatDetailDto>> getSeatsByGame(
         @RequestParam List<Long> seatIds,
         @RequestParam Long gameId
     ) {
