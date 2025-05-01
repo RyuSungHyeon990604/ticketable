@@ -79,7 +79,7 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
         " where seat.id in :seatIds" +
         "   and game.id = :gameId "
     )
-    List<SeatDto> findSeatDtosByGame(Long gameId, List<Long> seatIds);
+    List<SeatDetailDto> findSeatDtosByGame(Long gameId, List<Long> seatIds);
 
     @Query("SELECT s FROM Seat s JOIN FETCH s.section WHERE s.id = :seatId")
     Optional<Seat> findByIdWithSection(@Param("seatId") Long seatId);
