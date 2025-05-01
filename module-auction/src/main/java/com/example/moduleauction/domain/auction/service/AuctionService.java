@@ -13,6 +13,7 @@ import com.example.moduleauction.feign.TicketClient;
 import com.example.moduleauction.feign.dto.GameDto;
 import com.example.moduleauction.feign.dto.SectionAndPositionDto;
 import com.example.moduleauction.feign.dto.TicketDto;
+import com.example.moduleauction.domain.auction.dto.TicketChangeOwnerDto;
 import com.example.moduleauction.util.AuctionDetailRedisUtil;
 import com.example.modulecommon.entity.AuthUser;
 import com.example.modulecommon.exception.ServerException;
@@ -61,6 +62,7 @@ public class AuctionService {
 	private final AuctionHistoryService auctionHistoryService;
 	private final AuctionPaymentService auctionPaymentService;
 	private final PointQueueService pointQueueService;
+	private final TicketQueueService ticketQueueService;
 	private final AuctionBidRedisUtil auctionBidRedisUtil;
 	private final AuctionDetailRedisUtil auctionDetailRedisUtil;
 	private final ApplicationEventPublisher applicationEventPublisher;
@@ -171,7 +173,7 @@ public class AuctionService {
 			throw new ServerException(INVALID_BIDDING_AMOUNT);
 		}
 
-		// 3. 경매가 종료된 경우 예외처리
+		// 3. 경매가 종료시간이 된 경우 예외처리
 		if (auction.isTimeOver()) {
 			expireAuction(List.of(auction));
 			throw new ServerException(AUCTION_TIME_OVER);
@@ -296,8 +298,18 @@ public class AuctionService {
 				auction.getBidPoint().longValue()
 			))
 			.toList();
-
 		pointQueueService.enqueueRefundAuction(refundList);
+
+		List<TicketChangeOwnerDto> ticketChangeOwnerList = auctions.stream()
+			.filter(Auction::hasBidder)
+			.map(auction -> new TicketChangeOwnerDto(
+				auction.getTicketId(),
+				auction.getBidderId(),
+				auction.getBidPoint().longValue()
+			))
+			.toList();
+		ticketQueueService.enqueueTicketChangeOwner(ticketChangeOwnerList);
+
 		expireAuction(auctions.getContent());
 	}
 }

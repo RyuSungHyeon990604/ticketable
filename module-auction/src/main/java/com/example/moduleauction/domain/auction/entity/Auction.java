@@ -76,7 +76,7 @@ public class Auction extends Timestamped {
 	}
 
 	public boolean isTimeOver() {
-		return this.getCreatedAt().plusHours(24).isBefore(LocalDateTime.now());
+		return this.getCreatedAt().plusHours(24).isBefore(LocalDateTime.now()) && this.deletedAt == null;
 	}
 
 	public boolean isSameSellerAndBidder(Long bidderId) {
