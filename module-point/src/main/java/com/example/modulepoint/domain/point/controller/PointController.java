@@ -1,5 +1,7 @@
 package com.example.modulepoint.domain.point.controller;
 
+import com.example.modulecommon.annotation.LoginUser;
+import com.example.modulecommon.entity.AuthUser;
 import com.example.modulepoint.domain.point.dto.request.ExchangePointRequest;
 import com.example.modulepoint.domain.point.dto.response.PointResponse;
 import com.example.modulepoint.domain.point.service.PointService;
@@ -15,25 +17,25 @@ public class PointController {
 
 	private final PointService pointService;
 
-	@PostMapping("/v1/members/{memberId}/points/exchange")
+	@PostMapping("/v1/points/exchange")
 	public ResponseEntity<PointResponse> exchangePoint(
-		@PathVariable Long memberId,
+		@LoginUser AuthUser authUser,
 		@Valid @RequestBody ExchangePointRequest request
 	) {
-		return ResponseEntity.ok(pointService.exchangePoint(memberId, request));
+		return ResponseEntity.ok(pointService.exchangePoint(authUser.getMemberId(), request));
 	}
 
-	@GetMapping("/v1/members/{memberId}/points")
+	@GetMapping("/v1/points")
 	public ResponseEntity<PointResponse> getMemberPoint(
-		@PathVariable Long memberId
-	) {
-		return ResponseEntity.ok(pointService.getMemberPoint(memberId));
+		@LoginUser AuthUser authUser
+		) {
+		return ResponseEntity.ok(pointService.getMemberPoint(authUser.getMemberId()));
 	}
 	
 	@PostMapping("/v1/points")
 	public ResponseEntity<Void> createPoint(
 		@RequestParam Long memberId
-		) {
+	) {
 		pointService.createPoint(memberId);
 		return ResponseEntity.ok().build();
 	}

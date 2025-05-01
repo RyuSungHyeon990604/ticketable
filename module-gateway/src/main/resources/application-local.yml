@@ -68,10 +68,10 @@ spring:
         - id: module-point
           uri: http://localhost:8086
           predicates:
-            - Path=/api/v*/members/**
+            - Path=/api/v*/points/**
           filters:
             - name: ValidateToken
-            - RewritePath=/point-module/(?<segment>.*), /${segment}
+            - RewritePath=/module-point/(?<segment>.*), /${segment}
 
 
         - id: admin-game
