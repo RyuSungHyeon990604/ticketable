@@ -27,6 +27,11 @@ public class AuthController {
 		return ResponseEntity.ok(authService.login(request));
 	}
 	
+	@PostMapping("/v2/auth/login")
+	public ResponseEntity<AuthResponse> loginV2(@Valid @RequestBody LoginRequest request) {
+		return ResponseEntity.ok(authService.loginV2(request));
+	}
+	
 	@PostMapping("/v1/auth/validate")
 	public ResponseEntity<Void> validateToken(
 		@RequestHeader("Authorization") String authToken,

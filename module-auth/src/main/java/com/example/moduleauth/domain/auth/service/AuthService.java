@@ -54,9 +54,26 @@ public class AuthService {
 		);
 		return new AuthResponse(accessToken);
 	}
-
+	
 	@Transactional
 	public AuthResponse login(LoginRequest request) {
+		Member findMember = memberRepository.findByEmail(request.getEmail())
+			.orElseThrow(() -> new ServerException(USER_NOT_FOUND));
+		
+		if (!passwordEncoder.matches(request.getPassword(), findMember.getPassword())) {
+			throw new ServerException(INVALID_PASSWORD);
+		}
+		
+		MemberRole memberRole = MemberRole.of(findMember.getRole());
+		
+		String accessToken = jwtUtil.createAccessToken(
+			findMember.getId(), findMember.getEmail(), findMember.getName(), memberRole
+		);
+		return new AuthResponse(accessToken);
+	}
+
+	@Transactional
+	public AuthResponse loginV2(LoginRequest request) {
 		if (!reCaptchaService.isValid(request.getRecaptchaToken())) {
 			throw new ServerException(INVALID_RECAPTCHA_TOKEN);
 		}
