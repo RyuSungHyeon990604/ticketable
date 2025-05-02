@@ -106,6 +106,14 @@ public class ReservationService {
 		if(reservation.getState().equals("WAITING_PAYMENT")) {
 			List<Long> seatIds = reservation.getReserveSeats().stream().map(ReserveSeat::getSeatId).toList();
 			reservation.cancelPayment();
+
+			// 캐시 이벤트 발생
+			TicketEvent ticketEvent = new TicketEvent(
+					reservation.getGameId(),
+					seatIds.get(0)
+			);
+			ticketPublisher.publish(ticketEvent);
+
 			eventPublisher.publishEvent(new SeatHoldReleaseEvent(seatIds, authUser.getMemberId()));
 			return;
 		}
@@ -118,9 +126,21 @@ public class ReservationService {
 	@Transactional
 	public void proceedReservationExpire() {
 		LocalDateTime expiredLimit = LocalDateTime.now().minusMinutes(15);
-		int updated = reservationRepository.updateExpiredReservations(expiredLimit);
-		log.info("{} rows updated", updated);
+		List<Reservation> expiredReservationList = reservationRepository.findExpiredReservations(expiredLimit);
+		log.info("{} rows updated", expiredReservationList.size());
+
+		for (Reservation reservation : expiredReservationList) {
+			reservation.expiredPayment();
+			List<Long> seatIds = reservation.getReserveSeats().stream().map(ReserveSeat::getSeatId).toList();
+
+			TicketEvent ticketEvent = new TicketEvent(
+					reservation.getGameId(),
+					seatIds.get(0)
+			);
+			ticketPublisher.publish(ticketEvent);
+		}
 	}
+
 	public Set<Long> getBookedSeatsId(Long gameId) {
 		return reservationRepository.findBookedSeatIdByGameId(gameId);
 	}
