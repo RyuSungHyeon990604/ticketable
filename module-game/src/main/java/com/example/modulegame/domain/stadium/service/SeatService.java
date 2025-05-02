@@ -115,4 +115,8 @@ public class SeatService {
     public Seat getSeat(Long seatId) {
         return seatRepository.findByIdWithSection(seatId).orElseThrow(() -> new ServerException(SEAT_NOT_FOUND));
     }
+
+    public List<Seat> getAllByStadiumId(Long stadiumId) {
+        return seatRepository.findAllByStadiumId(stadiumId);
+    }
 }

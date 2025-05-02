@@ -1,7 +1,7 @@
 package com.example.moduleticket.domain.reservation.service;
 
 import com.example.moduleticket.domain.ticket.event.ReservationUnknownFailureEvent;
-import com.example.moduleticket.feign.PaymentClient;
+import com.example.moduleticket.feign.PointClient;
 import com.example.moduleticket.feign.dto.request.PointPaymentRequestDto;
 import com.example.moduleticket.global.argumentresolver.AuthUser;
 import com.example.moduleticket.global.exception.ServerException;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ReservationPaymentService {
 
-	private final PaymentClient paymentClient;
+	private final PointClient pointClient;
 	private final ApplicationEventPublisher eventPublisher;
 
 	public void reservePayment(AuthUser authUser, Long reservationId, int price) {
@@ -28,7 +28,7 @@ public class ReservationPaymentService {
 
 		//결제요청
 		try {
-			paymentClient.processPayment(
+			pointClient.processPayment(
 				authUser.getMemberId(),
 				requestDto
 			);
@@ -46,7 +46,7 @@ public class ReservationPaymentService {
 
 	private void reTryPayment(PointPaymentRequestDto request, Long memberId, Long reservationId) {
 		try {
-			paymentClient.processPayment(memberId, request);
+			pointClient.processPayment(memberId, request);
 		} catch (ServerException e) {
 			throw e;
 		} catch (Exception e) {

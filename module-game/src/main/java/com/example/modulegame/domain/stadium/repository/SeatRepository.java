@@ -79,4 +79,13 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
 
     @Query("SELECT s FROM Seat s JOIN FETCH s.section WHERE s.id = :seatId")
     Optional<Seat> findByIdWithSection(@Param("seatId") Long seatId);
+
+    @Query("""
+        SELECT s
+        FROM Seat s
+        JOIN s.section st
+        JOIN st.stadium sd
+        WHERE sd.id = :stadiumId
+""")
+    List<Seat> findAllByStadiumId(Long stadiumId);
 }

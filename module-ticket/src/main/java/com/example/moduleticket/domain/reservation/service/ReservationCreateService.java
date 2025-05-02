@@ -5,14 +5,15 @@ import com.example.moduleticket.domain.reservation.dto.ReservationResponse;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.entity.ReserveSeat;
 import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
-import com.example.moduleticket.feign.SeatClient;
+import com.example.moduleticket.feign.GameClient;
 import com.example.moduleticket.feign.dto.SeatDetailDto;
 import com.example.moduleticket.global.argumentresolver.AuthUser;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -20,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReservationCreateService {
 	private final ReservationRepository reservationRepository;
 	private final ReservationValidator reservationValidator;
-	private final SeatClient seatClient;
+	private final GameClient gameClient;
 
 	@Transactional
 	public ReservationResponse createReservation(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
@@ -28,7 +29,7 @@ public class ReservationCreateService {
 		reservationValidator.checkTicketSeatDuplicate(reservationCreateRequest.getGameId(), reservationCreateRequest.getSeatIds());
 		reservationValidator.checkDuplicateReservation(reservationCreateRequest.getSeatIds());
 
-		List<SeatDetailDto> seatDetailDtos = seatClient.getSeatsByGameAndSection(
+		List<SeatDetailDto> seatDetailDtos = gameClient.getSeatsByGameAndSection(
 			reservationCreateRequest.getGameId(),
 			reservationCreateRequest.getSectionId(),
 			reservationCreateRequest.getSeatIds()
