@@ -2,10 +2,8 @@ package com.example.moduleauction.domain.auction.service;
 
 import org.springframework.stereotype.Service;
 
-import com.example.moduleauction.domain.auction.entity.Auction;
 import com.example.moduleauction.feign.PaymentClient;
 import com.example.moduleauction.feign.dto.request.PointPaymentRequestDto;
-import com.example.modulecommon.entity.AuthUser;
 
 import lombok.RequiredArgsConstructor;
 

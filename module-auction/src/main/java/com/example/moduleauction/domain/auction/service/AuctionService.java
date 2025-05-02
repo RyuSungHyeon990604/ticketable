@@ -1,6 +1,6 @@
 package com.example.moduleauction.domain.auction.service;
 
-import static com.example.modulecommon.exception.ErrorCode.*;
+import static com.example.moduleauction.config.exception.ErrorCode.*;
 
 import com.example.moduleauction.domain.auction.dto.AuctionDetailDto;
 import com.example.moduleauction.domain.auction.dto.RecoveryDto;
@@ -15,8 +15,8 @@ import com.example.moduleauction.feign.dto.SectionAndPositionDto;
 import com.example.moduleauction.feign.dto.TicketDto;
 import com.example.moduleauction.domain.auction.dto.TicketChangeOwnerDto;
 import com.example.moduleauction.util.AuctionDetailRedisUtil;
-import com.example.modulecommon.entity.AuthUser;
-import com.example.modulecommon.exception.ServerException;
+import com.example.moduleauction.domain.auction.entity.AuthUser;
+import com.example.moduleauction.config.exception.ServerException;
 import com.example.moduleauction.domain.auction.event.BidUpdateEvent;
 import com.example.moduleauction.domain.auction.dto.request.AuctionBidRequest;
 import com.example.moduleauction.domain.auction.dto.request.AuctionCreateRequest;
