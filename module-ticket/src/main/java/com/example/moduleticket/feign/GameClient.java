@@ -3,13 +3,15 @@ package com.example.moduleticket.feign;
 import com.example.moduleticket.config.OpenFeignConfig;
 import com.example.moduleticket.feign.dto.GameDto;
 import java.util.List;
+
+import com.example.moduleticket.feign.dto.SeatDetailDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "game", url = "http://localhost:8081", configuration = OpenFeignConfig.class)
+@FeignClient(name = "module-game", configuration = OpenFeignConfig.class)
 public interface GameClient {
 
 	@GetMapping("/api/internal/games/{gameId}")
@@ -17,4 +19,17 @@ public interface GameClient {
 
 	@GetMapping("/api/internal/games")
 	public List<GameDto> getGames(@RequestParam List<Long> gameIds);
+
+	@GetMapping("/api/internal/seats/by-section")
+	List<SeatDetailDto> getSeatsByGameAndSection(
+			@RequestParam Long gameId,
+			@RequestParam Long sectionId,
+			@RequestParam List<Long> seatIds
+	);
+
+	@GetMapping("/api/internal/seats/by-game")
+	List<SeatDetailDto> getSeatsByGame(
+			@RequestParam Long gameId,
+			@RequestParam List<Long> seatIds
+	);
 }

@@ -9,9 +9,8 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
-      client-name: ${REDIS_USER}
-      password: ${REDIS_PASSWORD}
-
+      client-name: ${REDIS_USER:default}
+      password: ${REDIS_PASSWORD:1234}
   cloud:
     gateway:
       routes:

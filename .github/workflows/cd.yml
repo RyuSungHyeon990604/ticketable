@@ -7,7 +7,7 @@ name: CD
 
 on:
   push:
-    branches: [ "test/cicd" ]
+    branches: [ "develop" ]
 
 jobs:
   deploy:
@@ -27,7 +27,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: test/cicd
+          ref: develop
 
       - name: Get changed files
         id: changed-files

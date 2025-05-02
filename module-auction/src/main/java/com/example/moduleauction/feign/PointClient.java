@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.example.moduleauction.feign.dto.PaymentDto;
 import com.example.moduleauction.feign.dto.request.PointPaymentRequestDto;
 
-@FeignClient(name = "payment", url = "http://localhost:8086/api")
-public interface PaymentClient {
+@FeignClient(name = "module-point")
+public interface PointClient {
 
 	@PostMapping("/internal/members/{memberId}/points/decrement")
 	PaymentDto processPayment(

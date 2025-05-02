@@ -8,7 +8,6 @@ import com.example.moduleauction.domain.auction.dto.RefundDto;
 import com.example.moduleauction.domain.auction.event.BidSaveEvent;
 import com.example.moduleauction.domain.auction.event.AuctionDetailSaveEvent;
 import com.example.moduleauction.feign.GameClient;
-import com.example.moduleauction.feign.SeatClient;
 import com.example.moduleauction.feign.TicketClient;
 import com.example.moduleauction.feign.dto.GameDto;
 import com.example.moduleauction.feign.dto.SectionAndPositionDto;
@@ -69,13 +68,12 @@ public class AuctionService {
 
 	private final TicketClient ticketClient;
 	private final GameClient gameClient;
-	private final SeatClient seatClient;
 
 	@Transactional
 	public AuctionResponse createAuction(AuthUser authUser, AuctionCreateRequest dto) {
 		TicketDto ticket = ticketClient.getTicket(authUser.getMemberId(), dto.getTicketId());
 		GameDto game = gameClient.getGame(ticket.getGameId());
-		SectionAndPositionDto sectionAndPositions = seatClient.getSectionAndPositions(ticket.getSeatIds());
+		SectionAndPositionDto sectionAndPositions = gameClient.getSectionAndPositions(ticket.getSeatIds());
 
 		// 경기 시작 24시간 전 경매등록 검증
 		if (game.isTimeOver()) {
