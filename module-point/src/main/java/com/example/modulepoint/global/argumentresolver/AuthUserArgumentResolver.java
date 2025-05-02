@@ -1,8 +1,7 @@
-package com.example.modulecommon.argumentresolver;
+package com.example.modulepoint.global.argumentresolver;
 
-import com.example.modulecommon.annotation.LoginUser;
-import com.example.modulecommon.entity.AuthUser;
-import org.apache.catalina.User;
+import com.example.modulepoint.global.annotation.LoginUser;
+import com.example.modulepoint.global.entity.AuthUser;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
