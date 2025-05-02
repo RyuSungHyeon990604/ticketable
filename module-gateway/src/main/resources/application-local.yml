@@ -21,7 +21,7 @@ spring:
 
 
         - id: auth-login
-          uri: lb://module-login
+          uri: lb://module-auth
           predicates:
             - Path=/api/v*/auth/login
           filters:
@@ -39,12 +39,12 @@ spring:
 
 
         - id: auth-member
-          uri: lb://module-member
+          uri: lb://module-auth
           predicates:
             - Path=/api/v*/members/**
           filters:
             - name: ValidateToken
-            - RewritePath=/auth-member/(?<segment>.*), /${segment}
+            - RewritePath=/module-auth/(?<segment>.*), /${segment}
 
 
         - id: module-auction
@@ -73,7 +73,7 @@ spring:
             - name: ValidateToken
               args:
                 requiredRole: ROLE_ADMIN
-            - RewritePath=/admin-game/(?<segment>.*), /${segment}
+            - RewritePath=/module-game/(?<segment>.*), /${segment}
 
 
         - id: exchange-point
@@ -84,7 +84,7 @@ spring:
             - name: ValidateToken
               args:
                 requiredRole: ROLE_ADMIN
-            - RewritePath=/exchange-point/(?<segment>.*), /${segment}
+            - RewritePath=/module-point/(?<segment>.*), /${segment}
 
       httpclient:
         pool:
