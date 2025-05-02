@@ -1,7 +1,7 @@
 package com.example.modulepoint.domain.payment.controller;
 
-import com.example.modulecommon.annotation.LoginUser;
-import com.example.modulecommon.entity.AuthUser;
+import com.example.modulepoint.global.annotation.LoginUser;
+import com.example.modulepoint.global.entity.AuthUser;
 import com.example.modulepoint.domain.payment.service.PointPaymentService;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;

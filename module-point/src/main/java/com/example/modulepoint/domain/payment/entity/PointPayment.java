@@ -1,6 +1,6 @@
 package com.example.modulepoint.domain.payment.entity;
 
-import com.example.modulecommon.entity.Timestamped;
+import com.example.modulepoint.global.entity.Timestamped;
 import com.example.modulepoint.domain.payment.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;

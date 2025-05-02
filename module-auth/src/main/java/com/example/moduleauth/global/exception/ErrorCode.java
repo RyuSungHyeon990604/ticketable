@@ -1,4 +1,4 @@
-package com.example.modulecommon.exception;
+package com.example.moduleauth.global.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

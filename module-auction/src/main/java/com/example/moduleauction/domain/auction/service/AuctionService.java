@@ -1,7 +1,5 @@
 package com.example.moduleauction.domain.auction.service;
 
-import static com.example.modulecommon.exception.ErrorCode.*;
-
 import com.example.moduleauction.domain.auction.dto.AuctionDetailDto;
 import com.example.moduleauction.domain.auction.event.BidSaveEvent;
 import com.example.moduleauction.domain.auction.event.AuctionDetailSaveEvent;

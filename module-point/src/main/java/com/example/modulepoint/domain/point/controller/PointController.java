@@ -1,7 +1,8 @@
 package com.example.modulepoint.domain.point.controller;
 
-import com.example.modulecommon.annotation.LoginUser;
-import com.example.modulecommon.entity.AuthUser;
+import com.example.modulepoint.domain.point.dto.request.ChargePointRequest;
+import com.example.modulepoint.global.annotation.LoginUser;
+import com.example.modulepoint.global.entity.AuthUser;
 import com.example.modulepoint.domain.point.dto.request.ExchangePointRequest;
 import com.example.modulepoint.domain.point.dto.request.PointPaymentRequestDto;
 import com.example.modulepoint.domain.point.dto.response.PointResponse;
@@ -70,4 +71,12 @@ public class PointController {
 		return ResponseEntity.ok().build();
 	}
 
+	// 어드민 포인트 충전 (테스트를 위함)
+	@PostMapping("/v1/admin/points/charge")
+	public ResponseEntity<PointResponse> chargePoint(
+		@LoginUser AuthUser authUser,
+		@RequestBody ChargePointRequest request
+	) {
+		return ResponseEntity.ok(pointService.chargePoint(authUser.getMemberId(), request));
+	}
 }

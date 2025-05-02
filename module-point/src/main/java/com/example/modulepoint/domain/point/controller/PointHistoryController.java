@@ -1,7 +1,7 @@
 package com.example.modulepoint.domain.point.controller;
 
-import com.example.modulecommon.annotation.LoginUser;
-import com.example.modulecommon.entity.AuthUser;
+import com.example.modulepoint.global.annotation.LoginUser;
+import com.example.modulepoint.global.entity.AuthUser;
 import com.example.modulepoint.domain.point.dto.response.PointHistoryResponse;
 import com.example.modulepoint.domain.point.service.PointHistoryService;
 import lombok.RequiredArgsConstructor;

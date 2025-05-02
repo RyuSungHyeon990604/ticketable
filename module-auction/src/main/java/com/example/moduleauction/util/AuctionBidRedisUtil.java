@@ -2,9 +2,8 @@ package com.example.moduleauction.util;
 
 import static com.example.modulecommon.exception.ErrorCode.INVALID_BIDDING_AMOUNT;
 
-import com.example.moduleauction.domain.auction.dto.AuctionDetailDto;
 import com.example.modulecommon.exception.ServerException;
-import com.example.moduleauction.domain.auction.entity.Auction;
+
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
