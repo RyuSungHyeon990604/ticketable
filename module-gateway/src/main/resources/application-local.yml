@@ -68,7 +68,7 @@ spring:
         - id: admin-game
           uri: lb://module-game
           predicates:
-            - Path=/api/v*/admin/games/**, /api/v*/admin/sections/**, /api/v*/admin/seats/**, api/v*/admin/stadiums/**
+            - Path=/api/v*/admin/games/**, /api/v*/admin/sections/**, /api/v*/admin/seats/**, /api/v*/admin/stadiums/**
           filters:
             - name: ValidateToken
               args:
