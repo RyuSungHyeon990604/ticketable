@@ -20,6 +20,8 @@ import org.springframework.data.web.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.example.modulepoint.global.exception.ErrorCode.*;
+
 @Service
 @RequiredArgsConstructor
 public class ExchangeHistoryService {

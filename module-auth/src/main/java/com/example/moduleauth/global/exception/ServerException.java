@@ -1,6 +1,5 @@
 package com.example.moduleauth.global.exception;
 
-import com.example.modulepoint.global.exception.ErrorCode;
 import lombok.Getter;
 
 @Getter

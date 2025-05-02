@@ -4,16 +4,18 @@ import com.example.moduleauth.domain.auth.dto.request.LoginRequest;
 import com.example.moduleauth.domain.auth.dto.request.SignupRequest;
 import com.example.moduleauth.domain.auth.dto.response.AuthResponse;
 import com.example.moduleauth.feign.PointService;
-import com.example.modulecommon.exception.ServerException;
 import com.example.moduleauth.common.role.MemberRole;
 import com.example.moduleauth.common.util.JwtUtil;
 import com.example.moduleauth.domain.member.entity.Member;
 import com.example.moduleauth.domain.member.repository.MemberRepository;
+import com.example.moduleauth.global.exception.ServerException;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.example.moduleauth.global.exception.ErrorCode.*;
 
 @RequiredArgsConstructor
 @Service

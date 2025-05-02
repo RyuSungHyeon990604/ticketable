@@ -3,6 +3,8 @@ package com.example.moduleauth.domain.member.controller;
 import com.example.moduleauth.domain.member.dto.request.DeleteMemberRequest;
 import com.example.moduleauth.domain.member.dto.request.UpdatePasswordRequest;
 import com.example.moduleauth.domain.member.service.MemberService;
+import com.example.moduleauth.global.annotation.LoginUser;
+import com.example.moduleauth.global.entity.AuthUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
