@@ -31,12 +31,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 	)
 	Set<Long> findBookedSeatIdByGameId(Long gameId);
 
-	@Modifying
-	@Query("update Reservation r"
-		+ "    set r.state = 'EXPIRED_PAYMENT' "
-		+ "  where r.state = 'WAITING_PAYMENT' "
-		+ "    and r.createdAt < :expiredLimit ")
-	int updateExpiredReservations(LocalDateTime expiredLimit);
+	@Query("SELECT r " +
+			"FROM Reservation r " +
+//			"JOIN ReserveSeat rs " +
+//			"ON r.id = rs.reservation.id " +
+			"WHERE r.state = 'WAITING_PAYMENT' " +
+			"AND r.createdAt < :expiredLimit"
+	)
+	List<Reservation> findExpiredReservations(LocalDateTime expiredLimit);
 
 	boolean existsByReserveSeats_SeatIdInAndState(List<Long> reserveSeatIds, String state);
 }
