@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.moduleticket.domain.ticket.dto.TicketChangeOwnerDto;
 import com.example.moduleticket.domain.ticket.repository.TicketRepository;
-import com.example.moduleticket.feign.PaymentClient;
+import com.example.moduleticket.feign.PointClient;
 import com.example.moduleticket.feign.dto.request.PointPaymentRequestDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -30,7 +30,7 @@ public class TicketTransferStreamConsumer {
 
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final TicketRepository ticketRepository; // 직접 접근
-	private final PaymentClient paymentClient;
+	private final PointClient pointClient;
 
 	private static final String STREAM_KEY = "ticket_change_owner_stream";
 	private static final String GROUP_NAME = "ticket_change_owner_group";
@@ -58,7 +58,7 @@ public class TicketTransferStreamConsumer {
 							log.error("티켓 이전 실패 → 포인트 환불 예정: {}", dto, e);
 							PointPaymentRequestDto pointPaymentRequestDto = new PointPaymentRequestDto(
 								dto.getNewOwnerId() + "REFUND","REFUND", Math.toIntExact(dto.getBidPoint()), dto.getNewOwnerId());
-							paymentClient.processRefund(dto.getNewOwnerId(), pointPaymentRequestDto);
+							pointClient.processRefund(dto.getNewOwnerId(), pointPaymentRequestDto);
 						}
 					}
 				}

@@ -17,7 +17,6 @@ import com.example.moduleticket.domain.ticket.entity.Ticket;
 import com.example.moduleticket.domain.ticket.entity.TicketSeat;
 import com.example.moduleticket.domain.ticket.repository.TicketRepository;
 import com.example.moduleticket.feign.GameClient;
-import com.example.moduleticket.feign.SeatClient;
 import com.example.moduleticket.feign.dto.GameDto;
 import com.example.moduleticket.feign.dto.SeatDetailDto;
 import com.example.moduleticket.global.argumentresolver.AuthUser;
@@ -42,7 +41,6 @@ public class TicketService {
 	private final TicketPaymentService ticketPaymentService;
 	private final TicketCreateService ticketCreateService;
 	private final GameClient gameClient;
-	private final SeatClient seatClient;
 	private final RefundQueueService refundQueueService;
 	private final TicketPublisher ticketPublisher;
 
@@ -83,7 +81,7 @@ public class TicketService {
 	public TicketResponse issueTicketFromReservation(AuthUser auth, Long gameId, List<Long> seatIds,
 		Reservation reservation) {
 
-		List<SeatDetailDto> seatDetailDtos = seatClient.getSeatsByGame(gameId, seatIds);
+		List<SeatDetailDto> seatDetailDtos = gameClient.getSeatsByGame(gameId, seatIds);
 
 		TicketContext ticketContext = ticketCreateService.createTicket(auth, seatDetailDtos, reservation);
 		ticketPaymentService.create(

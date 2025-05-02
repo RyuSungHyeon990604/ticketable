@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.example.moduleauction.feign.dto.TicketDto;
 
-@FeignClient(name = "ticket", url = "http://localhost:8082")
+@FeignClient(name = "module-ticket")
 public interface TicketClient {
 
 	@GetMapping("/api/internal/members/{memberId}/tickets/{ticketId}")
