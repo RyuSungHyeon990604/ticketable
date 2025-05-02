@@ -1,4 +1,4 @@
-package com.example.modulegame.common.exception;
+package com.example.modulewaiting.global.exception;
 
 import java.util.HashMap;
 import java.util.Map;

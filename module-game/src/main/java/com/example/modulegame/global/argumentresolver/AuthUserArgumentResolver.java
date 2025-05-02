@@ -1,8 +1,7 @@
-package com.example.modulecommon.argumentresolver;
+package com.example.modulegame.global.argumentresolver;
 
-import com.example.modulecommon.annotation.LoginUser;
-import com.example.modulecommon.entity.AuthUser;
-import org.apache.catalina.User;
+import com.example.modulegame.global.annotation.LoginUser;
+import com.example.modulegame.global.entity.AuthUser;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -22,8 +21,8 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 		NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 
-		Long memberId = Long.valueOf(webRequest.getHeader("memberId"));
-		String memberRole = webRequest.getHeader("role");
+		Long memberId = Long.valueOf(webRequest.getHeader("member-id"));
+		String memberRole = webRequest.getHeader("member-role");
 		return new AuthUser(memberId, memberRole);
 	}
 }

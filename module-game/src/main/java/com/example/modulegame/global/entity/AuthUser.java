@@ -1,4 +1,4 @@
-package com.example.modulecommon.entity;
+package com.example.modulegame.global.entity;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

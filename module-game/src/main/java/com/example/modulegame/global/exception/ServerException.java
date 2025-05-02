@@ -1,4 +1,4 @@
-package com.example.modulecommon.exception;
+package com.example.modulegame.global.exception;
 
 import lombok.Getter;
 

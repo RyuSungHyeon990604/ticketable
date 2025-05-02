@@ -1,18 +1,18 @@
-package com.example.modulecommon.exception;
+package com.example.modulewaiting.global.exception;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-
-import java.util.HashMap;
-import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-	
+
 	@ExceptionHandler(ServerException.class)
 	public ResponseEntity<ErrorResponse> responseStatusExceptionException(ServerException e) {
 		ErrorCode errorCode = e.getErrorCode();
@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
 		ErrorResponse response = new ErrorResponse(status, message, code);
 		return ResponseEntity.status(errorCode.getStatus()).body(response);
 	}
-	
+
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ErrorResponse> methodArgumentNotValidException(MethodArgumentNotValidException ex) {
 		HttpStatus status = BAD_REQUEST;

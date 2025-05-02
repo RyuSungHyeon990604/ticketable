@@ -1,4 +1,4 @@
-package com.example.modulecommon.util;
+package com.example.modulegame.global.util;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
