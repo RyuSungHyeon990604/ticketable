@@ -17,7 +17,7 @@ public class GrpcClientConfig {
     @Bean
     public TicketServiceGrpc.TicketServiceBlockingStub ticketServiceBlockingStub() {
         ManagedChannel channel = ManagedChannelBuilder
-                .forAddress(host, port) // 티켓 서버 주소/포트
+                .forAddress(host, port) // 티켓 서버 주소/포트.
                 .usePlaintext() // TLS 없이 통신
                 .build();
         return TicketServiceGrpc.newBlockingStub(channel);
