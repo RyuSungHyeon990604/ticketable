@@ -631,7 +631,7 @@ jobs:
               -e DB_URL=${{ secrets.DB_URL }} \
               -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
               -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              -e IMPORT_API_KEY=${{ secrets.IMPORT_API_KEY }} \              
+              -e IMPORT_API_KEY=${{ secrets.IMPORT_API_KEY }} \
               -e IMPORT_API_SECRET=${{ secrets.IMPORT_API_SECRET }} \
               -e REDIS_HOST=${{ secrets.REDIS_HOST }} \
               -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
