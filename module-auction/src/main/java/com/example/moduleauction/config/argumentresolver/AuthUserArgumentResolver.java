@@ -22,7 +22,7 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 		NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 
-		Long memberId = Long.valueOf(webRequest.getHeader("member-id"));
+		Long memberId = Long.valueOf(webRequest.getHeader("memberId"));
 		String memberRole = webRequest.getHeader("member-role");
 		return new AuthUser(memberId, memberRole);
 	}
