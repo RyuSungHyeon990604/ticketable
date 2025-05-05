@@ -30,6 +30,7 @@ public class FeignClientErrorDecoder implements ErrorDecoder {
 
 			String body = Util.toString(response.body().asReader());
 			Map<String, String> map = mapper.readValue(body, Map.class);
+			log.info("error : {}",map);
 			if(map.get("code") == null) {
 				return new UnknownException();
 			} else {
