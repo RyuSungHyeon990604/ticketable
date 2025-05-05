@@ -627,11 +627,11 @@ jobs:
             sudo docker pull ${{ secrets.AWS_REGISTRY }}/repo-ticketable:point-$SHORT_SHA
             sudo docker run -d --name module-point --network host -p 8086:8086 \
               -e eureka.client.serviceUrl.defaultZone=${{ secrets.EUREKA_URL }} \
+              -e SPRING_PROFILES_ACTIVE=prod \
               -e DB_URL=${{ secrets.DB_URL }} \
               -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
               -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
               -e IMPORT_API_KEY=${{ secrets.IMPORT_API_KEY }} \              
-              -e SPRING_PROFILES_ACTIVE=prod \
               -e IMPORT_API_SECRET=${{ secrets.IMPORT_API_SECRET }} \
               -e REDIS_HOST=${{ secrets.REDIS_HOST }} \
               -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
@@ -742,7 +742,7 @@ jobs:
               -e SECRET_KEY=${{ secrets.SECRET_KEY }} \
               -e REDIS_HOST=${{ secrets.REDIS_HOST }} \
               -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
-              -e REDIS_USER=${{ secrets.REDIS_USER }} \
+              -e REDIS_USER=${{ secrets.REDIS_USER }} \ㅔ
               -e REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} \
               ${{ secrets.AWS_REGISTRY }}/repo-ticketable:ticket-$SHORT_SHA
 
