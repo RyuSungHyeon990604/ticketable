@@ -4,7 +4,6 @@ import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.ticket.dto.TicketContext;
 import com.example.moduleticket.domain.ticket.entity.Ticket;
 import com.example.moduleticket.domain.ticket.repository.TicketRepository;
-import com.example.moduleticket.feign.dto.SeatDetailDto;
 import com.example.moduleticket.global.argumentresolver.AuthUser;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +21,11 @@ public class TicketCreateService {
 	private final TicketSeatService ticketSeatService;
 
 	@Transactional
-	public TicketContext createTicket(AuthUser auth, List<SeatDetailDto> seats, Reservation reservation) {
-		long gameId = seats.get(0).getGameId();
-		List<Long> seatIds = seats.stream().map(SeatDetailDto::getSeatId).toList();
+	public TicketContext createTicket(AuthUser auth, List<Long> seats, Reservation reservation) {
+		long gameId = reservation.getGameId();
 
 		Ticket ticket = ticketRepository.save(new Ticket(reservation, auth.getMemberId(), gameId));
-		ticketSeatService.createAll(seatIds, gameId, ticket);
+		ticketSeatService.createAll(seats, gameId, ticket);
 
 		return new TicketContext(ticket, auth.getMemberId(), seats, reservation.getTotalPrice());
 	}

@@ -5,16 +5,15 @@ import static com.example.moduleticket.global.exception.ErrorCode.INVALID_RESERV
 import static com.example.moduleticket.global.exception.ErrorCode.RESERVATION_NOT_FOUND;
 
 import com.example.moduleticket.domain.reservation.dto.ReservationCreateRequest;
-import com.example.moduleticket.domain.reservation.dto.ReservationResponse;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.entity.ReserveSeat;
 import com.example.moduleticket.domain.reservation.event.TicketEvent;
 import com.example.moduleticket.domain.reservation.event.publisher.TicketPublisher;
 import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
-import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.event.SeatHoldReleaseEvent;
 import com.example.moduleticket.domain.ticket.service.TicketService;
 import com.example.moduleticket.global.argumentresolver.AuthUser;
+import com.example.moduleticket.global.dto.ApiResponse;
 import com.example.moduleticket.global.exception.ServerException;
 import com.example.moduleticket.util.SeatHoldRedisUtil;
 import java.time.LocalDateTime;
@@ -41,14 +40,14 @@ public class ReservationService {
 	private final ApplicationEventPublisher eventPublisher;
 	private final TicketPublisher ticketPublisher;
 
-	public ReservationResponse processReserve(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
+	public ApiResponse<Void> processReserve(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
 		seatHoldRedisUtil.holdSeatAtomic(
 			reservationCreateRequest.getGameId(),
 			reservationCreateRequest.getSeatIds(),
 			String.valueOf(auth.getMemberId())
 		);
 		try {
-			ReservationResponse reservation = reservationCreateService.createReservation(
+			ApiResponse<Void> reservation = reservationCreateService.createReservation(
 				auth,
 				reservationCreateRequest
 			);
@@ -67,13 +66,13 @@ public class ReservationService {
 	}
 
 	@Transactional
-	public TicketResponse processReservationCompletion(AuthUser authUser, Long reservationId) {
+	public ApiResponse<Void> processReservationCompletion(AuthUser authUser, Long reservationId) {
 		Reservation reservation = reservationRepository.findByIdMemberId(reservationId, authUser.getMemberId())
 			.orElseThrow(() -> new ServerException(RESERVATION_NOT_FOUND));
 
 		if (reservation.getState().equals("COMPLETE_PAYMENT")) {
 			log.info("이미 결제된 예약입니다.");
-			return ticketService.getTicketByReservationId(reservationId);
+			return ApiResponse.messageOnly("이미 결제된 예약입니다.");
 		}
 
 		List<Long> seatIds = reservation.getReserveSeats().stream().map(ReserveSeat::getSeatId).toList();
@@ -85,9 +84,8 @@ public class ReservationService {
 		reservationPaymentService.reservePayment(authUser, reservationId, reservation.getTotalPrice());
 
 		//티켓 생성
-		TicketResponse ticketResponse = ticketService.issueTicketFromReservation(
+		ticketService.issueTicketFromReservation(
 			authUser,
-			gameId,
 			seatIds,
 			reservation
 		);
@@ -95,7 +93,7 @@ public class ReservationService {
 		reservation.completePayment();
 		eventPublisher.publishEvent(new SeatHoldReleaseEvent(seatIds, gameId));
 
-		return ticketResponse;
+		return ApiResponse.messageOnly("티켓 결제가 완료되었습니다");
 	}
 
 

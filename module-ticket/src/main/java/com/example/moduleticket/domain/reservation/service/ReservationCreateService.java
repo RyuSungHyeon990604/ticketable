@@ -1,19 +1,18 @@
 package com.example.moduleticket.domain.reservation.service;
 
 import com.example.moduleticket.domain.reservation.dto.ReservationCreateRequest;
-import com.example.moduleticket.domain.reservation.dto.ReservationResponse;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.entity.ReserveSeat;
 import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
 import com.example.moduleticket.feign.GameClient;
 import com.example.moduleticket.feign.dto.SeatDetailDto;
 import com.example.moduleticket.global.argumentresolver.AuthUser;
+import com.example.moduleticket.global.dto.ApiResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -24,7 +23,7 @@ public class ReservationCreateService {
 	private final GameClient gameClient;
 
 	@Transactional
-	public ReservationResponse createReservation(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
+	public ApiResponse<Void> createReservation(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
 
 		reservationValidator.checkTicketSeatDuplicate(reservationCreateRequest.getGameId(), reservationCreateRequest.getSeatIds());
 		reservationValidator.checkDuplicateReservation(reservationCreateRequest.getSeatIds(),reservationCreateRequest.getGameId() );
@@ -35,14 +34,15 @@ public class ReservationCreateService {
 			reservationCreateRequest.getSeatIds()
 		);
 
-		int seatPrice = seatDetailDtos.stream().mapToInt(seat-> seat.getSectionPrice() + seat.getGamePrice()).sum();
+		int seatPrice = seatDetailDtos.stream().mapToInt(SeatDetailDto::getSectionPrice).sum();
+		int gamePrice = seatDetailDtos.get(0).getGamePrice();
 
 		//예약 데이터 생성
 		Reservation reservation = new Reservation(
 			auth.getMemberId(),
 			reservationCreateRequest.getGameId(),
 			"WAITING_PAYMENT",
-			seatPrice
+			seatPrice + gamePrice
 		);
 
 		List<ReserveSeat> ReserveSeatList = ReserveSeat.from(
@@ -55,6 +55,6 @@ public class ReservationCreateService {
 		}
 		reservationRepository.save(reservation);
 
-		return ReservationResponse.from(reservation, seatDetailDtos);
+		return ApiResponse.messageOnly("예약이 완료되었습니다.");
 	}
 }

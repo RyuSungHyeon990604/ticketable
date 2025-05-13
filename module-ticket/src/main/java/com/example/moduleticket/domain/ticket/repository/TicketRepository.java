@@ -21,6 +21,14 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 	Optional<Ticket> findByIdAndDeletedAtIsNull(Long id, Long memberId);
 
 	@Query("SELECT t "
+		+ "   FROM Ticket t "
+		+ "   join fetch t.reservation "
+		+ "  WHERE t.id = :id "
+		+ "    AND t.deletedAt is null "
+		+ "    AND t.memberId = :memberId")
+	Optional<Ticket> findByIdAndDeletedAtIsNullWithReservation(Long id, Long memberId);
+
+	@Query("SELECT t "
 		+ "   FROM Ticket t  "
 		+ "  WHERE t.memberId = :memberId "
 		+ "    AND t.deletedAt is null ")
