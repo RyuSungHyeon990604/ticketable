@@ -6,10 +6,13 @@ import com.example.moduleticket.feign.dto.request.PointPaymentRequestDto;
 import com.example.moduleticket.global.argumentresolver.AuthUser;
 import com.example.moduleticket.global.exception.ServerException;
 import com.example.moduleticket.util.IdempotencyKeyUtil;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReservationPaymentService {
@@ -17,7 +20,7 @@ public class ReservationPaymentService {
 	private final PointClient pointClient;
 	private final ApplicationEventPublisher eventPublisher;
 
-	public void reservePayment(AuthUser authUser, Long reservationId, int price) {
+	public void reservePayment(AuthUser authUser, Long reservationId, int price, List<Long> seatIds, Long gameId) {
 
 		PointPaymentRequestDto requestDto = new PointPaymentRequestDto(
 			IdempotencyKeyUtil.forReservation(reservationId, "decrement"),
@@ -35,23 +38,9 @@ public class ReservationPaymentService {
 		} catch (ServerException e) {
 			throw e;
 		} catch (Exception e) {
-			//알수없는 오류이므로 다시결제요청
-			reTryPayment(
-				requestDto,
-				authUser.getMemberId(),
-				reservationId
-			);
-		}
-	}
-
-	private void reTryPayment(PointPaymentRequestDto request, Long memberId, Long reservationId) {
-		try {
-			pointClient.processPayment(memberId, request);
-		} catch (ServerException e) {
-			throw e;
-		} catch (Exception e) {
-			//알수없는 예외로 마킹
-			eventPublisher.publishEvent(new ReservationUnknownFailureEvent(reservationId));
+			log.error("결제 재시도까지 실패: memberId={}, reservationId={}, err={}",
+				authUser.getMemberId(), reservationId, e.getMessage(), e);
+			eventPublisher.publishEvent(new ReservationUnknownFailureEvent(reservationId, seatIds, gameId, authUser.getMemberId()));
 			throw e;
 		}
 	}

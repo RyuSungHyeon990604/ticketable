@@ -24,6 +24,7 @@ public class SeatHoldRedisUtil {
 	private final DefaultRedisScript<Long> holdSeatRedisScript;
 	private final DefaultRedisScript<Long> releaseSeatRedisScript;
 	private final DefaultRedisScript<Long> checkHeldRedisScript;
+	private final DefaultRedisScript<Long> extendSeatHoldTTLScript;
 
 	private static final Duration SEAT_HOLD_TTL = Duration.ofMinutes(15);
 	private static final String SEAT_HOLD_TTL_STRING = String.valueOf(SEAT_HOLD_TTL.getSeconds());
@@ -61,8 +62,14 @@ public class SeatHoldRedisUtil {
 
 	}
 
+	public void extendSeatHoldTTL(Long memberId, Long gameId, List<Long> seatIds, int extensionMillis) {
+		List<String> keys = seatIds.stream().map(id -> createKey(id, gameId)).toList();
+		redisTemplate.execute(extendSeatHoldTTLScript, keys, extensionMillis, memberId);
+	}
+
 	public String createKey(Long seatId, Long gameId){
 		return "game:" + gameId
 			+ ":seat:" + seatId;
 	}
+
 }

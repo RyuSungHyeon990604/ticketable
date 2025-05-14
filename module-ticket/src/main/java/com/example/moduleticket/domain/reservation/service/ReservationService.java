@@ -81,7 +81,7 @@ public class ReservationService {
 		//authUser가 선점한 좌석이맞는지 최종 확인 & TTL만료시 에약완료 불가
 		reservationValidator.validateReservationForComplete(authUser, gameId, seatIds, reservation);
 
-		reservationPaymentService.reservePayment(authUser, reservationId, reservation.getTotalPrice());
+		reservationPaymentService.reservePayment(authUser, reservationId, reservation.getTotalPrice(), seatIds, gameId);
 
 		//티켓 생성
 		ticketService.issueTicketFromReservation(

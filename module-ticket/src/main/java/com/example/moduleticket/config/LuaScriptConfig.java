@@ -67,4 +67,12 @@ public class LuaScriptConfig {
 		script.setResultType(Long.class);
 		return script;
 	}
+
+	@Bean
+	public DefaultRedisScript<Long> extendSeatHoldTTLScript(){
+		DefaultRedisScript<Long> script = new DefaultRedisScript<>();
+		script.setLocation(new ClassPathResource("lua/extendSeatHoldTTL.lua"));
+		script.setResultType(Long.class);
+		return script;
+	}
 }
