@@ -29,6 +29,18 @@ public class PointHistoryService {
 		
 		pointHistoryRepository.save(pointHistory);
 	}
+
+
+	public void createPointHistoryV2(Integer charge, PointHistoryType type, Long memberId, String idempotencyKey) {
+		PointHistory pointHistory = PointHistory.builder()
+			.charge(charge)
+			.type(type)
+			.memberId(memberId)
+			.idempotencyKey(idempotencyKey)
+			.build();
+
+		pointHistoryRepository.save(pointHistory);
+	}
 	
 	@Transactional(readOnly = true)
 	public PagedModel<PointHistoryResponse> getPointHistories(Long memberId, int page) {

@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "module-point", configuration = OpenFeignConfig.class)
 public interface PointClient {
 
-	@PostMapping("/api/internal/members/{memberId}/points/decrement")
+	@PostMapping("/api/v2/internal/members/{memberId}/points/decrement")
 	PaymentDto processPayment(
 		@PathVariable Long memberId,
 		@RequestBody PointPaymentRequestDto pointPaymentRequestDto
 	);
 
-	@PostMapping("/api/internal/members/{memberId}/points/increment")
+	@PostMapping("/api/v2/internal/members/{memberId}/points/increment")
 	PaymentDto processRefund(
 		@PathVariable Long memberId,
 		@RequestBody PointPaymentRequestDto pointPaymentRequestDto

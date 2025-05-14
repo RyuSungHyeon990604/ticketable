@@ -5,6 +5,7 @@ import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.domain.ticket.service.TicketService;
 import com.example.moduleticket.global.annotation.LoginUser;
 import com.example.moduleticket.global.argumentresolver.AuthUser;
+import com.example.moduleticket.global.dto.ApiResponse;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -23,19 +24,19 @@ public class TicketController {
 
 
 	@GetMapping("/v1/tickets")
-	public ResponseEntity<List<TicketResponse>> getAllTickets(
+	public ResponseEntity<ApiResponse<?>> getAllTickets(
 		@LoginUser AuthUser authUser
 	) {
-		List<TicketResponse> ticketResponseList = ticketService.getAllTickets(authUser);
-		return ResponseEntity.ok(ticketResponseList);
+		ApiResponse<List<TicketResponse>> allTickets = ticketService.getAllTickets(authUser);
+		return ResponseEntity.ok(allTickets);
 	}
 
 	@GetMapping("/v1/tickets/{ticketId}")
-	public ResponseEntity<TicketResponse> getTicket(
+	public ResponseEntity<ApiResponse<?>> getTicket(
 		@LoginUser AuthUser authUser,
 		@PathVariable Long ticketId
 	) {
-		TicketResponse ticketResponse = ticketService.getTicket(authUser, ticketId);
+		ApiResponse<TicketResponse> ticketResponse = ticketService.getTicket(authUser, ticketId);
 		return ResponseEntity.ok(ticketResponse);
 	}
 

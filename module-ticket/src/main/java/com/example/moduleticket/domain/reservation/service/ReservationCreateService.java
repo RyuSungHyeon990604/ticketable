@@ -23,7 +23,7 @@ public class ReservationCreateService {
 	private final GameClient gameClient;
 
 	@Transactional
-	public ApiResponse<Void> createReservation(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
+	public Reservation createReservation(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
 
 		reservationValidator.checkTicketSeatDuplicate(reservationCreateRequest.getGameId(), reservationCreateRequest.getSeatIds());
 		reservationValidator.checkDuplicateReservation(reservationCreateRequest.getSeatIds(),reservationCreateRequest.getGameId() );
@@ -55,6 +55,6 @@ public class ReservationCreateService {
 		}
 		reservationRepository.save(reservation);
 
-		return ApiResponse.messageOnly("예약이 완료되었습니다.");
+		return reservation;
 	}
 }

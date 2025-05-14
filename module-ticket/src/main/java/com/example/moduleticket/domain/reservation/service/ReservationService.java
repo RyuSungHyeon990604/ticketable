@@ -47,7 +47,7 @@ public class ReservationService {
 			String.valueOf(auth.getMemberId())
 		);
 		try {
-			ApiResponse<Void> reservation = reservationCreateService.createReservation(
+			reservationCreateService.createReservation(
 				auth,
 				reservationCreateRequest
 			);
@@ -58,7 +58,7 @@ public class ReservationService {
 			);
 			ticketPublisher.publish(ticketEvent);
 
-			return reservation;
+			return ApiResponse.messageOnly("예약이 완료되었습니다. 15분내로 결제를 완료해주세요");
 		} catch (Exception e) {
 			seatHoldRedisUtil.releaseSeatAtomic(reservationCreateRequest.getSeatIds(),reservationCreateRequest.getGameId());
 			throw e;

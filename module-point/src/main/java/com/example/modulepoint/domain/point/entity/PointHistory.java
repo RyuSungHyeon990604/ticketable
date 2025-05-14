@@ -32,10 +32,14 @@ public class PointHistory extends Timestamped {
 	@Column(nullable = false)
 	private Long memberId;
 
+	@Column(unique = true)
+	private String idempotencyKey;
+
 	@Builder
-	public PointHistory(Integer charge, PointHistoryType type, Long memberId) {
+	public PointHistory(Integer charge, PointHistoryType type, Long memberId, String idempotencyKey) {
 		this.charge = charge;
 		this.type = type;
 		this.memberId = memberId;
+		this.idempotencyKey = idempotencyKey;
 	}
 }

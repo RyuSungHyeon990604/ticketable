@@ -57,6 +57,21 @@ public class PointController {
 		return ResponseEntity.ok().build();
 	}
 
+	@PostMapping("/v2/internal/members/{memberId}/points/increment")
+	public ResponseEntity<Void> increasePointV2(
+		@PathVariable Long memberId,
+		@RequestBody PointPaymentRequestDto pointPaymentRequestDto
+	) {
+		PointHistoryType type = PointHistoryType.valueOf(pointPaymentRequestDto.getType());
+		pointService.increasePointV2(
+			pointPaymentRequestDto.getIdempotencyKey(),
+			memberId,
+			pointPaymentRequestDto.getAmount(),
+			type
+		);
+		return ResponseEntity.ok().build();
+	}
+
 	@PostMapping("/internal/members/{memberId}/points/decrement")
 	public ResponseEntity<Void> decreasePoint(
 		@PathVariable Long memberId,
@@ -64,6 +79,21 @@ public class PointController {
 	) {
 		PointHistoryType type = PointHistoryType.valueOf(pointPaymentRequestDto.getType());
 		pointService.decreasePoint(
+			memberId,
+			pointPaymentRequestDto.getAmount(),
+			type
+		);
+		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping("/v2/internal/members/{memberId}/points/decrement")
+	public ResponseEntity<Void> decreasePointV2(
+		@PathVariable Long memberId,
+		@RequestBody PointPaymentRequestDto pointPaymentRequestDto
+	) {
+		PointHistoryType type = PointHistoryType.valueOf(pointPaymentRequestDto.getType());
+		pointService.decreasePointV2(
+			pointPaymentRequestDto.getIdempotencyKey(),
 			memberId,
 			pointPaymentRequestDto.getAmount(),
 			type

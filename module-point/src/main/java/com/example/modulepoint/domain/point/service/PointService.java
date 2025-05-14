@@ -16,9 +16,13 @@ import com.example.modulepoint.domain.point.enums.PointHistoryType;
 import com.example.modulepoint.domain.exchange.repository.ExchangeHistoryRepository;
 import com.example.modulepoint.domain.point.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PointService {
@@ -79,6 +83,21 @@ public class PointService {
 		pointHistoryService.createPointHistory(charge, type, memberId);
 	}
 
+	@Transactional
+	public void increasePointV2(String idempotencyKey,Long memberId, Integer charge, PointHistoryType type ) {
+		Point point = getPoint(memberId);
+
+		point.plusPoint(charge);
+		try {
+			pointHistoryService.createPointHistoryV2(charge, type, memberId, idempotencyKey);
+		} catch (DataIntegrityViolationException e) {
+			log.warn("중복 환불요청, 환불이력이 존재합니다. idempotencyKey: {}", idempotencyKey);
+			//트랜잭션 롤백 수행
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+		}
+
+	}
+
 	/**
 	 * 입찰, 티켓 예매 등에서 사용될 포인트 증가 메서드
 	 */
@@ -88,6 +107,24 @@ public class PointService {
 
 		point.minusPoint(charge);
 		pointHistoryService.createPointHistory(charge, type, memberId);
+	}
+
+	/**
+	 * 입찰, 티켓 예매 등에서 사용될 포인트 증가 메서드
+	 * 멱등성 버전
+	 */
+	@Transactional
+	public void decreasePointV2(String idempotencyKey, Long memberId, Integer charge, PointHistoryType type) {
+		Point point = getPoint(memberId);
+
+		point.minusPoint(charge);
+		try {
+			pointHistoryService.createPointHistoryV2(charge, type, memberId, idempotencyKey);
+		} catch (DataIntegrityViolationException e) {
+			log.warn("중복 결제요청, 결제이력이 존재합니다. idempotencyKey: {}", idempotencyKey);
+			//트랜잭션 롤백 수행
+			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+		}
 	}
 	
 	@Transactional

@@ -32,7 +32,7 @@ public class ReservationController {
 	}
 
 	@PostMapping("/v1/reservations/{reservationId}")
-	public ResponseEntity<TicketResponse> completePaymentReservation(
+	public ResponseEntity<ApiResponse<Void>> completePaymentReservation(
 		@LoginUser AuthUser authUser,
 		@PathVariable Long reservationId
 	) {
