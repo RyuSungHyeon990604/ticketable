@@ -6,6 +6,7 @@ import com.example.moduleticket.global.exception.UnknownException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;
 import feign.Response.Body;
+import feign.RetryableException;
 import feign.Util;
 import feign.codec.ErrorDecoder;
 import java.io.IOException;
@@ -31,12 +32,23 @@ public class FeignClientErrorDecoder implements ErrorDecoder {
 			String body = Util.toString(response.body().asReader());
 			Map<String, String> map = mapper.readValue(body, Map.class);
 			log.info("error : {}",map);
-			if(map.get("code") == null) {
-				return new UnknownException();
-			} else {
-				return new ServerException(ErrorCode.valueOf(map.get("code")));
+			if(map.get("code") != null) {
+				try {
+					return new ServerException(ErrorCode.valueOf(map.get("code")));
+				} catch (IllegalArgumentException e) {
+					log.error("error : {}",map);
+					return new UnknownException("정의되지 않은 에러 코드입니다: " + map.get("code"));
+				}
+			} else if(response.status() == 503 || response.status() == 500){
+				return new RetryableException(
+					response.status(),
+					"Service Unavailable - Retryable",
+					response.request().httpMethod(),
+					(Long) null,
+					response.request()
+				);
 			}
-
+			return new UnknownException("Feign 호출 중 알 수 없는 오류가 발생했습니다. status = " + response.status());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
