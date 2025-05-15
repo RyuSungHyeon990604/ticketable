@@ -6,9 +6,13 @@ import com.example.moduleticket.feign.dto.request.PointPaymentRequestDto;
 import com.example.moduleticket.global.argumentresolver.AuthUser;
 import com.example.moduleticket.global.exception.ServerException;
 import com.example.moduleticket.util.IdempotencyKeyUtil;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.client.circuitbreaker.NoFallbackAvailableException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +24,7 @@ public class ReservationPaymentService {
 	private final PointClient pointClient;
 	private final ApplicationEventPublisher eventPublisher;
 
+	@CircuitBreaker(name="pointCircuit")
 	public void reservePayment(AuthUser authUser, Long reservationId, int price, List<Long> seatIds, Long gameId) {
 
 		PointPaymentRequestDto requestDto = new PointPaymentRequestDto(
@@ -31,17 +36,22 @@ public class ReservationPaymentService {
 
 		//결제요청
 		try {
-			pointClient.processPayment(
+			processPayment(
 				authUser.getMemberId(),
 				requestDto
 			);
-		} catch (ServerException e) {
+		} catch (ServerException | CallNotPermittedException e ) {
 			throw e;
 		} catch (Exception e) {
-			log.error("결제 재시도까지 실패: memberId={}, reservationId={}, err={}",
+			log.error("결제 성공여부 판단 불가 : memberId={}, reservationId={}, err={}",
 				authUser.getMemberId(), reservationId, e.getMessage(), e);
 			eventPublisher.publishEvent(new ReservationUnknownFailureEvent(reservationId, seatIds, gameId, authUser.getMemberId()));
 			throw e;
 		}
 	}
+
+	public void processPayment(Long memberId, PointPaymentRequestDto requestDto) {
+		pointClient.processPayment(memberId, requestDto);
+	}
+
 }

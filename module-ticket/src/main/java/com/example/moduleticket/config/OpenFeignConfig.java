@@ -10,12 +10,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableFeignClients("com.example.moduleticket.feign")
 public class OpenFeignConfig {
-
-	@Bean
-	Retryer.Default retryer() {
-		return new Retryer.Default(1000, 5000, 3);
-	}
-
 	@Bean
 	public ErrorDecoder errorDecoder() {
 		return new FeignClientErrorDecoder();

@@ -64,7 +64,7 @@ public class SeatHoldRedisUtil {
 
 	public void extendSeatHoldTTL(Long memberId, Long gameId, List<Long> seatIds, int extensionMillis) {
 		List<String> keys = seatIds.stream().map(id -> createKey(id, gameId)).toList();
-		redisTemplate.execute(extendSeatHoldTTLScript, keys, extensionMillis, memberId);
+		redisTemplate.execute(extendSeatHoldTTLScript, keys, String.valueOf(extensionMillis), String.valueOf(memberId));
 	}
 
 	public String createKey(Long seatId, Long gameId){

@@ -39,14 +39,6 @@ public class FeignClientErrorDecoder implements ErrorDecoder {
 					log.error("error : {}",map);
 					return new UnknownException("정의되지 않은 에러 코드입니다: " + map.get("code"));
 				}
-			} else if(response.status() == 503 || response.status() == 500){
-				return new RetryableException(
-					response.status(),
-					"Service Unavailable - Retryable",
-					response.request().httpMethod(),
-					(Long) null,
-					response.request()
-				);
 			}
 			return new UnknownException("Feign 호출 중 알 수 없는 오류가 발생했습니다. status = " + response.status());
 		} catch (IOException e) {
