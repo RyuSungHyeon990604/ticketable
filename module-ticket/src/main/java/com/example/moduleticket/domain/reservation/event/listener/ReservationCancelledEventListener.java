@@ -1,0 +1,37 @@
+package com.example.moduleticket.domain.reservation.event.listener;
+
+import com.example.moduleticket.domain.reservation.event.ReservationCancelledEvent;
+import com.example.moduleticket.domain.reservation.event.TicketEvent;
+import com.example.moduleticket.domain.reservation.service.SeatHoldManager;
+import com.example.moduleticket.domain.ticket.entity.Ticket;
+import com.example.moduleticket.util.SeatHoldRedisUtil;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class ReservationCancelledEventListener {
+	private final SeatHoldRedisUtil seatHoldRedisUtil;
+	private final RedisTemplate<String, Object> redisTemplate;
+
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	public void releaseSeatHoldFromRedis(ReservationCancelledEvent event) {
+		log.debug("좌석 점유 해제 : reservationId = {}", event.getReservationId());
+		seatHoldRedisUtil.releaseSeatAtomic(event.getSeatIds(), event.getGameId());
+	}
+
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	public void refreshCache(ReservationCancelledEvent event){
+		log.debug("예약 취소 캐시 갱신 : reservationId = {}", event.getReservationId());
+		TicketEvent ticketEvent = new TicketEvent(
+			event.getGameId(),
+			event.getSeatIds().get(0)
+		);
+		redisTemplate.convertAndSend("reservation", ticketEvent);
+	}
+}

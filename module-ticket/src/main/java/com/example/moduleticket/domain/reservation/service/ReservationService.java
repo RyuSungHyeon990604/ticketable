@@ -8,22 +8,21 @@ import com.example.moduleticket.domain.reservation.context.SeatHoldContext;
 import com.example.moduleticket.domain.reservation.dto.ReservationCreateRequest;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.entity.ReserveSeat;
-import com.example.moduleticket.domain.reservation.enums.ReservationState;
-import com.example.moduleticket.domain.reservation.event.TicketEvent;
-import com.example.moduleticket.domain.reservation.event.publisher.TicketPublisher;
+import com.example.moduleticket.domain.reservation.event.ReservationCancelledEvent;
+import com.example.moduleticket.domain.reservation.event.ReservationCompleteEvent;
+import com.example.moduleticket.domain.reservation.event.ReservationCreatedEvent;
+import com.example.moduleticket.domain.reservation.event.ReservationExpiredEvent;
+import com.example.moduleticket.domain.reservation.event.publisher.ReservationEventPublisher;
 import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
-import com.example.moduleticket.domain.ticket.event.SeatHoldReleaseEvent;
 import com.example.moduleticket.domain.ticket.service.TicketService;
 import com.example.moduleticket.global.argumentresolver.AuthUser;
 import com.example.moduleticket.global.dto.ApiResponse;
 import com.example.moduleticket.global.exception.ServerException;
-import com.example.moduleticket.util.SeatHoldRedisUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,24 +38,24 @@ public class ReservationService {
 	private final ReservationValidator reservationValidator;
 	private final SeatHoldManager seatHoldManager;
 	private final TicketService ticketService;
-	private final ApplicationEventPublisher eventPublisher;
-	private final TicketPublisher ticketPublisher;
+	private final ReservationEventPublisher reservationEventPublisher;
 
 	public ApiResponse<Void> processReserve(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
 		Long gameId = reservationCreateRequest.getGameId();
 		List<Long> seatIds = reservationCreateRequest.getSeatIds();
 		Long memberId = auth.getMemberId();
 		try (SeatHoldContext hold = seatHoldManager.hold(memberId, gameId,seatIds)) {
-			reservationCreateService.createReservation(
+			Reservation reservation = reservationCreateService.createReservation(
 				auth,
 				reservationCreateRequest
 			);
-			// 캐시 이벤트 발생
-			TicketEvent ticketEvent = new TicketEvent(
-				reservationCreateRequest.getGameId(),
-				reservationCreateRequest.getSeatIds().get(0)
+			ReservationCreatedEvent reservationCreatedEvent = new ReservationCreatedEvent(
+				reservation.getId(),
+				auth.getMemberId(),
+				reservation.getGameId(),
+				seatIds
 			);
-			ticketPublisher.publish(ticketEvent);
+			reservationEventPublisher.handleReservationCreated(reservationCreatedEvent);
 			hold.markReservationSuccess();
 			return ApiResponse.messageOnly("예약이 완료되었습니다. 15분내로 결제를 완료해주세요");
 		}
@@ -91,7 +90,13 @@ public class ReservationService {
 		);
 
 		reservation.completePayment();
-		eventPublisher.publishEvent(new SeatHoldReleaseEvent(seatIds, gameId));
+		ReservationCompleteEvent reservationCompleteEvent = new ReservationCompleteEvent(
+			reservation.getId(),
+			authUser.getMemberId(),
+			gameId,
+			seatIds
+		);
+		reservationEventPublisher.handleReservationCompleted(reservationCompleteEvent);
 
 		return ApiResponse.messageOnly("티켓 결제가 완료되었습니다");
 	}
@@ -105,14 +110,13 @@ public class ReservationService {
 			List<Long> seatIds = reservation.getReserveSeats().stream().map(ReserveSeat::getSeatId).toList();
 			reservation.cancelPayment();
 
-			// 캐시 이벤트 발생
-			TicketEvent ticketEvent = new TicketEvent(
-					reservation.getGameId(),
-					seatIds.get(0)
+			ReservationCancelledEvent reservationCancelledEvent = new ReservationCancelledEvent(
+				reservation.getId(),
+				authUser.getMemberId(),
+				reservation.getGameId(),
+				seatIds
 			);
-			ticketPublisher.publish(ticketEvent);
-
-			eventPublisher.publishEvent(new SeatHoldReleaseEvent(seatIds, authUser.getMemberId()));
+			reservationEventPublisher.handleReservationCancelled(reservationCancelledEvent);
 			return;
 		}
 
@@ -131,11 +135,13 @@ public class ReservationService {
 			reservation.expiredPayment();
 			List<Long> seatIds = reservation.getReserveSeats().stream().map(ReserveSeat::getSeatId).toList();
 
-			TicketEvent ticketEvent = new TicketEvent(
-					reservation.getGameId(),
-					seatIds.get(0)
+			ReservationExpiredEvent reservationExpiredEvent = new ReservationExpiredEvent(
+				reservation.getId(),
+				reservation.getMemberId(),
+				reservation.getGameId(),
+				seatIds
 			);
-			ticketPublisher.publish(ticketEvent);
+			reservationEventPublisher.handleReservationExpired(reservationExpiredEvent);
 		}
 	}
 
