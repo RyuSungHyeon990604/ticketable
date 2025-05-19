@@ -3,6 +3,7 @@ package com.example.moduleticket.domain.reservation.service;
 import com.example.moduleticket.domain.reservation.dto.ReservationCreateRequest;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.entity.ReserveSeat;
+import com.example.moduleticket.domain.reservation.enums.ReservationState;
 import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
 import com.example.moduleticket.feign.GameClient;
 import com.example.moduleticket.feign.dto.SeatDetailDto;
@@ -25,9 +26,11 @@ public class ReservationCreateService {
 	@Transactional
 	public Reservation createReservation(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
 
+		//좌석 중복 검증
 		reservationValidator.checkTicketSeatDuplicate(reservationCreateRequest.getGameId(), reservationCreateRequest.getSeatIds());
 		reservationValidator.checkDuplicateReservation(reservationCreateRequest.getSeatIds(),reservationCreateRequest.getGameId() );
 
+		//좌석 정보를 가져온다
 		List<SeatDetailDto> seatDetailDtos = gameClient.getSeatsByGameAndSection(
 			reservationCreateRequest.getGameId(),
 			reservationCreateRequest.getSectionId(),
@@ -41,7 +44,7 @@ public class ReservationCreateService {
 		Reservation reservation = new Reservation(
 			auth.getMemberId(),
 			reservationCreateRequest.getGameId(),
-			"WAITING_PAYMENT",
+			ReservationState.WAITING_PAYMENT,
 			seatPrice + gamePrice
 		);
 

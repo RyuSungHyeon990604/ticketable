@@ -4,9 +4,11 @@ package com.example.moduleticket.domain.reservation.service;
 import static com.example.moduleticket.global.exception.ErrorCode.INVALID_RESERVATION_STATE;
 import static com.example.moduleticket.global.exception.ErrorCode.RESERVATION_NOT_FOUND;
 
+import com.example.moduleticket.domain.reservation.context.SeatHoldContext;
 import com.example.moduleticket.domain.reservation.dto.ReservationCreateRequest;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.entity.ReserveSeat;
+import com.example.moduleticket.domain.reservation.enums.ReservationState;
 import com.example.moduleticket.domain.reservation.event.TicketEvent;
 import com.example.moduleticket.domain.reservation.event.publisher.TicketPublisher;
 import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
@@ -35,18 +37,16 @@ public class ReservationService {
 	private final ReservationCreateService reservationCreateService;
 	private final ReservationPaymentService reservationPaymentService;
 	private final ReservationValidator reservationValidator;
-	private final SeatHoldRedisUtil seatHoldRedisUtil;
+	private final SeatHoldManager seatHoldManager;
 	private final TicketService ticketService;
 	private final ApplicationEventPublisher eventPublisher;
 	private final TicketPublisher ticketPublisher;
 
 	public ApiResponse<Void> processReserve(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
-		seatHoldRedisUtil.holdSeatAtomic(
-			reservationCreateRequest.getGameId(),
-			reservationCreateRequest.getSeatIds(),
-			String.valueOf(auth.getMemberId())
-		);
-		try {
+		Long gameId = reservationCreateRequest.getGameId();
+		List<Long> seatIds = reservationCreateRequest.getSeatIds();
+		Long memberId = auth.getMemberId();
+		try (SeatHoldContext hold = seatHoldManager.hold(memberId, gameId,seatIds)) {
 			reservationCreateService.createReservation(
 				auth,
 				reservationCreateRequest
@@ -57,11 +57,8 @@ public class ReservationService {
 				reservationCreateRequest.getSeatIds().get(0)
 			);
 			ticketPublisher.publish(ticketEvent);
-
+			hold.markReservationSuccess();
 			return ApiResponse.messageOnly("예약이 완료되었습니다. 15분내로 결제를 완료해주세요");
-		} catch (Exception e) {
-			seatHoldRedisUtil.releaseSeatAtomic(reservationCreateRequest.getSeatIds(),reservationCreateRequest.getGameId());
-			throw e;
 		}
 	}
 
@@ -70,11 +67,14 @@ public class ReservationService {
 		Reservation reservation = reservationRepository.findByIdMemberId(reservationId, authUser.getMemberId())
 			.orElseThrow(() -> new ServerException(RESERVATION_NOT_FOUND));
 
-		if (reservation.getState().equals("COMPLETE_PAYMENT")) {
+		if (reservation.isCompletePayment()) {
 			log.info("이미 결제된 예약입니다.");
 			return ApiResponse.messageOnly("이미 결제된 예약입니다.");
 		}
 
+		if(!reservation.isPayable()) {
+			return ApiResponse.messageOnly("결제를 진행 할 수 없는 예약내역입니다.");
+		}
 		List<Long> seatIds = reservation.getReserveSeats().stream().map(ReserveSeat::getSeatId).toList();
 		Long gameId = reservation.getGameId();
 
@@ -101,7 +101,7 @@ public class ReservationService {
 	public void cancelReservation(AuthUser authUser, Long reservationId) {
 		Reservation reservation = reservationRepository.findByIdMemberId(reservationId, authUser.getMemberId())
 			.orElseThrow(() -> new ServerException(RESERVATION_NOT_FOUND));
-		if(reservation.getState().equals("WAITING_PAYMENT")) {
+		if(reservation.isCancelable()) {
 			List<Long> seatIds = reservation.getReserveSeats().stream().map(ReserveSeat::getSeatId).toList();
 			reservation.cancelPayment();
 

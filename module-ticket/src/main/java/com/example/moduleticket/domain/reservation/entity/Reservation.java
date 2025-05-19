@@ -1,9 +1,12 @@
 package com.example.moduleticket.domain.reservation.entity;
 
+import com.example.moduleticket.domain.reservation.enums.ReservationState;
 import com.example.moduleticket.global.entity.Timestamped;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -31,7 +34,8 @@ public class Reservation extends Timestamped {
 
 	//WAITING_PAYMENT, COMPLETE_PAYMENT, CANCEL_PAYMENT, EXPIRED_PAYMENT
 	@Column(nullable = false)
-	private String state;
+	@Enumerated(EnumType.STRING)
+	private ReservationState state;
 
 	@Column(nullable = false)
 	private int totalPrice;
@@ -39,7 +43,7 @@ public class Reservation extends Timestamped {
 	@OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<ReserveSeat> reserveSeats = new HashSet<>();
 
-	public Reservation(Long memberId, Long gameId, String state, int totalPrice) {
+	public Reservation(Long memberId, Long gameId, ReservationState state, int totalPrice) {
 		this.memberId = memberId;
 		this.gameId = gameId;
 		this.state = state;
@@ -52,19 +56,30 @@ public class Reservation extends Timestamped {
 	}
 
 	public void completePayment() {
-		this.state = "COMPLETE_PAYMENT";
+		this.state = ReservationState.COMPLETE_PAYMENT;
 	}
 
 	public void cancelPayment() {
-		this.state = "CANCEL_PAYMENT";
+		this.state = ReservationState.CANCEL_PAYMENT;
 	}
 
 	public void expiredPayment() {
-		this.state = "EXPIRED_PAYMENT";
+		this.state = ReservationState.EXPIRED_PAYMENT;
 	}
 
 	public void markUnknownFailed() {
-		this.state = "UNKNOWN_FAILED";
+		this.state = ReservationState.UNKNOWN;
 	}
 
+	public boolean isCompletePayment() {
+		return this.state == ReservationState.COMPLETE_PAYMENT;
+	}
+
+	public boolean isPayable() {
+		return state == ReservationState.WAITING_PAYMENT;
+	}
+
+	public boolean isCancelable() {
+		 return state == ReservationState.WAITING_PAYMENT;
+	}
 }
