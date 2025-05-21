@@ -5,6 +5,7 @@ import static com.example.moduleticket.global.exception.ErrorCode.SEAT_HOLD_EXPI
 import static com.example.moduleticket.global.exception.ErrorCode.TICKET_ALREADY_RESERVED;
 
 import com.example.moduleticket.domain.reservation.entity.Reservation;
+import com.example.moduleticket.domain.reservation.enums.ReservationState;
 import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
 import com.example.moduleticket.domain.ticket.repository.TicketSeatRepository;
 import com.example.moduleticket.global.argumentresolver.AuthUser;
@@ -47,7 +48,7 @@ public class ReservationValidator {
 	public void checkDuplicateReservation(List<Long> seatIds, Long gameId) {
 		if(reservationRepository.existsByReserveSeats_SeatIdInAndStateAndGameId(
 			seatIds,
-			"WAITING_PAYMENT",
+			ReservationState.WAITING_PAYMENT,
 			gameId)
 		) {
 			throw new ServerException(TICKET_ALREADY_RESERVED);

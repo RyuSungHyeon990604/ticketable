@@ -11,21 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name = "module-game", configuration = OpenFeignConfig.class)
 public interface GameClient {
-
-	@GetMapping("/api/internal/games/{gameId}")
-	GameDto getGame(@PathVariable Long gameId);
-
 	@GetMapping("/api/internal/seats/by-section")
 	List<SeatDetailDto> getSeatsByGameAndSection(
 			@RequestParam Long gameId,
 			@RequestParam Long sectionId,
 			@RequestParam List<Long> seatIds
 	);
-
-	@GetMapping("/api/internal/seats/by-game")
-	List<SeatDetailDto> getSeatsByGame(
-			@RequestParam Long gameId,
-			@RequestParam List<Long> seatIds
-	);
-
 }

@@ -4,15 +4,19 @@ import com.example.grpc.ticket.BookedSeatsRequest;
 import com.example.grpc.ticket.BookedSeatsResponse;
 import com.example.grpc.ticket.TicketServiceGrpc;
 import lombok.RequiredArgsConstructor;
+import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class GameGrpcClientService {
-    private final TicketServiceGrpc.TicketServiceBlockingStub ticketServiceBlockingStub;
+
+    @GrpcClient("ticket")
+    private TicketServiceGrpc.TicketServiceBlockingStub ticketServiceBlockingStub;
     public Set<Long> getBookedSeatIds(Long gameId) {
         BookedSeatsRequest request = BookedSeatsRequest.newBuilder()
                 .setGameId(gameId)

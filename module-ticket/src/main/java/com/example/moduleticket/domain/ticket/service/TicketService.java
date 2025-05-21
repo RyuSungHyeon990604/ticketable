@@ -102,11 +102,10 @@ public class TicketService {
 	 */
 	@Transactional
 	public void deleteAllTicketsByCanceledGame(Long gameId) {
-		GameDto game = gameClient.getGame(gameId);
-		if(game != null ){
+		List<RefundDto> refundDtoList = ticketRepository.findRefundDtoByGameId(gameId);
+		if(refundDtoList == null || refundDtoList.isEmpty()){
 			throw new ServerException(ALREADY_CANCELED_GAME);
 		}
-		List<RefundDto> refundDtoList = ticketRepository.findRefundDtoByGameId(gameId);
 		refundQueueService.enqueueRefundTicket(refundDtoList);
 		ticketRepository.softDeleteAllByGameId(gameId);
 	}

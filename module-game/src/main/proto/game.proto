@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.example.grpc.game";
+option java_outer_classname = "GameProto";
+
+package game;
+
+service GameService {
+  rpc getSeatsByGameAndSection (SeatInfo) returns (SeatDetailDtoList);
+}
+
+message SeatInfo {
+  int64 gameId = 1;
+  int64 sectionId = 2;
+  repeated int64 seatIds = 3;
+}
+
+message SeatDetailDto {
+  int64 seatId = 1;
+  int64 sectionId = 2;
+  int64 gameId = 3;
+  int32 gamePrice = 4;
+  int32 sectionPrice = 5;
+}
+
+message SeatDetailDtoList {
+  repeated SeatDetailDto seatDetailDtoList = 1;
+}

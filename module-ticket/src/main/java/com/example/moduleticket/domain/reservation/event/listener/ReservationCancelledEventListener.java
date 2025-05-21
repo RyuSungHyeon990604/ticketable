@@ -8,6 +8,7 @@ import com.example.moduleticket.util.SeatHoldRedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -25,6 +26,7 @@ public class ReservationCancelledEventListener {
 		seatHoldRedisUtil.releaseSeatAtomic(event.getSeatIds(), event.getGameId());
 	}
 
+	@Async
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void refreshCache(ReservationCancelledEvent event){
 		log.debug("예약 취소 캐시 갱신 : reservationId = {}", event.getReservationId());

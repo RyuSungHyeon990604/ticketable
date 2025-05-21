@@ -1,13 +1,12 @@
 package com.example.moduleticket.domain.reservation.repository;
 
 import com.example.moduleticket.domain.reservation.entity.Reservation;
+import com.example.moduleticket.domain.reservation.enums.ReservationState;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
@@ -40,5 +39,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 	)
 	List<Reservation> findExpiredReservations(LocalDateTime expiredLimit);
 
-	boolean existsByReserveSeats_SeatIdInAndStateAndGameId(List<Long> reserveSeatIds, String state, Long gameId);
+	boolean existsByReserveSeats_SeatIdInAndStateAndGameId(List<Long> reserveSeatIds, ReservationState state, Long gameId);
 }

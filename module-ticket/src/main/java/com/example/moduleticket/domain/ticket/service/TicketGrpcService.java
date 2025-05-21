@@ -6,11 +6,12 @@ import com.example.grpc.ticket.TicketServiceGrpc;
 import com.example.moduleticket.domain.reservation.service.ReservationService;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
+import net.devh.boot.grpc.server.service.GrpcService;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-@Service
+@GrpcService
 @RequiredArgsConstructor
 public class TicketGrpcService extends TicketServiceGrpc.TicketServiceImplBase {
     private final ReservationService reservationService; // 기존 좌석 조회 서비스
