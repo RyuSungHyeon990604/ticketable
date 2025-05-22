@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class SeatHoldManager {
+public class SeatHoldService {
 	private final SeatHoldRedisUtil seatHoldRedisUtil;
 
 	public SeatHoldContext hold(Long memberId, Long gameId, List<Long> seatIds) {

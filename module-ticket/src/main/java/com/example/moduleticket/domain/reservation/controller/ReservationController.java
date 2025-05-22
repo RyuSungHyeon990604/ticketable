@@ -2,7 +2,6 @@ package com.example.moduleticket.domain.reservation.controller;
 
 import com.example.moduleticket.domain.reservation.dto.ReservationCreateRequest;
 import com.example.moduleticket.domain.reservation.service.ReservationService;
-import com.example.moduleticket.domain.ticket.dto.response.TicketResponse;
 import com.example.moduleticket.global.annotation.LoginUser;
 import com.example.moduleticket.global.argumentresolver.AuthUser;
 import com.example.moduleticket.global.dto.ApiResponse;
@@ -28,7 +27,7 @@ public class ReservationController {
 		@LoginUser AuthUser authUser,
 		@RequestBody ReservationCreateRequest reservationCreateRequest
 	) {
-		return ResponseEntity.ok(reservationService.processReserve(authUser, reservationCreateRequest));
+		return ResponseEntity.ok(reservationService.createReservationWithHold(authUser, reservationCreateRequest));
 	}
 
 	@PostMapping("/v1/reservations/{reservationId}")
@@ -36,7 +35,7 @@ public class ReservationController {
 		@LoginUser AuthUser authUser,
 		@PathVariable Long reservationId
 	) {
-		return ResponseEntity.ok(reservationService.processReservationCompletion(authUser, reservationId));
+		return ResponseEntity.ok(reservationService.completeReservationPayment(authUser, reservationId));
 	}
 
 	@GetMapping("/internal/reservations/games/{gameId}")

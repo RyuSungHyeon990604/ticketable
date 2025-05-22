@@ -10,7 +10,6 @@ import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.entity.ReserveSeat;
 import com.example.moduleticket.domain.reservation.event.ReservationCancelledEvent;
 import com.example.moduleticket.domain.reservation.event.ReservationCompleteEvent;
-import com.example.moduleticket.domain.reservation.event.ReservationCreatedEvent;
 import com.example.moduleticket.domain.reservation.event.ReservationExpiredEvent;
 import com.example.moduleticket.domain.reservation.event.publisher.ReservationEventPublisher;
 import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
@@ -36,33 +35,26 @@ public class ReservationService {
 	private final ReservationCreateService reservationCreateService;
 	private final ReservationPaymentService reservationPaymentService;
 	private final ReservationValidator reservationValidator;
-	private final SeatHoldManager seatHoldManager;
+	private final SeatHoldService seatHoldService;
 	private final TicketService ticketService;
 	private final ReservationEventPublisher reservationEventPublisher;
 
-	public ApiResponse<Void> processReserve(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
+	public ApiResponse<Void> createReservationWithHold(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
 		Long gameId = reservationCreateRequest.getGameId();
 		List<Long> seatIds = reservationCreateRequest.getSeatIds();
 		Long memberId = auth.getMemberId();
-		try (SeatHoldContext hold = seatHoldManager.hold(memberId, gameId,seatIds)) {
-			Reservation reservation = reservationCreateService.createReservation(
+		try (SeatHoldContext hold = seatHoldService.hold(memberId, gameId,seatIds)) {
+			reservationCreateService.createReservation(
 				auth,
 				reservationCreateRequest
 			);
-			ReservationCreatedEvent reservationCreatedEvent = new ReservationCreatedEvent(
-				reservation.getId(),
-				auth.getMemberId(),
-				reservation.getGameId(),
-				seatIds
-			);
-			reservationEventPublisher.handleReservationCreated(reservationCreatedEvent);
 			hold.markReservationSuccess();
 			return ApiResponse.messageOnly("예약이 완료되었습니다. 15분내로 결제를 완료해주세요");
 		}
 	}
 
 	@Transactional
-	public ApiResponse<Void> processReservationCompletion(AuthUser authUser, Long reservationId) {
+	public ApiResponse<Void> completeReservationPayment(AuthUser authUser, Long reservationId) {
 		Reservation reservation = reservationRepository.findByIdMemberId(reservationId, authUser.getMemberId())
 			.orElseThrow(() -> new ServerException(RESERVATION_NOT_FOUND));
 

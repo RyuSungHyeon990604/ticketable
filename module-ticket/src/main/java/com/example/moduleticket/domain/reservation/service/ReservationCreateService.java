@@ -6,6 +6,8 @@ import com.example.moduleticket.domain.reservation.dto.ReservationCreateRequest;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.entity.ReserveSeat;
 import com.example.moduleticket.domain.reservation.enums.ReservationState;
+import com.example.moduleticket.domain.reservation.event.ReservationCreatedEvent;
+import com.example.moduleticket.domain.reservation.event.publisher.ReservationEventPublisher;
 import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
 import com.example.moduleticket.feign.GameClient;
 import com.example.moduleticket.global.argumentresolver.AuthUser;
@@ -25,6 +27,7 @@ public class ReservationCreateService {
 	private final ReservationValidator reservationValidator;
 	private final GameClient gameClient;
 	private final GameGrpcClient gameGrpcClient;
+	private final ReservationEventPublisher reservationEventPublisher;
 
 	@Transactional
 	public Reservation createReservation(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
@@ -70,6 +73,14 @@ public class ReservationCreateService {
 			reservation.addSeat(reserveSeat);
 		}
 		reservationRepository.save(reservation);
+
+		ReservationCreatedEvent reservationCreatedEvent = new ReservationCreatedEvent(
+			reservation.getId(),
+			auth.getMemberId(),
+			reservation.getGameId(),
+			reservationCreateRequest.getSeatIds()
+		);
+		reservationEventPublisher.handleReservationCreated(reservationCreatedEvent);
 
 		return reservation;
 	}
