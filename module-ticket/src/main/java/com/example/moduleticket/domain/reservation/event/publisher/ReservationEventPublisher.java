@@ -1,7 +1,7 @@
 package com.example.moduleticket.domain.reservation.event.publisher;
 
 import com.example.moduleticket.domain.reservation.event.ReservationCancelledEvent;
-import com.example.moduleticket.domain.reservation.event.ReservationCompleteEvent;
+import com.example.moduleticket.domain.reservation.event.ReservationPaymentComplete;
 import com.example.moduleticket.domain.reservation.event.ReservationCreatedEvent;
 import com.example.moduleticket.domain.reservation.event.ReservationExpiredEvent;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class ReservationEventPublisher {
 		applicationEventPublisher.publishEvent(reservationExpiredEvent);
 	}
 
-	public void handleReservationCompleted(ReservationCompleteEvent reservationCompleteEvent) {
+	public void handleReservationCompleted(ReservationPaymentComplete reservationCompleteEvent) {
 		applicationEventPublisher.publishEvent(reservationCompleteEvent);
 	}
 

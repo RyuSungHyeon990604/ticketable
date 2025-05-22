@@ -66,8 +66,8 @@ public class TicketService {
 
 
 	@Transactional
-	public void issueTicketFromReservation(AuthUser auth, List<Long> seatIds, Reservation reservation) {
-		TicketContext ticketContext = ticketCreateService.createTicket(auth, seatIds, reservation);
+	public void issueTicketFromReservation(Long memberId, List<Long> seatIds, Long reservationId) {
+		TicketContext ticketContext = ticketCreateService.createTicket(memberId, seatIds, reservationId);
 		ticketPaymentService.create(
 			ticketContext.getTicket(),
 			ticketContext.getMemberId(),

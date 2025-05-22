@@ -9,11 +9,10 @@ import com.example.moduleticket.domain.reservation.dto.ReservationCreateRequest;
 import com.example.moduleticket.domain.reservation.entity.Reservation;
 import com.example.moduleticket.domain.reservation.entity.ReserveSeat;
 import com.example.moduleticket.domain.reservation.event.ReservationCancelledEvent;
-import com.example.moduleticket.domain.reservation.event.ReservationCompleteEvent;
 import com.example.moduleticket.domain.reservation.event.ReservationExpiredEvent;
+import com.example.moduleticket.domain.reservation.event.ReservationPaymentComplete;
 import com.example.moduleticket.domain.reservation.event.publisher.ReservationEventPublisher;
 import com.example.moduleticket.domain.reservation.repository.ReservationRepository;
-import com.example.moduleticket.domain.ticket.service.TicketService;
 import com.example.moduleticket.global.argumentresolver.AuthUser;
 import com.example.moduleticket.global.dto.ApiResponse;
 import com.example.moduleticket.global.exception.ServerException;
@@ -36,7 +35,6 @@ public class ReservationService {
 	private final ReservationPaymentService reservationPaymentService;
 	private final ReservationValidator reservationValidator;
 	private final SeatHoldService seatHoldService;
-	private final TicketService ticketService;
 	private final ReservationEventPublisher reservationEventPublisher;
 
 	public ApiResponse<Void> createReservationWithHold(AuthUser auth, ReservationCreateRequest reservationCreateRequest) {
@@ -73,22 +71,15 @@ public class ReservationService {
 		reservationValidator.validateReservationForComplete(authUser, gameId, seatIds, reservation);
 
 		reservationPaymentService.reservePayment(authUser, reservationId, reservation.getTotalPrice(), seatIds, gameId);
-
-		//티켓 생성
-		ticketService.issueTicketFromReservation(
-			authUser,
-			seatIds,
-			reservation
-		);
-
 		reservation.completePayment();
-		ReservationCompleteEvent reservationCompleteEvent = new ReservationCompleteEvent(
+
+		ReservationPaymentComplete reservationPaymentComplete = new ReservationPaymentComplete(
 			reservation.getId(),
 			authUser.getMemberId(),
 			gameId,
 			seatIds
 		);
-		reservationEventPublisher.handleReservationCompleted(reservationCompleteEvent);
+		reservationEventPublisher.handleReservationCompleted(reservationPaymentComplete);
 
 		return ApiResponse.messageOnly("티켓 결제가 완료되었습니다");
 	}

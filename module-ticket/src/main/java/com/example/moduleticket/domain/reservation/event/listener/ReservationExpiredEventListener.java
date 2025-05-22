@@ -24,7 +24,7 @@ public class ReservationExpiredEventListener {
 		seatHoldRedisUtil.releaseSeatAtomic(event.getSeatIds(), event.getGameId());
 	}
 
-	@Async
+	@Async("refreshCacheThreadPool")
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void refreshCache(ReservationExpiredEvent event){
 		log.debug("예약 만료 캐시 갱신 수행 : reservationId = {}", event.getReservationId());

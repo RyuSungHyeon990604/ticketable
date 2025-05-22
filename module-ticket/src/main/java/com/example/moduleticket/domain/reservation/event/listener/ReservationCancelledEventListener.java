@@ -24,7 +24,7 @@ public class ReservationCancelledEventListener {
 		seatHoldRedisUtil.releaseSeatAtomic(event.getSeatIds(), event.getGameId());
 	}
 
-	@Async
+	@Async("refreshCacheThreadPool")
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void refreshCache(ReservationCancelledEvent event){
 		log.debug("예약 취소 캐시 갱신 : reservationId = {}", event.getReservationId());

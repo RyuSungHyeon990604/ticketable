@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class ReservationCompleteEvent {
+public class ReservationPaymentComplete {
 	private final Long reservationId;
 	private final Long memberId;
 	private final Long gameId;
