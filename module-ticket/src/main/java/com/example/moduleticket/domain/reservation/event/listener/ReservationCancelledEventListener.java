@@ -2,8 +2,6 @@ package com.example.moduleticket.domain.reservation.event.listener;
 
 import com.example.moduleticket.domain.reservation.event.ReservationCancelledEvent;
 import com.example.moduleticket.domain.reservation.event.TicketEvent;
-import com.example.moduleticket.domain.reservation.service.SeatHoldManager;
-import com.example.moduleticket.domain.ticket.entity.Ticket;
 import com.example.moduleticket.util.SeatHoldRedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
